@@ -99,6 +99,17 @@ app.disable('x-powered-by');
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: '200kb' }));
 
+// SEO: forceer één canonieke versie van de site. Zonder dit ziet Google
+// arbeidsdeskundig.com én www.arbeidsdeskundig.com als twee aparte URL's met
+// identieke content — met een 301 (permanente redirect) wordt overal
+// eenduidig de www-versie de "echte" URL, in lijn met BASE_URL hieronder.
+app.use((req, res, next) => {
+    if (req.hostname === 'arbeidsdeskundig.com') {
+        return res.redirect(301, `https://www.arbeidsdeskundig.com${req.originalUrl}`);
+    }
+    next();
+});
+
 // Statische assets (indien later toegevoegd, bv. /public/afbeeldingen) cachen agressief.
 // De hoofd-HTML zelf wordt NIET via express.static geserveerd, want die krijgt
 // per route aangepaste <head>-tags — zie renderPage() hieronder.

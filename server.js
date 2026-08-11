@@ -436,7 +436,7 @@ ${personas.map((p) => `- [${p.title}](${BASE_URL}/voor/${p.slug}): ${p.meta}`).j
 // ---------------------------------------------------------------------------
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'arbeidsdeskundig.com <noreply@arbeidsdeskundig.com>';
-const NOTIFY_EMAIL = 'info@arbeidsdeskundig.com';
+const NOTIFY_EMAIL = 'info@matchvermogen.nl';
 
 async function sendEmail({ to, subject, html, replyTo, attachments }) {
     if (!RESEND_API_KEY) {
@@ -784,6 +784,12 @@ app.post('/api/checklist', async (req, res) => {
         });
     }
     res.json({ ok: true });
+});
+
+// Google Search Console eigendomsverificatie (HTML-bestandsmethode). De inhoud
+// moet exact overeenkomen met wat Google in het te downloaden bestand zet.
+app.get('/googlea9befd16dd1488a4.html', (req, res) => {
+    res.type('text/plain').send('google-site-verification: googlea9befd16dd1488a4.html');
 });
 
 app.get('/healthz', (req, res) => res.status(200).send('ok'));

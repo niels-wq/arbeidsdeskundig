@@ -710,21 +710,26 @@ app.post('/api/offerte-pdf', async (req, res) => {
         const voornaam = naam.split(' ')[0] || 'daar';
         const attachments = [{ filename: 'offerte-arbeidsdeskundig-onderzoek.pdf', content: pdfBase64 }];
 
-        await sendEmail({
+        // De PDF gaat meteen terug naar de browser — de gebruiker hoeft niet te
+        // wachten op de e-mailverzending. Traagheid of een hapering bij Resend
+        // mag nooit de download zelf laten mislukken (zie ook: "unexpected end
+        // of JSON input", precies het symptoom van een te lang wachtende respons).
+        res.json({ ok: true, pdfBase64 });
+
+        sendEmail({
             to: email,
             subject: 'Je vrijblijvende offerte — arbeidsdeskundig.com',
-            html: `<p>Bedankt, ${escapeHtml(voornaam)} — hierbij je vrijblijvende offerte als PDF. Geen verplichtingen: neem gerust de tijd, en stel vooral vragen als iets niet duidelijk is.</p>`,
+            html: `<p>Bedankt, ${escapeHtml(voornaam)} — hierbij je vrijblijvende offerte als PDF. Geen verplichtingen: neem gerust de tijd, en stel vooral vragen as iets niet duidelijk is.</p>`,
             attachments,
-        });
-        await sendEmail({
+        }).catch((err) => console.error('Offerte-PDF: e-mail naar aanvrager mislukt (achtergrond):', err));
+
+        sendEmail({
             to: NOTIFY_EMAIL,
             subject: `Nieuwe PDF-offerte gegenereerd — ${naam}`,
             html: `<h2>Vrijblijvende offerte gegenereerd via arbeidsdeskundig.com</h2><table>${fieldsToHtml(fields)}</table>`,
             replyTo: email,
             attachments,
-        });
-
-        res.json({ ok: true, pdfBase64 });
+        }).catch((err) => console.error('Offerte-PDF: notificatiemail mislukt (achtergrond):', err));
     } catch (err) {
         console.error('Fout bij genereren offerte-PDF:', err);
         res.status(500).json({ ok: false, error: 'Er ging iets mis bij het genereren van de offerte.' });

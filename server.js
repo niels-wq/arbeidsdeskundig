@@ -103,8 +103,14 @@ app.use(express.json({ limit: '200kb' }));
 // arbeidsdeskundig.com én www.arbeidsdeskundig.com als twee aparte URL's met
 // identieke content — met een 301 (permanente redirect) wordt overal
 // eenduidig de www-versie de "echte" URL, in lijn met BASE_URL hieronder.
+//
+// BELANGRIJK: /api/-aanroepen slaan we hier bewust over. Een 301 op een POST
+// laat de browser het verzoek herhalen als GET, zonder de meegestuurde data —
+// daarmee zou elk formulier (offerte, aanmelden, checklist) stuklopen zodra
+// iemand de site via het kale domein had geopend. Er is voor API-aanroepen
+// ook geen SEO-reden om te redirecten; Google indexeert die toch niet.
 app.use((req, res, next) => {
-    if (req.hostname === 'arbeidsdeskundig.com') {
+    if (req.hostname === 'arbeidsdeskundig.com' && !req.path.startsWith('/api/')) {
         return res.redirect(301, `https://www.arbeidsdeskundig.com${req.originalUrl}`);
     }
     next();

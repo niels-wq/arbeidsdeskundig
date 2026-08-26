@@ -99,23 +99,6 @@ app.disable('x-powered-by');
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: '200kb' }));
 
-// SEO: forceer één canonieke versie van de site. Zonder dit ziet Google
-// arbeidsdeskundig.com én www.arbeidsdeskundig.com als twee aparte URL's met
-// identieke content — met een 301 (permanente redirect) wordt overal
-// eenduidig de www-versie de "echte" URL, in lijn met BASE_URL hieronder.
-//
-// BELANGRIJK: /api/-aanroepen slaan we hier bewust over. Een 301 op een POST
-// laat de browser het verzoek herhalen als GET, zonder de meegestuurde data —
-// daarmee zou elk formulier (offerte, aanmelden, checklist) stuklopen zodra
-// iemand de site via het kale domein had geopend. Er is voor API-aanroepen
-// ook geen SEO-reden om te redirecten; Google indexeert die toch niet.
-app.use((req, res, next) => {
-    if (req.hostname === 'arbeidsdeskundig.com' && !req.path.startsWith('/api/')) {
-        return res.redirect(301, `https://www.arbeidsdeskundig.com${req.originalUrl}`);
-    }
-    next();
-});
-
 // Statische assets (indien later toegevoegd, bv. /public/afbeeldingen) cachen agressief.
 // De hoofd-HTML zelf wordt NIET via express.static geserveerd, want die krijgt
 // per route aangepaste <head>-tags — zie renderPage() hieronder.
@@ -453,7 +436,7 @@ ${personas.map((p) => `- [${p.title}](${BASE_URL}/voor/${p.slug}): ${p.meta}`).j
 // ---------------------------------------------------------------------------
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'arbeidsdeskundig.com <noreply@arbeidsdeskundig.com>';
-const NOTIFY_EMAIL = 'info@matchvermogen.nl';
+const NOTIFY_EMAIL = 'info@arbeidsdeskundig.com';
 
 async function sendEmail({ to, subject, html, replyTo, attachments }) {
     if (!RESEND_API_KEY) {
@@ -716,26 +699,21 @@ app.post('/api/offerte-pdf', async (req, res) => {
         const voornaam = naam.split(' ')[0] || 'daar';
         const attachments = [{ filename: 'offerte-arbeidsdeskundig-onderzoek.pdf', content: pdfBase64 }];
 
-        // De PDF gaat meteen terug naar de browser — de gebruiker hoeft niet te
-        // wachten op de e-mailverzending. Traagheid of een hapering bij Resend
-        // mag nooit de download zelf laten mislukken (zie ook: "unexpected end
-        // of JSON input", precies het symptoom van een te lang wachtende respons).
-        res.json({ ok: true, pdfBase64 });
-
-        sendEmail({
+        await sendEmail({
             to: email,
             subject: 'Je vrijblijvende offerte — arbeidsdeskundig.com',
-            html: `<p>Bedankt, ${escapeHtml(voornaam)} — hierbij je vrijblijvende offerte als PDF. Geen verplichtingen: neem gerust de tijd, en stel vooral vragen as iets niet duidelijk is.</p>`,
+            html: `<p>Bedankt, ${escapeHtml(voornaam)} — hierbij je vrijblijvende offerte als PDF. Geen verplichtingen: neem gerust de tijd, en stel vooral vragen als iets niet duidelijk is.</p>`,
             attachments,
-        }).catch((err) => console.error('Offerte-PDF: e-mail naar aanvrager mislukt (achtergrond):', err));
-
-        sendEmail({
+        });
+        await sendEmail({
             to: NOTIFY_EMAIL,
             subject: `Nieuwe PDF-offerte gegenereerd — ${naam}`,
             html: `<h2>Vrijblijvende offerte gegenereerd via arbeidsdeskundig.com</h2><table>${fieldsToHtml(fields)}</table>`,
             replyTo: email,
             attachments,
-        }).catch((err) => console.error('Offerte-PDF: notificatiemail mislukt (achtergrond):', err));
+        });
+
+        res.json({ ok: true, pdfBase64 });
     } catch (err) {
         console.error('Fout bij genereren offerte-PDF:', err);
         res.status(500).json({ ok: false, error: 'Er ging iets mis bij het genereren van de offerte.' });
@@ -806,12 +784,6 @@ app.post('/api/checklist', async (req, res) => {
         });
     }
     res.json({ ok: true });
-});
-
-// Google Search Console eigendomsverificatie (HTML-bestandsmethode). De inhoud
-// moet exact overeenkomen met wat Google in het te downloaden bestand zet.
-app.get('/googlea9befd16dd1488a4.html', (req, res) => {
-    res.type('text/plain').send('google-site-verification: googlea9befd16dd1488a4.html');
 });
 
 app.get('/healthz', (req, res) => res.status(200).send('ok'));

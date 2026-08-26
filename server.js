@@ -12,6 +12,16 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
+
+// Vangnet: een onverwachte fout ergens in het proces mag de server nooit
+// stilzwijgend laten crashen (dat zou lopende verzoeken afbreken met een
+// leeg/ongeldig antwoord — precies het "unexpected end of JSON input"-symptoom).
+process.on('uncaughtException', (err) => {
+    console.error('[proces] Onverwachte fout (proces blijft draaien):', err);
+});
+process.on('unhandledRejection', (err) => {
+    console.error('[proces] Onverwachte afgewezen promise (proces blijft draaien):', err);
+});
 const PORT = process.env.PORT || 3000;
 const BASE_URL = process.env.BASE_URL || 'https://www.arbeidsdeskundig.com';
 
@@ -98,6 +108,23 @@ app.disable('x-powered-by');
 // strikte CSP, dan hoort daar eerst een refactor naar externe .js/.css bij.
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: '200kb' }));
+
+// SEO: forceer één canonieke versie van de site. Zonder dit ziet Google
+// arbeidsdeskundig.com én www.arbeidsdeskundig.com als twee aparte URL's met
+// identieke content — met een 301 (permanente redirect) wordt overal
+// eenduidig de www-versie de "echte" URL, in lijn met BASE_URL hieronder.
+//
+// BELANGRIJK: /api/-aanroepen slaan we hier bewust over. Een 301 op een POST
+// laat de browser het verzoek herhalen als GET, zonder de meegestuurde data —
+// daarmee zou elk formulier (offerte, aanmelden, checklist) stuklopen zodra
+// iemand de site via het kale domein had geopend. Er is voor API-aanroepen
+// ook geen SEO-reden om te redirecten; Google indexeert die toch niet.
+app.use((req, res, next) => {
+    if (req.hostname === 'arbeidsdeskundig.com' && !req.path.startsWith('/api/')) {
+        return res.redirect(301, `https://www.arbeidsdeskundig.com${req.originalUrl}`);
+    }
+    next();
+});
 
 // Statische assets (indien later toegevoegd, bv. /public/afbeeldingen) cachen agressief.
 // De hoofd-HTML zelf wordt NIET via express.static geserveerd, want die krijgt
@@ -436,7 +463,7 @@ ${personas.map((p) => `- [${p.title}](${BASE_URL}/voor/${p.slug}): ${p.meta}`).j
 // ---------------------------------------------------------------------------
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'arbeidsdeskundig.com <noreply@arbeidsdeskundig.com>';
-const NOTIFY_EMAIL = 'info@arbeidsdeskundig.com';
+const NOTIFY_EMAIL = 'info@matchvermogen.nl';
 
 async function sendEmail({ to, subject, html, replyTo, attachments }) {
     if (!RESEND_API_KEY) {
@@ -685,38 +712,54 @@ function genereerOffertePdf(fields) {
 }
 
 app.post('/api/offerte-pdf', async (req, res) => {
+    console.log('[offerte-pdf] verzoek ontvangen');
     const fields = req.body || {};
     const naam = (fields.naam || '').trim();
     const email = (fields.email || '').trim();
     const telefoon = (fields.telefoon || '').trim();
     if (!naam || !email || !telefoon) {
+        console.log('[offerte-pdf] verplichte velden ontbreken, 400');
         return res.status(400).json({ ok: false, error: 'Naam, e-mail en telefoon zijn verplicht.' });
     }
 
     try {
+        console.log('[offerte-pdf] PDF genereren...');
         const pdfBuffer = await genereerOffertePdf(fields);
+        console.log('[offerte-pdf] PDF klaar,', pdfBuffer.length, 'bytes');
         const pdfBase64 = pdfBuffer.toString('base64');
         const voornaam = naam.split(' ')[0] || 'daar';
         const attachments = [{ filename: 'offerte-arbeidsdeskundig-onderzoek.pdf', content: pdfBase64 }];
 
-        await sendEmail({
+        // De PDF gaat rechtstreeks als bestand terug (geen JSON/base64-omweg meer).
+        // Dat scheelt ~33% aan bytes, en sluit uit dat een onderweg afgekapte
+        // respons ooit nog als "unexpected end of JSON input" kan verschijnen —
+        // er wordt voor de PDF zelf nergens meer JSON geparsed.
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename="offerte-arbeidsdeskundig-onderzoek.pdf"');
+        res.setHeader('X-Voornaam', encodeURIComponent(voornaam));
+        res.setHeader('Access-Control-Expose-Headers', 'X-Voornaam');
+        res.send(pdfBuffer);
+        console.log('[offerte-pdf] PDF-bestand verstuurd naar browser');
+
+        sendEmail({
             to: email,
             subject: 'Je vrijblijvende offerte — arbeidsdeskundig.com',
             html: `<p>Bedankt, ${escapeHtml(voornaam)} — hierbij je vrijblijvende offerte als PDF. Geen verplichtingen: neem gerust de tijd, en stel vooral vragen als iets niet duidelijk is.</p>`,
             attachments,
-        });
-        await sendEmail({
+        }).then(() => console.log('[offerte-pdf] e-mail naar aanvrager verstuurd')).catch((err) => console.error('[offerte-pdf] e-mail naar aanvrager mislukt:', err));
+
+        sendEmail({
             to: NOTIFY_EMAIL,
             subject: `Nieuwe PDF-offerte gegenereerd — ${naam}`,
             html: `<h2>Vrijblijvende offerte gegenereerd via arbeidsdeskundig.com</h2><table>${fieldsToHtml(fields)}</table>`,
             replyTo: email,
             attachments,
-        });
-
-        res.json({ ok: true, pdfBase64 });
+        }).then(() => console.log('[offerte-pdf] notificatiemail verstuurd')).catch((err) => console.error('[offerte-pdf] notificatiemail mislukt:', err));
     } catch (err) {
-        console.error('Fout bij genereren offerte-PDF:', err);
-        res.status(500).json({ ok: false, error: 'Er ging iets mis bij het genereren van de offerte.' });
+        console.error('[offerte-pdf] FOUT tijdens verwerking:', err);
+        if (!res.headersSent) {
+            res.status(500).json({ ok: false, error: 'Er ging iets mis bij het genereren van de offerte: ' + (err && err.message ? err.message : 'onbekende fout') });
+        }
     }
 });
 
@@ -784,6 +827,35 @@ app.post('/api/checklist', async (req, res) => {
         });
     }
     res.json({ ok: true });
+});
+
+app.post('/api/bel-me-terug', async (req, res) => {
+    const fields = req.body || {};
+    const naam = fields['bt-naam'] || fields.naam || '';
+    const telefoon = fields['bt-telefoon'] || fields.telefoon || '';
+    const moment = fields['bt-moment'] || fields.moment || 'Niet opgegeven';
+
+    console.log('[bel-me-terug] verzoek ontvangen van', naam || 'onbekend');
+    try {
+        await sendEmail({
+            to: NOTIFY_EMAIL,
+            subject: `Bel-me-terug verzoek — ${naam || 'onbekend'}`,
+            html: `<h2>Iemand wil teruggebeld worden</h2><table>${fieldsToHtml({ Naam: naam, Telefoonnummer: telefoon, Moment: moment })}</table>`,
+        });
+    } catch (err) {
+        console.error('[bel-me-terug] e-mail mislukt:', err);
+        // Geen res.status(500) hier: de bezoeker heeft zijn gegevens al ingevuld en
+        // moet altijd de bevestiging zien — een falende notificatiemail is voor
+        // ons een probleem om op te lossen, niet iets waar de bezoeker last van
+        // hoort te hebben.
+    }
+    res.json({ ok: true });
+});
+
+// Google Search Console eigendomsverificatie (HTML-bestandsmethode). De inhoud
+// moet exact overeenkomen met wat Google in het te downloaden bestand zet.
+app.get('/googlea9befd16dd1488a4.html', (req, res) => {
+    res.type('text/plain').send('google-site-verification: googlea9befd16dd1488a4.html');
 });
 
 app.get('/healthz', (req, res) => res.status(200).send('ok'));

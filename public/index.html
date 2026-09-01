@@ -345,7 +345,7 @@
         </div>
         <p class="trust-line">1.500+ onderzoeken uitgevoerd · gemiddeld 4,9/5 op Google · vertrouwd door BAM, Sligro, Hornbach, Buurtzorg, Takeaway, Royal Cosun, ING en 100+ andere organisaties</p>
         <button onclick="openCalendlyPopup()" style="margin-top:14px; display:inline-flex; align-items:center; gap:10px; background:none; border:none; padding:0; cursor:pointer; text-align:left;">
-          <img src="https://matchvermogen.nl/wp-content/uploads/2026/07/Gemini_Generated_Image_q1m3tfq1m3tfq1m3-e1785326938544.png" alt="Niels Alderding" loading="lazy" style="width:34px; height:34px; border-radius:50%; object-fit:cover; flex-shrink:0;" onerror="this.style.display='none';">
+          <img src="https://matchvermogen.nl/wp-content/uploads/2026/07/Gemini_Generated_Image_q1m3tfq1m3tfq1m3-e1785326938544.png" alt="Niels Alderding" loading="lazy" style="width:52px; height:52px; border-radius:50%; object-fit:cover; flex-shrink:0;" onerror="this.style.display='none';">
           <span style="font-size:.82rem; color:var(--muted2);">☕ Liever eerst even sparren? Vraag het mij persoonlijk — Niels</span>
         </button>
       </div>
@@ -1782,8 +1782,8 @@
       <p class="eyebrow">Gratis checklist</p>
       <h2 style="font-size:1.25rem; margin-top:8px; color:var(--ink);">Arbeidsdeskundig onderzoek & Spoor 2: alle valkuilen op een rij</h2>
       <p style="margin-top:10px; font-size:.88rem; color:var(--muted);">Vul je gegevens in en ontvang de checklist direct — inclusief de meest gemaakte fouten die loonsancties en vertraging veroorzaken.</p>
-      <label class="field" style="margin-top:16px;"><span class="lbl">Naam</span><input type="text" id="cl-naam"></label>
-      <label class="field"><span class="lbl">E-mail</span><input type="email" id="cl-email"></label>
+      <label class="field" style="margin-top:16px;"><span class="lbl">Naam <span class="req">*</span></span><input type="text" id="cl-naam"></label>
+      <label class="field"><span class="lbl">E-mail <span class="req">*</span></span><input type="email" id="cl-email"></label>
       <button class="btn-primary" style="width:100%;" onclick="submitChecklist()">Verstuur & bekijk checklist</button>
       <p style="font-size:.7rem; color:#98A0A8; margin-top:10px;">Je ontvangt ook een kopie per e-mail. We gebruiken je gegevens niet voor iets anders.</p>
     </div>
@@ -4852,7 +4852,10 @@ whk: `
   function submitChecklist(){
     const naam = document.getElementById('cl-naam').value.trim();
     const email = document.getElementById('cl-email').value.trim();
-    if(!naam || !email) return;
+    if(!naam || !email){
+      alert('Vul je naam en e-mailadres in, dan sturen we de checklist meteen door.');
+      return;
+    }
     document.getElementById('checklist-form-step').classList.add('hidden');
     document.getElementById('checklist-result-step').classList.remove('hidden');
     document.querySelectorAll('#checklist-result-step .checklist-anim-item').forEach(el=>{

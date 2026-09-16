@@ -10,6 +10,13 @@ const compression = require('compression');
 const helmet = require('helmet');
 const path = require('path');
 const fs = require('fs');
+const {
+    isHoneypotTriggered,
+    validateOfferteLead,
+    validateAanmeldLead,
+    validateChecklistLead,
+    validateBelMeTerugLead,
+} = require('./lead-validation');
 
 const app = express();
 
@@ -493,9 +500,54 @@ async function sendEmail({ to, subject, html, replyTo, attachments }) {
 // Zet een { veldnaam: waarde }-object om in een nette HTML-lijst voor in de e-mail.
 function fieldsToHtml(fields) {
     return Object.entries(fields)
-        .filter(([, v]) => v !== undefined && v !== null && v !== '')
-        .map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0; color:#666; vertical-align:top;">${escapeHtml(k)}</td><td style="padding:4px 0;">${escapeHtml(String(v))}</td></tr>`)
+        .filter(([, v]) => v !== undefined && v !== null && v !== '' && v !== false)
+        .map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0; color:#666; vertical-align:top;">${escapeHtml(k)}</td><td style="padding:4px 0;">${escapeHtml(v === true ? 'Ja' : String(v))}</td></tr>`)
         .join('');
+}
+
+function rejectLead(res, result) {
+    return res.status(400).json({
+        ok: false,
+        error: (result.errors && result.errors[0]) || 'Controleer je gegevens en probeer opnieuw.',
+        details: result.errors || [],
+    });
+}
+
+function ignoreHoneypot(res, fields, label) {
+    if (!isHoneypotTriggered(fields)) return false;
+    console.log(`[${label}] honeypot gevuld — geen e-mail verstuurd`);
+    res.json({ ok: true });
+    return true;
+}
+
+function offerteMailFields(lead) {
+    const bronLabel = lead.bron === 'offerte-pdf'
+        ? 'PDF-offerte'
+        : (lead.bron === 'offerte-contact' ? 'Contactverzoek' : 'Offerte');
+    return {
+        Aanvraag: bronLabel,
+        Naam: lead.naam,
+        Bedrijf: lead.bedrijf,
+        'E-mail': lead.email,
+        Telefoon: lead.telefoon,
+        Bedrijfsgrootte: OFFERTE_GROOTTE_LABELS[lead.grootte] || lead.grootte,
+        Onderzoeksvorm: lead.vorm,
+        Omschrijving: lead.omschrijving,
+    };
+}
+
+function leftoverFormFields(raw, skipKeys) {
+    const skip = new Set(skipKeys);
+    const out = {};
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
+    for (const [key, val] of Object.entries(raw)) {
+        if (skip.has(key)) continue;
+        if (/(^|-)(website|url|honeypot|_hp)$/i.test(key)) continue;
+        if (key.startsWith('of-doc-')) continue;
+        if (val === undefined || val === null || val === '') continue;
+        out[key] = val;
+    }
+    return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -566,7 +618,7 @@ function saniteerVoorNummer(tekst) {
 function volgendOfferteNummer(klantBedrijf, klantNaam, klantEmail) {
     const jaar = new Date().getFullYear();
     // Sleutel voor de telling: bedrijfsnaam als die er is, anders naam, anders e-mail.
-    const sleutelBron = (klantBedrijf || klantNaam || klantEmail || 'onbekend').trim().toLowerCase();
+    const sleutelBron = (klantBedrijf || klantNaam || klantEmail || 'klant').trim().toLowerCase();
     const sleutel = sleutelBron.replace(/[^a-z0-9]/g, '');
     // Weergave in het nummer zelf: dezelfde voorkeursvolgorde.
     const weergaveNaam = klantBedrijf || klantNaam || 'Klant';
@@ -714,20 +766,28 @@ function genereerOffertePdf(fields) {
 app.post('/api/offerte-pdf', async (req, res) => {
     console.log('[offerte-pdf] verzoek ontvangen');
     const fields = req.body || {};
-    const naam = (fields.naam || '').trim();
-    const email = (fields.email || '').trim();
-    const telefoon = (fields.telefoon || '').trim();
-    if (!naam || !email || !telefoon) {
+    if (ignoreHoneypot(res, fields, 'offerte-pdf')) return;
+    const parsed = validateOfferteLead(fields);
+    if (!parsed.ok) {
         console.log('[offerte-pdf] verplichte velden ontbreken, 400');
-        return res.status(400).json({ ok: false, error: 'Naam, e-mail en telefoon zijn verplicht.' });
+        return rejectLead(res, parsed);
     }
+    const lead = parsed.lead;
 
     try {
         console.log('[offerte-pdf] PDF genereren...');
-        const pdfBuffer = await genereerOffertePdf(fields);
+        const pdfBuffer = await genereerOffertePdf({
+            naam: lead.naam,
+            bedrijf: lead.bedrijf,
+            email: lead.email,
+            telefoon: lead.telefoon,
+            grootte: lead.grootte || 'midden',
+            vorm: lead.vorm || 'Online',
+            omschrijving: lead.omschrijving,
+        });
         console.log('[offerte-pdf] PDF klaar,', pdfBuffer.length, 'bytes');
         const pdfBase64 = pdfBuffer.toString('base64');
-        const voornaam = naam.split(' ')[0] || 'daar';
+        const voornaam = lead.naam.split(' ')[0] || 'daar';
         const attachments = [{ filename: 'offerte-arbeidsdeskundig-onderzoek.pdf', content: pdfBase64 }];
 
         // De PDF gaat rechtstreeks als bestand terug (geen JSON/base64-omweg meer).
@@ -742,7 +802,7 @@ app.post('/api/offerte-pdf', async (req, res) => {
         console.log('[offerte-pdf] PDF-bestand verstuurd naar browser');
 
         sendEmail({
-            to: email,
+            to: lead.email,
             subject: 'Je vrijblijvende offerte — arbeidsdeskundig.com',
             html: `<p>Bedankt, ${escapeHtml(voornaam)} — hierbij je vrijblijvende offerte als PDF. Geen verplichtingen: neem gerust de tijd, en stel vooral vragen als iets niet duidelijk is.</p>`,
             attachments,
@@ -750,9 +810,9 @@ app.post('/api/offerte-pdf', async (req, res) => {
 
         sendEmail({
             to: NOTIFY_EMAIL,
-            subject: `Nieuwe PDF-offerte gegenereerd — ${naam}`,
-            html: `<h2>Vrijblijvende offerte gegenereerd via arbeidsdeskundig.com</h2><table>${fieldsToHtml(fields)}</table>`,
-            replyTo: email,
+            subject: `Nieuwe PDF-offerte gegenereerd — ${lead.naam}`,
+            html: `<h2>Vrijblijvende offerte gegenereerd via arbeidsdeskundig.com</h2><table>${fieldsToHtml(offerteMailFields({ ...lead, bron: lead.bron || 'offerte-pdf' }))}</table>`,
+            replyTo: lead.email,
             attachments,
         }).then(() => console.log('[offerte-pdf] notificatiemail verstuurd')).catch((err) => console.error('[offerte-pdf] notificatiemail mislukt:', err));
     } catch (err) {
@@ -765,89 +825,121 @@ app.post('/api/offerte-pdf', async (req, res) => {
 
 app.post('/api/offerte', async (req, res) => {
     const fields = req.body || {};
-    const email = fields['of-email'] || fields.email;
-    const naam = fields['of-naam'] || fields.naam || '';
-    const voornaam = naam.split(' ')[0] || 'daar';
+    if (ignoreHoneypot(res, fields, 'offerte')) return;
+    const parsed = validateOfferteLead(fields);
+    if (!parsed.ok) {
+        console.log('[offerte] afgewezen:', parsed.errors.join('; '));
+        return rejectLead(res, parsed);
+    }
+    const lead = parsed.lead;
+    const voornaam = lead.naam.split(' ')[0] || 'daar';
 
     await sendEmail({
         to: NOTIFY_EMAIL,
-        subject: `Nieuwe offerteaanvraag — ${naam || 'onbekend'}`,
-        html: `<h2>Nieuwe offerteaanvraag via arbeidsdeskundig.com</h2><table>${fieldsToHtml(fields)}</table>`,
-        replyTo: email,
+        subject: `Nieuwe offerteaanvraag — ${lead.naam}`,
+        html: `<h2>Nieuwe offerteaanvraag via arbeidsdeskundig.com</h2><table>${fieldsToHtml(offerteMailFields(lead))}</table>`,
+        replyTo: lead.email,
     });
-    if (email) {
-        await sendEmail({
-            to: email,
-            subject: 'Bedankt voor je offerteaanvraag — arbeidsdeskundig.com',
-            html: `<p>Bedankt, ${escapeHtml(voornaam)} — we hebben je offerteaanvraag ontvangen en nemen binnen 24 uur contact met je op.</p>`,
-        });
-    }
+    await sendEmail({
+        to: lead.email,
+        subject: 'Bedankt voor je offerteaanvraag — arbeidsdeskundig.com',
+        html: `<p>Bedankt, ${escapeHtml(voornaam)} — we hebben je offerteaanvraag ontvangen en nemen binnen 24 uur contact met je op.</p>`,
+    });
     res.json({ ok: true });
 });
 
 app.post('/api/aanmelden', async (req, res) => {
     const fields = req.body || {};
-    const email = fields['inp-aanvrager-email'] || fields.email;
-    const naam = fields['inp-aanvrager-naam'] || fields.naam || '';
-    const voornaam = naam.split(' ')[0] || 'daar';
-    const spoor2 = !!fields['chk-spoor2'];
+    if (ignoreHoneypot(res, fields, 'aanmelden')) return;
+    const parsed = validateAanmeldLead(fields);
+    if (!parsed.ok) {
+        console.log('[aanmelden] afgewezen:', parsed.errors.join('; '));
+        return rejectLead(res, parsed);
+    }
+    const lead = parsed.lead;
+    const voornaam = lead.naam.split(' ')[0] || 'daar';
+    const notifyFields = {
+        Aanvraag: 'Aanmelding',
+        'Type dienstverlening': lead.dienst,
+        Wet: lead.wet,
+        Onderzoeksvorm: lead.vorm,
+        Bedrijfsgrootte: OFFERTE_GROOTTE_LABELS[lead.grootte] || lead.grootte,
+        'Naam aanvrager': lead.naam,
+        'E-mail aanvrager': lead.email,
+        'Telefoon aanvrager': lead.telefoon,
+        'Spoor 2 aangevraagd': lead.spoor2 ? 'Ja' : 'Nee',
+        ...leftoverFormFields(fields, [
+            'dienst', 'wet', 'vorm', 'grootte', 'naam', 'email', 'telefoon', 'spoor2',
+            'chk-spoor2', 'inp-aanvrager-naam', 'inp-aanvrager-email', 'inp-aanvrager-tel',
+            'bron', 'aanvraagtype',
+        ]),
+    };
 
     await sendEmail({
         to: NOTIFY_EMAIL,
-        subject: `Nieuwe aanmelding${spoor2 ? ' (incl. Spoor 2)' : ''} — ${naam || 'onbekend'}`,
-        html: `<h2>Nieuwe aanmelding via arbeidsdeskundig.com</h2><table>${fieldsToHtml(fields)}</table>`,
-        replyTo: email,
+        subject: `Nieuwe aanmelding${lead.spoor2 ? ' (incl. Spoor 2)' : ''} — ${lead.naam}`,
+        html: `<h2>Nieuwe aanmelding via arbeidsdeskundig.com</h2><table>${fieldsToHtml(notifyFields)}</table>`,
+        replyTo: lead.email,
     });
-    if (email) {
-        await sendEmail({
-            to: email,
-            subject: 'Bedankt voor je aanmelding — arbeidsdeskundig.com',
-            html: `<p>Bedankt, ${escapeHtml(voornaam)} — we hebben je aanmelding ontvangen en pakken dit binnen 24 uur op.</p>`,
-        });
-    }
+    await sendEmail({
+        to: lead.email,
+        subject: 'Bedankt voor je aanmelding — arbeidsdeskundig.com',
+        html: `<p>Bedankt, ${escapeHtml(voornaam)} — we hebben je aanmelding ontvangen en pakken dit binnen 24 uur op.</p>`,
+    });
     res.json({ ok: true });
 });
 
 app.post('/api/checklist', async (req, res) => {
     const fields = req.body || {};
-    const email = fields['cl-email'] || fields.email;
-    const naam = fields['cl-naam'] || fields.naam || '';
+    if (ignoreHoneypot(res, fields, 'checklist')) return;
+    const parsed = validateChecklistLead(fields);
+    if (!parsed.ok) {
+        console.log('[checklist] afgewezen:', parsed.errors.join('; '));
+        return rejectLead(res, parsed);
+    }
+    const lead = parsed.lead;
 
     await sendEmail({
         to: NOTIFY_EMAIL,
-        subject: `Checklist aangevraagd — ${naam || 'onbekend'}`,
-        html: `<h2>Gratis checklist aangevraagd via arbeidsdeskundig.com</h2><table>${fieldsToHtml(fields)}</table>`,
-        replyTo: email,
+        subject: `Checklist aangevraagd — ${lead.naam}`,
+        html: `<h2>Gratis checklist aangevraagd via arbeidsdeskundig.com</h2><table>${fieldsToHtml({ Aanvraag: 'Checklist', Naam: lead.naam, 'E-mail': lead.email })}</table>`,
+        replyTo: lead.email,
     });
-    if (email) {
-        await sendEmail({
-            to: email,
-            subject: 'Je gratis checklist — arbeidsdeskundig.com',
-            html: `<p>Bedankt${naam ? ', ' + escapeHtml(naam) : ''} — hierbij de checklist waar je om vroeg.</p>`,
-        });
-    }
+    await sendEmail({
+        to: lead.email,
+        subject: 'Je gratis checklist — arbeidsdeskundig.com',
+        html: `<p>Bedankt, ${escapeHtml(lead.naam)} — hierbij de checklist waar je om vroeg.</p>`,
+    });
     res.json({ ok: true });
 });
 
 app.post('/api/bel-me-terug', async (req, res) => {
     const fields = req.body || {};
-    const naam = fields['bt-naam'] || fields.naam || '';
-    const telefoon = fields['bt-telefoon'] || fields.telefoon || '';
-    const moment = fields['bt-moment'] || fields.moment || 'Niet opgegeven';
+    if (ignoreHoneypot(res, fields, 'bel-me-terug')) return;
+    const parsed = validateBelMeTerugLead(fields);
+    if (!parsed.ok) {
+        console.log('[bel-me-terug] afgewezen:', parsed.errors.join('; '));
+        return rejectLead(res, parsed);
+    }
+    const lead = parsed.lead;
 
-    console.log('[bel-me-terug] verzoek ontvangen van', naam || 'onbekend');
+    console.log('[bel-me-terug] verzoek ontvangen van', lead.naam);
     try {
         await sendEmail({
             to: NOTIFY_EMAIL,
-            subject: `Bel-me-terug verzoek — ${naam || 'onbekend'}`,
-            html: `<h2>Iemand wil teruggebeld worden</h2><table>${fieldsToHtml({ Naam: naam, Telefoonnummer: telefoon, Moment: moment })}</table>`,
+            subject: `Bel-me-terug verzoek — ${lead.naam}`,
+            html: `<h2>Iemand wil teruggebeld worden</h2><table>${fieldsToHtml({
+                Aanvraag: 'Bel-me-terug',
+                Naam: lead.naam,
+                Telefoonnummer: lead.telefoon,
+                'E-mail': lead.email,
+                Moment: lead.moment,
+            })}</table>`,
         });
     } catch (err) {
         console.error('[bel-me-terug] e-mail mislukt:', err);
-        // Geen res.status(500) hier: de bezoeker heeft zijn gegevens al ingevuld en
-        // moet altijd de bevestiging zien — een falende notificatiemail is voor
-        // ons een probleem om op te lossen, niet iets waar de bezoeker last van
-        // hoort te hebben.
+        // Validatie is al geslaagd; een falende notificatiemail is voor ons om
+        // op te lossen. De bezoeker krijgt hieronder alsnog ok:true.
     }
     res.json({ ok: true });
 });
@@ -893,6 +985,10 @@ app.use((req, res) => {
     res.status(404).set('Content-Type', 'text/html; charset=utf-8').send(html);
 });
 
-app.listen(PORT, () => {
-    console.log(`arbeidsdeskundig.com draait op poort ${PORT}`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`arbeidsdeskundig.com draait op poort ${PORT}`);
+    });
+}
+
+module.exports = { app };

@@ -160,6 +160,8 @@ function pickChecklistLead(fields) {
     return {
         naam: firstString(fields, ['cl-naam', 'naam']),
         email: firstString(fields, ['cl-email', 'email']),
+        telefoon: firstString(fields, ['cl-telefoon', 'telefoon']),
+        dienst: 'Checklist',
     };
 }
 
@@ -181,6 +183,7 @@ function pickBelMeTerugLead(fields) {
         telefoon: firstString(fields, ['bt-telefoon', 'telefoon']),
         email: firstString(fields, ['bt-email', 'email']),
         moment: firstString(fields, ['bt-moment', 'moment']) || 'Niet opgegeven',
+        dienst: 'Bel-me-terug',
     };
 }
 
@@ -199,8 +202,24 @@ function validateBelMeTerugLead(fields) {
 const TEST_EMAIL_DOMAINS = new Set([
     'example.com', 'example.org', 'example.net',
     'test.com', 'test.nl', 'localhost',
+    'mailinator.com', 'guerrillamail.com',
 ]);
 const TEST_NAME_RE = /^(test|tester|test user|testuser|testing)(\s+\d+)?$/i;
+const DUMMY_PHONES = new Set([
+    '0612345678',
+    '31612345678',
+    '0123456789',
+    '0600000000',
+    '0611111111',
+]);
+
+function isDummyPhone(phone) {
+    const digits = String(phone || '').replace(/\D/g, '');
+    if (!digits) return false;
+    if (DUMMY_PHONES.has(digits)) return true;
+    if (digits.length >= 8 && /^(\d)\1+$/.test(digits)) return true;
+    return false;
+}
 
 function isTestLead(lead, rawFields) {
     if (rawFields && (rawFields.test === true || rawFields.lead_test === true || rawFields.test === 'true')) {
@@ -212,7 +231,22 @@ function isTestLead(lead, rawFields) {
     if (domain && TEST_EMAIL_DOMAINS.has(domain)) return true;
     const naam = String(lead.naam || '').trim();
     if (TEST_NAME_RE.test(naam)) return true;
+    if (isDummyPhone(lead.telefoon) && TEST_NAME_RE.test(naam)) return true;
+    if (isDummyPhone(lead.telefoon) && (!lead.email || TEST_EMAIL_DOMAINS.has(domain))) return true;
     return false;
+}
+
+// Laatste vangnet: de productiemail van 16 sep was subject "... — onbekend"
+// met `<table></table>`. Die combinatie mag nooit de deur uit, ook niet als
+// een toekomstige mapping-fout lege velden weer wegfiltert.
+function notifyIsSafe(subject, html, lead) {
+    if (!lead || isPlaceholderName(lead.naam)) return false;
+    if (/onbekend/i.test(String(subject || ''))) return false;
+    const compact = String(html || '').replace(/\s+/g, '');
+    if (!compact || compact.includes('<table></table>')) return false;
+    if (!isValidEmail(lead.email) && !isValidPhone(lead.telefoon)) return false;
+    if (!String(lead.dienst || '').trim()) return false;
+    return true;
 }
 
 function leadDedupeKey(kind, lead) {
@@ -243,4 +277,6 @@ module.exports = {
     validateBelMeTerugLead,
     isTestLead,
     leadDedupeKey,
+    notifyIsSafe,
+    isDummyPhone,
 };

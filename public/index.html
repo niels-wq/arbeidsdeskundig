@@ -884,9 +884,9 @@
 
       <p id="of-error" class="form-error hidden" role="alert"></p>
       <div style="display:flex; flex-direction:column; gap:12px; margin-top:20px;">
-        <button class="btn-primary" id="btn-of-direct" disabled onclick="genereerOffertePdf()">Vrijblijvende offerte genereren (PDF)</button>
-        <button class="btn-ghost" id="btn-of-aanmelden" disabled onclick="gaNaarAanmelden()">Ik weet het al — direct aanmelden</button>
-        <button class="btn-ghost" id="btn-of-contact" disabled onclick="verstuurContactverzoek()">Liever eerst contact via e-mail/telefoon</button>
+        <button type="button" class="btn-primary" id="btn-of-direct" disabled onclick="genereerOffertePdf()">Vrijblijvende offerte genereren (PDF)</button>
+        <button type="button" class="btn-ghost" id="btn-of-aanmelden" disabled onclick="gaNaarAanmelden()">Ik weet het al — direct aanmelden</button>
+        <button type="button" class="btn-ghost" id="btn-of-contact" disabled onclick="verstuurContactverzoek()">Liever eerst contact via e-mail/telefoon</button>
       </div>
     </div>
 
@@ -1792,7 +1792,7 @@
       <label class="field"><span class="lbl">E-mail <span class="req">*</span></span><input type="email" id="cl-email" autocomplete="email"></label>
       <label class="hp-field" aria-hidden="true"><span>Website</span><input type="text" id="cl-website" name="website" tabindex="-1" autocomplete="off"></label>
       <p id="cl-error" class="form-error hidden" role="alert"></p>
-      <button class="btn-primary" style="width:100%;" onclick="submitChecklist()">Verstuur & bekijk checklist</button>
+      <button type="button" class="btn-primary" style="width:100%;" onclick="submitChecklist()">Verstuur & bekijk checklist</button>
       <p style="font-size:.7rem; color:#98A0A8; margin-top:10px;">Je ontvangt ook een kopie per e-mail. We gebruiken je gegevens niet voor iets anders.</p>
     </div>
     <div id="checklist-result-step" class="hidden">
@@ -1865,7 +1865,7 @@
         </select>
       </label>
       <p id="bt-error" class="form-error hidden" role="alert"></p>
-      <button class="btn-primary" style="width:100%; margin-top:16px;" id="bt-submit-btn" onclick="submitBelTerug()">Bel mij terug</button>
+      <button type="button" class="btn-primary" style="width:100%; margin-top:16px;" id="bt-submit-btn" onclick="submitBelTerug()">Bel mij terug</button>
       <p style="font-size:.7rem; color:#98A0A8; margin-top:10px;">We gebruiken je nummer alleen om je terug te bellen over deze aanvraag.</p>
     </div>
     <div id="belterug-result-step" class="hidden" style="text-align:center; padding:12px 0;">

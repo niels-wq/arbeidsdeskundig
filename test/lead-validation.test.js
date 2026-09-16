@@ -137,12 +137,37 @@ describe('bel-me-terug lead', () => {
 });
 
 describe('test-lead detection', () => {
-    const { isTestLead } = require('../lead-validation');
+    const { isTestLead, notifyIsSafe } = require('../lead-validation');
 
     it('treats example.com and explicit test flags as testdata', () => {
         assert.equal(isTestLead({ naam: 'Piet Tester', email: 'piet.tester@example.com' }), true);
         assert.equal(isTestLead({ naam: 'Jan Jansen', email: 'jan@bedrijf.nl' }, { test: true }), true);
         assert.equal(isTestLead({ naam: 'Test User', email: 'jan@bedrijf.nl' }), true);
-        assert.equal(isTestLead({ naam: 'Jan Jansen', email: 'jan@bedrijf.nl' }), false);
+        assert.equal(isTestLead({ naam: 'Jan Jansen', email: 'jan@bedrijf.nl', telefoon: '0629876543' }), false);
+    });
+
+    it('treats dummy-phone callbacks without email as testdata', () => {
+        assert.equal(isTestLead({ naam: 'Jan Jansen', telefoon: '0612345678' }), true);
+        assert.equal(isTestLead({ naam: 'Anna Bakker', telefoon: '0611223344' }), false);
+    });
+
+    it('rejects the exact production onbekend/empty-table payload', () => {
+        const productionSubject = 'Nieuwe offerteaanvraag — onbekend';
+        const productionHtml = '<h2>Nieuwe offerteaanvraag via arbeidsdeskundig.com</h2><table></table>';
+        assert.equal(notifyIsSafe(productionSubject, productionHtml, {
+            naam: '', email: '', telefoon: '', dienst: '',
+        }), false);
+    });
+
+    it('accepts a complete offerte notify payload', () => {
+        const parsed = validateOfferteLead({
+            naam: 'Jan Jansen',
+            email: 'jan@bedrijf.nl',
+            telefoon: '0629876543',
+        });
+        assert.equal(parsed.ok, true);
+        const html = `<h2>Nieuwe offerteaanvraag</h2><table><tr><td>Naam</td><td>${parsed.lead.naam}</td></tr></table>`;
+        assert.equal(notifyIsSafe(`Nieuwe offerteaanvraag — ${parsed.lead.naam}`, html, parsed.lead), true);
+        assert.equal(parsed.lead.dienst, 'Arbeidsdeskundig onderzoek');
     });
 });

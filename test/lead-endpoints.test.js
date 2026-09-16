@@ -155,6 +155,18 @@ describe('POST /api/bel-me-terug', () => {
         assert.equal(json.ok, true);
         assert.ok(emailLogs().some((l) => l.includes('Anna Bakker')));
     });
+
+    it('does not mail info@ for a dummy-phone test callback', async () => {
+        const before = emailLogs().length;
+        const { status, json } = await post('/api/bel-me-terug', {
+            naam: 'Jan Jansen',
+            telefoon: '0612345678',
+        });
+        assert.equal(status, 200);
+        assert.equal(json.ok, true);
+        const newLogs = emailLogs().slice(before);
+        assert.equal(newLogs.some((l) => l.includes('info@matchvermogen.nl')), false);
+    });
 });
 
 describe('POST /api/checklist', () => {

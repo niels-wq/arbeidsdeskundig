@@ -14,6 +14,7 @@ const {
     isHoneypotTriggered,
     isTestLead,
     leadDedupeKey,
+    notifyIsSafe,
     validateOfferteLead,
     validateAanmeldLead,
     validateChecklistLead,
@@ -576,6 +577,11 @@ async function deliverSalesLead({ kind, lead, rawFields, notifySubject, notifyHt
         console.log(`[${kind}] testdata — geen sales-notificatie naar info@ (${lead.naam || ''}, ${lead.email || lead.telefoon || ''})`);
         return { ok: true, test: true };
     }
+    if (!notifyIsSafe(notifySubject, notifyHtml, lead)) {
+        // Productiemail 16 sep: subject "... — onbekend" + lege <table></table>.
+        console.error(`[${kind}] geblokkeerd: onveilige notificatie (lege tabel, onbekend of ontbrekende contactgegevens)`);
+        return { ok: false, blocked: true };
+    }
     if (shouldSkipDuplicateNotify(kind, lead)) {
         console.log(`[${kind}] dubbele inzending binnen ${LEAD_DEDUPE_MS / 1000}s — tweede mail naar info@ overgeslagen`);
         return { ok: true, duplicate: true };
@@ -892,6 +898,9 @@ app.post('/api/offerte', async (req, res) => {
             html: `<p>Bedankt, ${escapeHtml(voornaam)} — we hebben je offerteaanvraag ontvangen en nemen binnen 24 uur contact met je op.</p>`,
         },
     });
+    if (delivered.blocked) {
+        return res.status(500).json({ ok: false, error: 'De aanvraag is ontvangen maar kon niet veilig worden doorgestuurd. Probeer het opnieuw of bel ons.' });
+    }
     res.json({ ok: true, test: !!delivered.test });
 });
 
@@ -935,6 +944,9 @@ app.post('/api/aanmelden', async (req, res) => {
             html: `<p>Bedankt, ${escapeHtml(voornaam)} — we hebben je aanmelding ontvangen en pakken dit binnen 24 uur op.</p>`,
         },
     });
+    if (delivered.blocked) {
+        return res.status(500).json({ ok: false, error: 'De aanvraag is ontvangen maar kon niet veilig worden doorgestuurd. Probeer het opnieuw of bel ons.' });
+    }
     res.json({ ok: true, test: !!delivered.test });
 });
 
@@ -953,7 +965,7 @@ app.post('/api/checklist', async (req, res) => {
         lead,
         rawFields: fields,
         notifySubject: `Checklist aangevraagd — ${lead.naam}`,
-        notifyHtml: `<h2>Gratis checklist aangevraagd via arbeidsdeskundig.com</h2><table>${fieldsToHtml({ Aanvraag: 'Checklist', Naam: lead.naam, 'E-mail': lead.email })}</table>`,
+        notifyHtml: `<h2>Gratis checklist aangevraagd via arbeidsdeskundig.com</h2><table>${fieldsToHtml({ Aanvraag: 'Checklist', Dienst: lead.dienst, Naam: lead.naam, 'E-mail': lead.email })}</table>`,
         replyTo: lead.email,
         visitor: {
             to: lead.email,
@@ -961,6 +973,9 @@ app.post('/api/checklist', async (req, res) => {
             html: `<p>Bedankt, ${escapeHtml(lead.naam)} — hierbij de checklist waar je om vroeg.</p>`,
         },
     });
+    if (delivered.blocked) {
+        return res.status(500).json({ ok: false, error: 'De aanvraag is ontvangen maar kon niet veilig worden doorgestuurd. Probeer het opnieuw of bel ons.' });
+    }
     res.json({ ok: true, test: !!delivered.test });
 });
 
@@ -983,6 +998,7 @@ app.post('/api/bel-me-terug', async (req, res) => {
             notifySubject: `Bel-me-terug verzoek — ${lead.naam}`,
             notifyHtml: `<h2>Iemand wil teruggebeld worden</h2><table>${fieldsToHtml({
                 Aanvraag: 'Bel-me-terug',
+                Dienst: lead.dienst,
                 Naam: lead.naam,
                 Telefoonnummer: lead.telefoon,
                 'E-mail': lead.email,

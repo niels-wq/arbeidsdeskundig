@@ -96,6 +96,7 @@ function pickOfferteLead(fields) {
         vorm: firstString(fields, ['of-vorm', 'vorm']),
         omschrijving: firstString(fields, ['of-omschrijving', 'omschrijving']),
         bron: firstString(fields, ['bron', 'aanvraagtype']) || 'offerte',
+        dienst: 'Arbeidsdeskundig onderzoek',
     };
 }
 
@@ -195,6 +196,32 @@ function validateBelMeTerugLead(fields) {
     return errors.length ? { ok: false, errors, lead } : { ok: true, lead };
 }
 
+const TEST_EMAIL_DOMAINS = new Set([
+    'example.com', 'example.org', 'example.net',
+    'test.com', 'test.nl', 'localhost',
+]);
+const TEST_NAME_RE = /^(test|tester|test user|testuser|testing)(\s+\d+)?$/i;
+
+function isTestLead(lead, rawFields) {
+    if (rawFields && (rawFields.test === true || rawFields.lead_test === true || rawFields.test === 'true')) {
+        return true;
+    }
+    if (!lead) return false;
+    const email = String(lead.email || '').trim().toLowerCase();
+    const domain = email.split('@')[1] || '';
+    if (domain && TEST_EMAIL_DOMAINS.has(domain)) return true;
+    const naam = String(lead.naam || '').trim();
+    if (TEST_NAME_RE.test(naam)) return true;
+    return false;
+}
+
+function leadDedupeKey(kind, lead) {
+    const naam = String((lead && lead.naam) || '').trim().toLowerCase();
+    const email = String((lead && lead.email) || '').trim().toLowerCase();
+    const telefoon = String((lead && lead.telefoon) || '').replace(/\D/g, '');
+    return [kind, naam, email, telefoon].join('|');
+}
+
 module.exports = {
     PLACEHOLDER_NAMES,
     DIENST_VALUES,
@@ -214,4 +241,6 @@ module.exports = {
     validateChecklistLead,
     pickBelMeTerugLead,
     validateBelMeTerugLead,
+    isTestLead,
+    leadDedupeKey,
 };

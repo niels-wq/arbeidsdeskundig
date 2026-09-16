@@ -135,3 +135,14 @@ describe('bel-me-terug lead', () => {
         assert.equal(ok.lead.moment, 'Morgen');
     });
 });
+
+describe('test-lead detection', () => {
+    const { isTestLead } = require('../lead-validation');
+
+    it('treats example.com and explicit test flags as testdata', () => {
+        assert.equal(isTestLead({ naam: 'Piet Tester', email: 'piet.tester@example.com' }), true);
+        assert.equal(isTestLead({ naam: 'Jan Jansen', email: 'jan@bedrijf.nl' }, { test: true }), true);
+        assert.equal(isTestLead({ naam: 'Test User', email: 'jan@bedrijf.nl' }), true);
+        assert.equal(isTestLead({ naam: 'Jan Jansen', email: 'jan@bedrijf.nl' }), false);
+    });
+});

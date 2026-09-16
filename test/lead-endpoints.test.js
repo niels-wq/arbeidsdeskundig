@@ -103,6 +103,37 @@ describe('POST /api/offerte', () => {
         assert.ok(mailed.length >= 1, 'expected notify mail to include the real name');
         assert.equal(mailed.some((l) => /onbekend/i.test(l)), false);
     });
+
+    it('does not mail info@ for example.com / test payloads', async () => {
+        const before = emailLogs().length;
+        const { status, json } = await post('/api/offerte', {
+            naam: 'Piet Tester',
+            email: 'piet.tester@example.com',
+            telefoon: '0612345678',
+        });
+        assert.equal(status, 200);
+        assert.equal(json.ok, true);
+        const newLogs = emailLogs().slice(before);
+        assert.equal(newLogs.some((l) => l.includes('info@matchvermogen.nl')), false);
+    });
+
+    it('does not send a second info@ mail for a duplicate submit', async () => {
+        const payload = {
+            naam: 'Lisa Duplo',
+            email: 'lisa.duplo@bedrijf.nl',
+            telefoon: '0687654321',
+            vorm: 'Fysiek',
+            grootte: 'klein',
+        };
+        const first = await post('/api/offerte', payload);
+        assert.equal(first.status, 200);
+        const afterFirst = emailLogs().filter((l) => l.includes('Lisa Duplo') && l.includes('info@matchvermogen.nl')).length;
+        assert.equal(afterFirst, 1);
+        const second = await post('/api/offerte', payload);
+        assert.equal(second.status, 200);
+        const afterSecond = emailLogs().filter((l) => l.includes('Lisa Duplo') && l.includes('info@matchvermogen.nl')).length;
+        assert.equal(afterSecond, 1);
+    });
 });
 
 describe('POST /api/bel-me-terug', () => {

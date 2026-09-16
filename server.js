@@ -12,6 +12,8 @@ const path = require('path');
 const fs = require('fs');
 const {
     isHoneypotTriggered,
+    isTestLead,
+    leadDedupeKey,
     validateOfferteLead,
     validateAanmeldLead,
     validateChecklistLead,
@@ -526,6 +528,7 @@ function offerteMailFields(lead) {
         : (lead.bron === 'offerte-contact' ? 'Contactverzoek' : 'Offerte');
     return {
         Aanvraag: bronLabel,
+        Dienst: lead.dienst || 'Arbeidsdeskundig onderzoek',
         Naam: lead.naam,
         Bedrijf: lead.bedrijf,
         'E-mail': lead.email,
@@ -548,6 +551,45 @@ function leftoverFormFields(raw, skipKeys) {
         out[key] = val;
     }
     return out;
+}
+
+// Voorkomt dat dezelfde lead binnen een paar seconden twee keer als
+// sales-mail binnenkomt (dubbele klik, bot-retry). Alleen de notificatie
+// naar info@ wordt overgeslagen; de HTTP-response blijft 200.
+const recentLeadNotifies = new Map();
+const LEAD_DEDUPE_MS = 8000;
+
+function shouldSkipDuplicateNotify(kind, lead) {
+    const now = Date.now();
+    for (const [key, ts] of recentLeadNotifies) {
+        if (now - ts > LEAD_DEDUPE_MS) recentLeadNotifies.delete(key);
+    }
+    const key = leadDedupeKey(kind, lead);
+    const prev = recentLeadNotifies.get(key);
+    if (prev && now - prev < LEAD_DEDUPE_MS) return true;
+    recentLeadNotifies.set(key, now);
+    return false;
+}
+
+async function deliverSalesLead({ kind, lead, rawFields, notifySubject, notifyHtml, replyTo, visitor }) {
+    if (isTestLead(lead, rawFields)) {
+        console.log(`[${kind}] testdata — geen sales-notificatie naar info@ (${lead.naam || ''}, ${lead.email || lead.telefoon || ''})`);
+        return { ok: true, test: true };
+    }
+    if (shouldSkipDuplicateNotify(kind, lead)) {
+        console.log(`[${kind}] dubbele inzending binnen ${LEAD_DEDUPE_MS / 1000}s — tweede mail naar info@ overgeslagen`);
+        return { ok: true, duplicate: true };
+    }
+    await sendEmail({
+        to: NOTIFY_EMAIL,
+        subject: notifySubject,
+        html: notifyHtml,
+        replyTo,
+    });
+    if (visitor && visitor.to) {
+        await sendEmail(visitor);
+    }
+    return { ok: true };
 }
 
 // ---------------------------------------------------------------------------
@@ -808,13 +850,17 @@ app.post('/api/offerte-pdf', async (req, res) => {
             attachments,
         }).then(() => console.log('[offerte-pdf] e-mail naar aanvrager verstuurd')).catch((err) => console.error('[offerte-pdf] e-mail naar aanvrager mislukt:', err));
 
-        sendEmail({
-            to: NOTIFY_EMAIL,
-            subject: `Nieuwe PDF-offerte gegenereerd — ${lead.naam}`,
-            html: `<h2>Vrijblijvende offerte gegenereerd via arbeidsdeskundig.com</h2><table>${fieldsToHtml(offerteMailFields({ ...lead, bron: lead.bron || 'offerte-pdf' }))}</table>`,
-            replyTo: lead.email,
-            attachments,
-        }).then(() => console.log('[offerte-pdf] notificatiemail verstuurd')).catch((err) => console.error('[offerte-pdf] notificatiemail mislukt:', err));
+        if (!isTestLead(lead, fields) && !shouldSkipDuplicateNotify('offerte-pdf', lead)) {
+            sendEmail({
+                to: NOTIFY_EMAIL,
+                subject: `Nieuwe PDF-offerte gegenereerd — ${lead.naam}`,
+                html: `<h2>Vrijblijvende offerte gegenereerd via arbeidsdeskundig.com</h2><table>${fieldsToHtml(offerteMailFields({ ...lead, bron: lead.bron || 'offerte-pdf' }))}</table>`,
+                replyTo: lead.email,
+                attachments,
+            }).then(() => console.log('[offerte-pdf] notificatiemail verstuurd')).catch((err) => console.error('[offerte-pdf] notificatiemail mislukt:', err));
+        } else {
+            console.log('[offerte-pdf] testdata of duplicaat — geen sales-notificatie');
+        }
     } catch (err) {
         console.error('[offerte-pdf] FOUT tijdens verwerking:', err);
         if (!res.headersSent) {
@@ -833,19 +879,20 @@ app.post('/api/offerte', async (req, res) => {
     }
     const lead = parsed.lead;
     const voornaam = lead.naam.split(' ')[0] || 'daar';
-
-    await sendEmail({
-        to: NOTIFY_EMAIL,
-        subject: `Nieuwe offerteaanvraag — ${lead.naam}`,
-        html: `<h2>Nieuwe offerteaanvraag via arbeidsdeskundig.com</h2><table>${fieldsToHtml(offerteMailFields(lead))}</table>`,
+    const delivered = await deliverSalesLead({
+        kind: 'offerte',
+        lead,
+        rawFields: fields,
+        notifySubject: `Nieuwe offerteaanvraag — ${lead.naam}`,
+        notifyHtml: `<h2>Nieuwe offerteaanvraag via arbeidsdeskundig.com</h2><table>${fieldsToHtml(offerteMailFields(lead))}</table>`,
         replyTo: lead.email,
+        visitor: {
+            to: lead.email,
+            subject: 'Bedankt voor je offerteaanvraag — arbeidsdeskundig.com',
+            html: `<p>Bedankt, ${escapeHtml(voornaam)} — we hebben je offerteaanvraag ontvangen en nemen binnen 24 uur contact met je op.</p>`,
+        },
     });
-    await sendEmail({
-        to: lead.email,
-        subject: 'Bedankt voor je offerteaanvraag — arbeidsdeskundig.com',
-        html: `<p>Bedankt, ${escapeHtml(voornaam)} — we hebben je offerteaanvraag ontvangen en nemen binnen 24 uur contact met je op.</p>`,
-    });
-    res.json({ ok: true });
+    res.json({ ok: true, test: !!delivered.test });
 });
 
 app.post('/api/aanmelden', async (req, res) => {
@@ -875,18 +922,20 @@ app.post('/api/aanmelden', async (req, res) => {
         ]),
     };
 
-    await sendEmail({
-        to: NOTIFY_EMAIL,
-        subject: `Nieuwe aanmelding${lead.spoor2 ? ' (incl. Spoor 2)' : ''} — ${lead.naam}`,
-        html: `<h2>Nieuwe aanmelding via arbeidsdeskundig.com</h2><table>${fieldsToHtml(notifyFields)}</table>`,
+    const delivered = await deliverSalesLead({
+        kind: 'aanmelden',
+        lead,
+        rawFields: fields,
+        notifySubject: `Nieuwe aanmelding${lead.spoor2 ? ' (incl. Spoor 2)' : ''} — ${lead.naam}`,
+        notifyHtml: `<h2>Nieuwe aanmelding via arbeidsdeskundig.com</h2><table>${fieldsToHtml(notifyFields)}</table>`,
         replyTo: lead.email,
+        visitor: {
+            to: lead.email,
+            subject: 'Bedankt voor je aanmelding — arbeidsdeskundig.com',
+            html: `<p>Bedankt, ${escapeHtml(voornaam)} — we hebben je aanmelding ontvangen en pakken dit binnen 24 uur op.</p>`,
+        },
     });
-    await sendEmail({
-        to: lead.email,
-        subject: 'Bedankt voor je aanmelding — arbeidsdeskundig.com',
-        html: `<p>Bedankt, ${escapeHtml(voornaam)} — we hebben je aanmelding ontvangen en pakken dit binnen 24 uur op.</p>`,
-    });
-    res.json({ ok: true });
+    res.json({ ok: true, test: !!delivered.test });
 });
 
 app.post('/api/checklist', async (req, res) => {
@@ -899,18 +948,20 @@ app.post('/api/checklist', async (req, res) => {
     }
     const lead = parsed.lead;
 
-    await sendEmail({
-        to: NOTIFY_EMAIL,
-        subject: `Checklist aangevraagd — ${lead.naam}`,
-        html: `<h2>Gratis checklist aangevraagd via arbeidsdeskundig.com</h2><table>${fieldsToHtml({ Aanvraag: 'Checklist', Naam: lead.naam, 'E-mail': lead.email })}</table>`,
+    const delivered = await deliverSalesLead({
+        kind: 'checklist',
+        lead,
+        rawFields: fields,
+        notifySubject: `Checklist aangevraagd — ${lead.naam}`,
+        notifyHtml: `<h2>Gratis checklist aangevraagd via arbeidsdeskundig.com</h2><table>${fieldsToHtml({ Aanvraag: 'Checklist', Naam: lead.naam, 'E-mail': lead.email })}</table>`,
         replyTo: lead.email,
+        visitor: {
+            to: lead.email,
+            subject: 'Je gratis checklist — arbeidsdeskundig.com',
+            html: `<p>Bedankt, ${escapeHtml(lead.naam)} — hierbij de checklist waar je om vroeg.</p>`,
+        },
     });
-    await sendEmail({
-        to: lead.email,
-        subject: 'Je gratis checklist — arbeidsdeskundig.com',
-        html: `<p>Bedankt, ${escapeHtml(lead.naam)} — hierbij de checklist waar je om vroeg.</p>`,
-    });
-    res.json({ ok: true });
+    res.json({ ok: true, test: !!delivered.test });
 });
 
 app.post('/api/bel-me-terug', async (req, res) => {
@@ -925,10 +976,12 @@ app.post('/api/bel-me-terug', async (req, res) => {
 
     console.log('[bel-me-terug] verzoek ontvangen van', lead.naam);
     try {
-        await sendEmail({
-            to: NOTIFY_EMAIL,
-            subject: `Bel-me-terug verzoek — ${lead.naam}`,
-            html: `<h2>Iemand wil teruggebeld worden</h2><table>${fieldsToHtml({
+        await deliverSalesLead({
+            kind: 'bel-me-terug',
+            lead,
+            rawFields: fields,
+            notifySubject: `Bel-me-terug verzoek — ${lead.naam}`,
+            notifyHtml: `<h2>Iemand wil teruggebeld worden</h2><table>${fieldsToHtml({
                 Aanvraag: 'Bel-me-terug',
                 Naam: lead.naam,
                 Telefoonnummer: lead.telefoon,

@@ -412,3 +412,84 @@ describe('kennisbank article: beslistermijn WIA 16 weken', () => {
         }
     });
 });
+
+const SECOND_OPINION_SLUG = 'second-opinion-arbeidsdeskundige';
+const SECOND_OPINION_PATH = '/kennisbank/' + SECOND_OPINION_SLUG;
+const SECOND_OPINION_RESERVED = [
+    'beslistermijn-wia-16-weken',
+    'riv-toets-bedrijfsarts-leidend',
+    'nadelen-arbeidsdeskundig-onderzoek',
+    'tips-werknemer-arbeidsdeskundig-onderzoek',
+    'verplicht-arbeidsdeskundig-onderzoek',
+    'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
+    'kosten-arbeidsdeskundig-onderzoek',
+    'fml-izp-lezen-belastbaarheid',
+    'wat-doet-arbeidsdeskundige',
+    'voorbereiden-gesprek-arbeidsdeskundige',
+    'passende-arbeid',
+    'psychische-klachten-werkhervatting',
+    'werkplekaanpassingen-subsidie',
+    'mediation-arbeidsconflict',
+];
+
+describe('kennisbank article: second opinion arbeidsdeskundige', () => {
+    it('serves unique commercial article HTML with SEO tags and schema', async () => {
+        const res = await fetch(base + SECOND_OPINION_PATH);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        assert.match(html, /<title>Second opinion arbeidsdeskundige: wanneer twijfel terecht is — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<meta name="description" content="Second opinion arbeidsdeskundige: wanneer twijfel terecht is, wat het wel en niet is, proces en relatie tot UWV. Vraag een offerte of kennismaking.">/);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${SECOND_OPINION_PATH}">`));
+        assert.match(html, /"@type":"Article"/);
+        assert.match(html, /"@type":"FAQPage"/);
+
+        const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
+        assert.ok(h1Match, 'SSR H1 missing');
+        assert.equal(h1Match[1], 'Second opinion arbeidsdeskundige: wanneer twijfel terecht is');
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>Second opinion arbeidsdeskundige: wanneer twijfel terecht is<\/h2>/);
+        assert.match(body, /second opinion arbeidsdeskundige/);
+        assert.match(body, /Wanneer twijfel terecht is/);
+        assert.match(body, /Wat een second opinion wel en niet is/);
+        assert.match(body, /deskundigenoordeel/);
+        assert.match(body, /eerste arbeidsdeskundig onderzoek/);
+        assert.match(body, /Hoe het proces loopt/);
+        assert.match(body, /Relatie tot UWV/);
+        assert.match(body, /aanvullend bewijs/);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /online of fysiek/i);
+        assert.doesNotMatch(body, /keuzehulp/);
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 100).join(' ');
+        assert.match(firstWords, /second opinion arbeidsdeskundige/i);
+
+        assert.match(html, /kennisbank\/wat-doet-arbeidsdeskundige/);
+        assert.match(html, /kennisbank\/nadelen-arbeidsdeskundig-onderzoek/);
+        assert.match(html, /kennisbank\/verplicht-arbeidsdeskundig-onderzoek/);
+        assert.match(html, /kennisbank\/kosten-arbeidsdeskundig-onderzoek/);
+        assert.match(html, /kennisbank\/tips-werknemer-arbeidsdeskundig-onderzoek/);
+        assert.match(html, /kennisbank\/voorbereiden-gesprek-arbeidsdeskundige/);
+        assert.match(html, /\/offerte-aanvragen/);
+        assert.match(html, /\/aanmelden/);
+        assert.match(html, /calendly\.com\/matchvermogen\/call-15-min/);
+    });
+
+    it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {
+        const res = await fetch(base + '/sitemap.xml');
+        assert.equal(res.status, 200);
+        const xml = await res.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${SECOND_OPINION_PATH}`));
+        assert.equal((xml.match(new RegExp(SECOND_OPINION_SLUG, 'g')) || []).length, 1);
+        for (const slug of SECOND_OPINION_RESERVED) {
+            assert.notEqual(slug, SECOND_OPINION_SLUG);
+            assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
+        }
+    });
+});

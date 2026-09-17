@@ -103,3 +103,74 @@ describe('kennisbank article: is AD onderzoek verplicht', () => {
         assert.equal((xml.match(new RegExp(VERPLICHT_SLUG, 'g')) || []).length, 1);
     });
 });
+
+const WERKNEMER_SLUG = 'tips-werknemer-arbeidsdeskundig-onderzoek';
+const WERKNEMER_PATH = '/kennisbank/' + WERKNEMER_SLUG;
+const RESERVED_SLUGS = [
+    'verplicht-arbeidsdeskundig-onderzoek',
+    'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
+    'kosten-arbeidsdeskundig-onderzoek',
+    'fml-izp-lezen-belastbaarheid',
+    'wat-doet-arbeidsdeskundige',
+    'voorbereiden-gesprek-arbeidsdeskundige',
+    'passende-arbeid',
+    'psychische-klachten-werkhervatting',
+    'werkplekaanpassingen-subsidie',
+    'mediation-arbeidsconflict',
+];
+
+describe('kennisbank article: tips werknemer arbeidsdeskundig onderzoek', () => {
+    it('serves unique employee-facing article HTML with SEO tags and schema', async () => {
+        const res = await fetch(base + WERKNEMER_PATH);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        assert.match(html, /<title>Tips voor werknemers bij een arbeidsdeskundig onderzoek — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<meta name="description" content="Tips voor werknemers bij een arbeidsdeskundig onderzoek: voorbereiding, rechten, beperkingen zonder medische oversharing. Vraag een kennismaking.">/);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${WERKNEMER_PATH}">`));
+        assert.match(html, /"@type":"Article"/);
+        assert.match(html, /"@type":"FAQPage"/);
+
+        const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
+        assert.ok(h1Match, 'SSR H1 missing');
+        assert.equal(h1Match[1], 'Tips voor werknemers bij een arbeidsdeskundig onderzoek');
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>Tips voor werknemers bij een arbeidsdeskundig onderzoek<\/h2>/);
+        assert.match(body, /tips voor werknemers bij een arbeidsdeskundig onderzoek/);
+        assert.match(body, /expliciet voor jou als werknemer/);
+        assert.match(body, /zonder medisch te overdelen/);
+        assert.match(body, /Arbeidsdeskundige versus bedrijfsarts/);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /De onmisbare checklist/);
+        assert.doesNotMatch(body, /\bBram\b/);
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 100).join(' ');
+        assert.match(firstWords, /tips voor werknemers bij een arbeidsdeskundig onderzoek/i);
+
+        assert.match(html, /kennisbank\/voorbereiden-gesprek-arbeidsdeskundige/);
+        assert.match(html, /kennisbank\/wat-doet-arbeidsdeskundige/);
+        assert.match(html, /kennisbank\/fml-izp-lezen-belastbaarheid/);
+        assert.match(html, /kennisbank\/passende-arbeid/);
+        assert.match(html, /kennisbank\/kosten-arbeidsdeskundig-onderzoek/);
+        assert.match(html, /calendly\.com\/matchvermogen\/call-15-min/);
+        assert.match(html, /\/voor\/werknemer/);
+    });
+
+    it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {
+        const res = await fetch(base + '/sitemap.xml');
+        assert.equal(res.status, 200);
+        const xml = await res.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${WERKNEMER_PATH}`));
+        assert.equal((xml.match(new RegExp(WERKNEMER_SLUG, 'g')) || []).length, 1);
+        for (const slug of RESERVED_SLUGS) {
+            assert.notEqual(slug, WERKNEMER_SLUG);
+            assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
+        }
+    });
+});

@@ -33,7 +33,9 @@ process.on('unhandledRejection', (err) => {
     console.error('[proces] Onverwachte afgewezen promise (proces blijft draaien):', err);
 });
 const PORT = process.env.PORT || 3000;
-const BASE_URL = process.env.BASE_URL || 'https://www.arbeidsdeskundig.com';
+// Altijd zonder trailing slash, zodat sitemap/canonicals nooit // in de URL krijgen
+// als BASE_URL in Railway per ongeluk mét slash is gezet.
+const BASE_URL = (process.env.BASE_URL || 'https://www.arbeidsdeskundig.com').replace(/\/$/, '');
 
 const INDEX_HTML = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8');
 
@@ -59,35 +61,44 @@ try {
 // enige bron van waarheid. Geen los posts.json-bestand meer om synchroon te
 // houden: pas je een artikel aan in index.html, dan klopt de routing vanzelf.
 function extractPosts(html) {
-    const start = html.indexOf('const posts = [');
-    const end = html.indexOf('\n  ];', start);
-    const block = html.slice(start, end);
-    const lines = block.match(/\{ tag:.*? \},?/gs) || [];
-    const field = (name, line) => {
-        const m = line.match(new RegExp(name + ':"((?:[^"\\\\]|\\\\.)*)"'));
-        return m ? m[1].replace(/\\"/g, '"') : null;
-    };
-    const extractFaq = (line) => {
-        const idx = line.indexOf('faq:[');
-        if (idx === -1) return null;
-        // Balanced-bracket scan vanaf 'faq:' tot de bijbehorende sluit-bracket.
-        let depth = 0, i = idx + 4, startIdx = -1;
-        for (; i < line.length; i++) {
-            if (line[i] === '[') { if (depth === 0) startIdx = i; depth++; }
-            else if (line[i] === ']') { depth--; if (depth === 0) { i++; break; } }
+    try {
+        const start = html.indexOf('const posts = [');
+        if (start === -1) {
+            console.error('[seo] Geen `const posts = [` gevonden in index.html — kennisbank-URLs ontbreken in sitemap.');
+            return [];
         }
-        const raw = line.slice(startIdx, i);
-        try { return JSON.parse(raw); } catch (e) { return null; }
-    };
-    return lines
-        .map((line) => ({
-            slug: field('slug', line),
-            title: field('title', line),
-            meta: field('meta', line),
-            tag: field('tag', line),
-            faq: extractFaq(line),
-        }))
-        .filter((p) => p.slug);
+        const end = html.indexOf('\n  ];', start);
+        const block = end === -1 ? html.slice(start) : html.slice(start, end);
+        const lines = block.match(/\{ tag:.*? \},?/gs) || [];
+        const field = (name, line) => {
+            const m = line.match(new RegExp(name + ':"((?:[^"\\\\]|\\\\.)*)"'));
+            return m ? m[1].replace(/\\"/g, '"') : null;
+        };
+        const extractFaq = (line) => {
+            const idx = line.indexOf('faq:[');
+            if (idx === -1) return null;
+            // Balanced-bracket scan vanaf 'faq:' tot de bijbehorende sluit-bracket.
+            let depth = 0, i = idx + 4, startIdx = -1;
+            for (; i < line.length; i++) {
+                if (line[i] === '[') { if (depth === 0) startIdx = i; depth++; }
+                else if (line[i] === ']') { depth--; if (depth === 0) { i++; break; } }
+            }
+            const raw = line.slice(startIdx, i);
+            try { return JSON.parse(raw); } catch (e) { return null; }
+        };
+        return lines
+            .map((line) => ({
+                slug: field('slug', line),
+                title: field('title', line),
+                meta: field('meta', line),
+                tag: field('tag', line),
+                faq: extractFaq(line),
+            }))
+            .filter((p) => p.slug);
+    } catch (err) {
+        console.error('[seo] Posts uit index.html lezen mislukt — sitemap valt terug op statische pagina\'s:', err);
+        return [];
+    }
 }
 
 const posts = extractPosts(INDEX_HTML);
@@ -95,17 +106,29 @@ const posts = extractPosts(INDEX_HTML);
 // personaData is pure JSON (gegenereerd met json.dumps), dus simpel te parsen —
 // geen regex-gepuzzel zoals bij de `posts`-array met zijn JS-objectliteral-syntax.
 function extractPersonas(html) {
-    const start = html.indexOf('const personaData = ');
-    const jsonStart = html.indexOf('[', start);
-    let depth = 0, i = jsonStart;
-    for (; i < html.length; i++) {
-        if (html[i] === '[') depth++;
-        else if (html[i] === ']') { depth--; if (depth === 0) { i++; break; } }
+    try {
+        const start = html.indexOf('const personaData = ');
+        if (start === -1) {
+            console.error('[seo] Geen `const personaData` gevonden in index.html — /voor/-URLs ontbreken in sitemap.');
+            return [];
+        }
+        const jsonStart = html.indexOf('[', start);
+        if (jsonStart === -1) return [];
+        let depth = 0, i = jsonStart;
+        for (; i < html.length; i++) {
+            if (html[i] === '[') depth++;
+            else if (html[i] === ']') { depth--; if (depth === 0) { i++; break; } }
+        }
+        const parsed = JSON.parse(html.slice(jsonStart, i));
+        return Array.isArray(parsed) ? parsed.filter((p) => p && p.slug) : [];
+    } catch (e) {
+        console.error('[seo] Personas uit index.html lezen mislukt — sitemap slaat /voor/-URLs over:', e);
+        return [];
     }
-    try { return JSON.parse(html.slice(jsonStart, i)); } catch (e) { return []; }
 }
 
 const personas = extractPersonas(INDEX_HTML);
+console.log(`[seo] ${posts.length} kennisbank-artikelen en ${personas.length} doelgroep-pagina's geladen`);
 const DEFAULT_TITLE = 'arbeidsdeskundig.com — Arbeidsdeskundig onderzoek, online én fysiek';
 const DEFAULT_DESC = 'Arbeidsdeskundig onderzoek vanaf €1.095,-. Online of fysiek, door heel Nederland. Specialist in WGA, Ziektewet en Wet Poortwachter.';
 
@@ -116,7 +139,15 @@ app.disable('x-powered-by');
 // helmet-headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy,
 // HSTS, enz.) staan wel aan — dat is winst zonder risico. Wil je later een
 // strikte CSP, dan hoort daar eerst een refactor naar externe .js/.css bij.
-app.use(helmet({ contentSecurityPolicy: false }));
+// CORP staat op cross-origin: dit is een publieke marketingsite. Helmet's
+// default `same-origin` laat browsers (en sommige SEO-/fetch-tools) de
+// sitemap als geblokkeerde cross-origin resource behandelen — dat wordt
+// vaak als HTTP 500 of "couldn't fetch sitemap" gerapporteerd, terwijl
+// curl wél 200 ziet.
+app.use(helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
 app.use(express.json({ limit: '200kb' }));
 
 // SEO: forceer één canonieke versie van de site. Zonder dit ziet Google
@@ -163,7 +194,7 @@ function escapeHtml(str) {
 }
 
 function renderPage(res, { title, description, canonicalPath, route, articleJsonLd, breadcrumbJsonLd, faqJsonLd, statusCode }) {
-    const canonical = BASE_URL.replace(/\/$/, '') + canonicalPath;
+    const canonical = BASE_URL + canonicalPath;
     const safeTitle = escapeHtml(title || DEFAULT_TITLE);
     const safeDesc = escapeHtml(description || DEFAULT_DESC);
 
@@ -220,9 +251,53 @@ function breadcrumbFor(items) {
             '@type': 'ListItem',
             position: i + 1,
             name: it.name,
-            item: BASE_URL.replace(/\/$/, '') + it.path,
+            item: BASE_URL + it.path,
         })),
     };
+}
+
+function xmlEscape(str) {
+    return String(str || '').replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;',
+    }[c]));
+}
+
+function absoluteUrl(pathname) {
+    if (!pathname || pathname === '/') return BASE_URL + '/';
+    return BASE_URL + (pathname.startsWith('/') ? pathname : '/' + pathname);
+}
+
+function sitemapUrlEl(loc, { changefreq = 'weekly', priority = '0.7' } = {}) {
+    const today = new Date().toISOString().slice(0, 10);
+    return `  <url><loc>${xmlEscape(loc)}</loc><lastmod>${today}</lastmod><changefreq>${changefreq}</changefreq><priority>${priority}</priority></url>`;
+}
+
+function buildSitemapXml() {
+    const staticPaths = [
+        '/', '/rekentool', '/keuzehulp', '/veelgestelde-vragen',
+        '/over-ons', '/offerte-aanvragen', '/aanmelden', '/kennisbank',
+    ];
+    const personaList = Array.isArray(personas) ? personas : [];
+    const postList = Array.isArray(posts) ? posts : [];
+    const urls = [
+        ...staticPaths.map((p) => sitemapUrlEl(absoluteUrl(p), {
+            changefreq: 'weekly',
+            priority: p === '/' ? '1.0' : '0.7',
+        })),
+        ...personaList
+            .filter((p) => p && p.slug)
+            .map((p) => sitemapUrlEl(absoluteUrl('/voor/' + p.slug), {
+                changefreq: 'monthly',
+                priority: '0.7',
+            })),
+        ...postList
+            .filter((p) => p && p.slug)
+            .map((p) => sitemapUrlEl(absoluteUrl('/kennisbank/' + p.slug), {
+                changefreq: 'monthly',
+                priority: '0.6',
+            })),
+    ];
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -327,7 +402,7 @@ app.get('/kennisbank/:slug', (req, res, next) => {
         inLanguage: 'nl-NL',
         author: { '@type': 'Organization', name: 'Matchvermogen B.V.' },
         publisher: { '@type': 'Organization', name: 'arbeidsdeskundig.com' },
-        mainEntityOfPage: BASE_URL.replace(/\/$/, '') + '/kennisbank/' + post.slug,
+        mainEntityOfPage: BASE_URL + '/kennisbank/' + post.slug,
     };
 
     // Elk artikel met FAQ-items krijgt zijn eigen FAQPage-schema — los van het
@@ -362,21 +437,27 @@ app.get('/kennisbank/:slug', (req, res, next) => {
 });
 
 // ---------------------------------------------------------------------------
-// sitemap.xml — dynamisch, inclusief alle kennisbank-artikelen
+// sitemap.xml — dynamisch, inclusief alle kennisbank-artikelen.
+// Mag nooit 500 teruggeven: ontbrekende posts/personas → weglaten, niet crashen.
 // ---------------------------------------------------------------------------
+function sendSitemap(res, xml) {
+    res.status(200)
+        .set({
+            'Content-Type': 'application/xml; charset=utf-8',
+            'Cache-Control': 'public, max-age=3600',
+            'Access-Control-Allow-Origin': '*',
+        })
+        .send(xml);
+}
+
 app.get('/sitemap.xml', (req, res) => {
-    const today = new Date().toISOString().slice(0, 10);
-    const staticPaths = [
-        '/', '/rekentool', '/keuzehulp', '/veelgestelde-vragen',
-        '/over-ons', '/offerte-aanvragen', '/aanmelden', '/kennisbank',
-    ];
-    const urls = [
-        ...staticPaths.map((p) => `  <url><loc>${BASE_URL}${p}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>${p === '/' ? '1.0' : '0.7'}</priority></url>`),
-        ...personas.map((p) => `  <url><loc>${BASE_URL}/voor/${p.slug}</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>`),
-        ...posts.map((p) => `  <url><loc>${BASE_URL}/kennisbank/${p.slug}</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>`),
-    ];
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>`;
-    res.set('Content-Type', 'application/xml').send(xml);
+    try {
+        sendSitemap(res, buildSitemapXml());
+    } catch (err) {
+        console.error('[sitemap] generatie mislukt, stuur minimale fallback:', err);
+        const fallback = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrlEl(absoluteUrl('/'), { changefreq: 'weekly', priority: '1.0' })}\n</urlset>`;
+        sendSitemap(res, fallback);
+    }
 });
 
 // ---------------------------------------------------------------------------
@@ -411,7 +492,10 @@ Allow: /
 
 Sitemap: ${BASE_URL}/sitemap.xml
 `;
-    res.set('Content-Type', 'text/plain').send(txt);
+    res.set({
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Access-Control-Allow-Origin': '*',
+    }).send(txt);
 });
 
 // ---------------------------------------------------------------------------
@@ -421,6 +505,7 @@ Sitemap: ${BASE_URL}/sitemap.xml
 // kan alleen helpen bij vindbaarheid in ChatGPT/Perplexity/Claude e.d.
 // ---------------------------------------------------------------------------
 app.get('/llms.txt', (req, res) => {
+    try {
     const byTag = {};
     posts.forEach((p) => {
         if (!byTag[p.tag]) byTag[p.tag] = [];
@@ -457,6 +542,10 @@ ${personas.map((p) => `- [${p.title}](${BASE_URL}/voor/${p.slug}): ${p.meta}`).j
         });
     });
     res.set('Content-Type', 'text/plain; charset=utf-8').send(txt);
+    } catch (err) {
+        console.error('[llms.txt] generatie mislukt:', err);
+        res.status(200).set('Content-Type', 'text/plain; charset=utf-8').send(`# arbeidsdeskundig.com\n\n${BASE_URL}/\n`);
+    }
 });
 
 // Health check (handig voor Railway se deploy-status)
@@ -1034,7 +1123,6 @@ app.use((req, res) => {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pagina niet gevonden (404) — arbeidsdeskundig.com</title>
 <meta name="robots" content="noindex, follow">
-<link rel="canonical" href="${BASE_URL}${req.path}">
 <style>
   body{font-family:Arial,sans-serif; background:#EDEFEA; color:#12203A; margin:0; display:flex; align-items:center; justify-content:center; min-height:100vh; text-align:center; padding:24px;}
   .box{max-width:480px;}
@@ -1051,7 +1139,22 @@ app.use((req, res) => {
   </div>
 </body>
 </html>`;
-    res.status(404).set('Content-Type', 'text/html; charset=utf-8').send(html);
+    res.status(404).set({
+        'Content-Type': 'text/html; charset=utf-8',
+        'X-Robots-Tag': 'noindex, follow',
+    }).send(html);
+});
+
+// Vangnet: een throw in een route mag nooit een onduidelijke proxy-500 worden
+// zonder logregel. Sitemap heeft zijn eigen try/catch en hoort hier niet te komen.
+app.use((err, req, res, next) => {
+    console.error('[express] Onverwachte fout op', req.method, req.path, err);
+    if (res.headersSent) return next(err);
+    if (req.path === '/sitemap.xml') {
+        const fallback = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrlEl(absoluteUrl('/'), { changefreq: 'weekly', priority: '1.0' })}\n</urlset>`;
+        return sendSitemap(res, fallback);
+    }
+    res.status(500).type('txt').send('Internal Server Error');
 });
 
 if (require.main === module) {

@@ -237,7 +237,7 @@
   @media(max-width:639px){ .advies-choice-grid{grid-template-columns:1fr;} }
 
   /* Homepage: doelgroep-kaarten */
-  .persona-card{text-align:left; cursor:pointer; padding:20px; background:var(--white); border:1px solid #DFE2DB; border-radius:2px; transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; display:flex; flex-direction:column; align-items:flex-start;}
+  .persona-card{text-align:left; cursor:pointer; padding:20px; background:var(--white); border:1px solid #DFE2DB; border-radius:2px; transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; display:flex; flex-direction:column; align-items:flex-start; text-decoration:none; color:inherit;}
   .persona-card:hover{transform:translateY(-3px); box-shadow:0 10px 22px rgba(18,32,58,.1); border-color:var(--teal);}
   .persona-icon{display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:50%; margin-bottom:12px;}
   @media(max-width:639px){ .persona-grid{grid-template-columns:1fr 1fr;} }
@@ -1728,21 +1728,21 @@
   <div class="footer-grid">
     <div>
       <h4>arbeidsdeskundig.com</h4>
-      <a onclick="setView('home')">Home</a>
-      <a onclick="setView('calculator')">Rekentool</a>
-      <a onclick="setView('offerte')">Offerte</a>
+      <a href="/" onclick="event.preventDefault(); setView('home')">Home</a>
+      <a href="/rekentool" onclick="event.preventDefault(); setView('calculator')">Rekentool</a>
+      <a href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Offerte</a>
     </div>
     <div>
       <h4>Kennis</h4>
-      <a onclick="setView('kennisbank')">Kennisbank</a>
-      <a onclick="setView('faq')">Veelgestelde vragen</a>
-      <a onclick="setView('over')">Over ons</a>
+      <a href="/kennisbank" onclick="event.preventDefault(); setView('kennisbank')">Kennisbank</a>
+      <a href="/veelgestelde-vragen" onclick="event.preventDefault(); setView('faq')">Veelgestelde vragen</a>
+      <a href="/over-ons" onclick="event.preventDefault(); setView('over')">Over ons</a>
     </div>
     <div>
       <h4>Netwerk</h4>
-      <a onclick="openArtikel('spoor2')">Best Match Re-integratie (spoor 2 & 3)</a>
-      <a onclick="openArtikel('whk')">Wat is de WHK-premie?</a>
-      <a onclick="setView('over')">Matchvermogen B.V. (moederbedrijf)</a>
+      <a href="/kennisbank/spoor2" onclick="event.preventDefault(); openArtikel('spoor2')">Best Match Re-integratie (spoor 2 & 3)</a>
+      <a href="/kennisbank/whk" onclick="event.preventDefault(); openArtikel('whk')">Wat is de WHK-premie?</a>
+      <a href="/over-ons" onclick="event.preventDefault(); setView('over')">Matchvermogen B.V. (moederbedrijf)</a>
     </div>
     <div>
       <h4>Contact</h4>
@@ -3880,11 +3880,11 @@ whk: `
     const grid = document.getElementById('persona-cards');
     if(!grid) return;
     grid.innerHTML = personaData.map(p => `
-      <button class="persona-card" onclick="openPersona('${p.slug}')">
+      <a class="persona-card" href="/voor/${p.slug}" onclick="event.preventDefault(); openPersona('${p.slug}')">
         <span class="persona-icon" style="background:${p.icon_bg};">${p.icon}</span>
         <h3 style="font-size:1rem; color:var(--ink);">${p.label}</h3>
         <p style="margin-top:6px; font-size:.82rem; color:var(--muted);">Uitleg en praktijkvoorbeelden op maat</p>
-      </button>
+      </a>
     `).join('');
   }
 

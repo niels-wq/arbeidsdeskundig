@@ -332,3 +332,83 @@ describe('kennisbank article: RIV-toets bedrijfsarts leidend', () => {
         }
     });
 });
+
+const BESLISTERMIJN_SLUG = 'beslistermijn-wia-16-weken';
+const BESLISTERMIJN_PATH = '/kennisbank/' + BESLISTERMIJN_SLUG;
+const BESLISTERMIJN_RESERVED = [
+    'riv-toets-bedrijfsarts-leidend',
+    'nadelen-arbeidsdeskundig-onderzoek',
+    'tips-werknemer-arbeidsdeskundig-onderzoek',
+    'verplicht-arbeidsdeskundig-onderzoek',
+    'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
+    'kosten-arbeidsdeskundig-onderzoek',
+    'fml-izp-lezen-belastbaarheid',
+    'wat-doet-arbeidsdeskundige',
+    'voorbereiden-gesprek-arbeidsdeskundige',
+    'passende-arbeid',
+    'psychische-klachten-werkhervatting',
+    'werkplekaanpassingen-subsidie',
+    'mediation-arbeidsconflict',
+];
+
+describe('kennisbank article: beslistermijn WIA 16 weken', () => {
+    it('serves unique actualiteit article HTML with SEO tags and schema', async () => {
+        const res = await fetch(base + BESLISTERMIJN_PATH);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        assert.match(html, /<title>Beslistermijn WIA 16 weken: dossier UWV-proof terwijl je wacht — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<meta name="description" content="Beslistermijn WIA 16 weken: wat de wacht na de aanvraag betekent, hoe je het dossier UWV-proof houdt, en waarom een snel AD-rapport helpt. Offerte.">/);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${BESLISTERMIJN_PATH}">`));
+        assert.match(html, /"@type":"Article"/);
+        assert.match(html, /"@type":"FAQPage"/);
+
+        const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
+        assert.ok(h1Match, 'SSR H1 missing');
+        assert.equal(h1Match[1], 'Beslistermijn WIA 16 weken: dossier UWV-proof terwijl je wacht');
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>Beslistermijn WIA 16 weken: dossier UWV-proof terwijl je wacht<\/h2>/);
+        assert.match(body, /beslistermijn WIA 16 weken/);
+        assert.match(body, /ná ontvangst van de WIA-aanvraag/);
+        assert.match(body, /1 januari 2026/);
+        assert.match(body, /tijdelijk 16 weken/);
+        assert.match(body, /ontvangstbevestiging/);
+        assert.match(body, /voorschot/);
+        assert.match(body, /2 tot 5 weken/);
+        assert.match(body, /verkort de beslistermijn van UWV niet/);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /online of fysiek/i);
+        assert.doesNotMatch(body, /keuzehulp/);
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 100).join(' ');
+        assert.match(firstWords, /beslistermijn WIA 16 weken/i);
+
+        assert.match(html, /kennisbank\/arbeidsdeskundig-onderzoek-na-1-jaar-ziekte/);
+        assert.match(html, /kennisbank\/verplicht-arbeidsdeskundig-onderzoek/);
+        assert.match(html, /kennisbank\/kosten-arbeidsdeskundig-onderzoek/);
+        assert.match(html, /kennisbank\/riv-toets/);
+        assert.match(html, /kennisbank\/wat-doet-arbeidsdeskundige/);
+        assert.match(html, /kennisbank\/fml-izp-lezen-belastbaarheid/);
+        assert.match(html, /\/offerte-aanvragen/);
+        assert.match(html, /\/aanmelden/);
+        assert.match(html, /calendly\.com\/matchvermogen\/call-15-min/);
+    });
+
+    it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {
+        const res = await fetch(base + '/sitemap.xml');
+        assert.equal(res.status, 200);
+        const xml = await res.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${BESLISTERMIJN_PATH}`));
+        assert.equal((xml.match(new RegExp(BESLISTERMIJN_SLUG, 'g')) || []).length, 1);
+        for (const slug of BESLISTERMIJN_RESERVED) {
+            assert.notEqual(slug, BESLISTERMIJN_SLUG);
+            assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
+        }
+    });
+});

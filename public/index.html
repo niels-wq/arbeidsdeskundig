@@ -57,6 +57,8 @@
   svg{display:block;}
   .wrap{max-width:1120px; margin:0 auto; padding:0 20px;}
   .hidden{display:none !important;}
+  .form-error{color:#9B2C2C; font-size:.85rem; margin:10px 0 0; line-height:1.4;}
+  .hp-field{position:absolute !important; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden;}
 
   header.site{position:sticky; top:0; z-index:40; background:var(--ink);}
   .navbar{display:flex; align-items:center; justify-content:space-between; padding:14px 20px; max-width:1120px; margin:0 auto;}
@@ -235,7 +237,7 @@
   @media(max-width:639px){ .advies-choice-grid{grid-template-columns:1fr;} }
 
   /* Homepage: doelgroep-kaarten */
-  .persona-card{text-align:left; cursor:pointer; padding:20px; background:var(--white); border:1px solid #DFE2DB; border-radius:2px; transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; display:flex; flex-direction:column; align-items:flex-start;}
+  .persona-card{text-align:left; cursor:pointer; padding:20px; background:var(--white); border:1px solid #DFE2DB; border-radius:2px; transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; display:flex; flex-direction:column; align-items:flex-start; text-decoration:none; color:inherit;}
   .persona-card:hover{transform:translateY(-3px); box-shadow:0 10px 22px rgba(18,32,58,.1); border-color:var(--teal);}
   .persona-icon{display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:50%; margin-bottom:12px;}
   @media(max-width:639px){ .persona-grid{grid-template-columns:1fr 1fr;} }
@@ -855,10 +857,11 @@
 
     <div id="offerte-form-step">
       <div class="grid2" style="margin-top:8px;">
-        <label class="field"><span class="lbl">Naam <span class="req">*</span></span><input type="text" id="of-naam"></label>
-        <label class="field"><span class="lbl">Bedrijf</span><input type="text" id="of-bedrijf"></label>
-        <label class="field"><span class="lbl">E-mail <span class="req">*</span></span><input type="email" id="of-email"></label>
-        <label class="field"><span class="lbl">Telefoon <span class="req">*</span></span><input type="tel" id="of-telefoon"></label>
+        <label class="field"><span class="lbl">Naam <span class="req">*</span></span><input type="text" id="of-naam" autocomplete="name"></label>
+        <label class="field"><span class="lbl">Bedrijf</span><input type="text" id="of-bedrijf" autocomplete="organization"></label>
+        <label class="field"><span class="lbl">E-mail <span class="req">*</span></span><input type="email" id="of-email" autocomplete="email"></label>
+        <label class="field"><span class="lbl">Telefoon <span class="req">*</span></span><input type="tel" id="of-telefoon" autocomplete="tel"></label>
+        <label class="hp-field" aria-hidden="true"><span>Website</span><input type="text" id="of-website" name="website" tabindex="-1" autocomplete="off"></label>
       </div>
       <label class="field"><span class="lbl">Bedrijfsgrootte</span>
         <div class="choice-row" data-group="of-grootte">
@@ -879,10 +882,11 @@
       </div>
       <label class="field" style="margin-top:16px;"><span class="lbl">Korte omschrijving van de situatie</span><textarea id="of-omschrijving" placeholder="Optioneel — helpt ons om snel de juiste inschatting te maken."></textarea></label>
 
+      <p id="of-error" class="form-error hidden" role="alert"></p>
       <div style="display:flex; flex-direction:column; gap:12px; margin-top:20px;">
-        <button class="btn-primary" id="btn-of-direct" disabled onclick="genereerOffertePdf()">Vrijblijvende offerte genereren (PDF)</button>
-        <button class="btn-ghost" id="btn-of-aanmelden" disabled onclick="gaNaarAanmelden()">Ik weet het al — direct aanmelden</button>
-        <button class="btn-ghost" id="btn-of-contact" disabled onclick="verstuurContactverzoek()">Liever eerst contact via e-mail/telefoon</button>
+        <button type="button" class="btn-primary" id="btn-of-direct" disabled onclick="genereerOffertePdf()">Vrijblijvende offerte genereren (PDF)</button>
+        <button type="button" class="btn-ghost" id="btn-of-aanmelden" disabled onclick="gaNaarAanmelden()">Ik weet het al — direct aanmelden</button>
+        <button type="button" class="btn-ghost" id="btn-of-contact" disabled onclick="verstuurContactverzoek()">Liever eerst contact via e-mail/telefoon</button>
       </div>
     </div>
 
@@ -1098,10 +1102,11 @@
         <label class="field"><span class="lbl">Rol opdrachtgever <span class="req">*</span></span>
           <select id="inp-rol"><option value="">Kies...</option><option>Werkgever</option><option>Casemanager</option><option>Verzekeraar</option><option>Anders</option></select>
         </label>
-        <label class="field"><span class="lbl">Naam aanvrager/opdrachtgever <span class="req">*</span></span><input type="text" id="inp-aanvrager-naam"></label>
-        <label class="field"><span class="lbl">Werkgever aanvrager/opdrachtgever <span class="req">*</span></span><input type="text" id="inp-aanvrager-werkgever"></label>
-        <label class="field"><span class="lbl">Email aanvrager/opdrachtgever <span class="req">*</span></span><input type="email" id="inp-aanvrager-email"></label>
-        <label class="field"><span class="lbl">Telefoonnummer aanvrager/opdrachtgever <span class="req">*</span></span><input type="tel" id="inp-aanvrager-tel"></label>
+        <label class="field"><span class="lbl">Naam aanvrager/opdrachtgever <span class="req">*</span></span><input type="text" id="inp-aanvrager-naam" autocomplete="name"></label>
+        <label class="field"><span class="lbl">Werkgever aanvrager/opdrachtgever <span class="req">*</span></span><input type="text" id="inp-aanvrager-werkgever" autocomplete="organization"></label>
+        <label class="field"><span class="lbl">Email aanvrager/opdrachtgever <span class="req">*</span></span><input type="email" id="inp-aanvrager-email" autocomplete="email"></label>
+        <label class="field"><span class="lbl">Telefoonnummer aanvrager/opdrachtgever <span class="req">*</span></span><input type="tel" id="inp-aanvrager-tel" autocomplete="tel"></label>
+        <label class="hp-field" aria-hidden="true"><span>Website</span><input type="text" id="inp-website" name="website" tabindex="-1" autocomplete="off"></label>
       </div>
       <label class="field"><span class="lbl">Opmerkingen</span><textarea id="inp-aanvrager-opmerkingen" placeholder="Vertel hier iets over het dossier."></textarea></label>
       <div style="display:flex; gap:12px;">
@@ -1223,9 +1228,10 @@
           </div>
         </div>
       </div>
+      <p id="aanmeld-error" class="form-error hidden" role="alert"></p>
       <div style="display:flex; gap:12px; margin-top:16px;">
         <button class="btn-ghost" onclick="goStep(5)">Terug</button>
-        <button class="btn-primary" id="btn-to-step7" disabled onclick="goStep(7)">Onderteken & plan intake</button>
+        <button class="btn-primary" id="btn-to-step7" disabled onclick="submitAanmelding()">Onderteken & plan intake</button>
       </div>
     </div>
 
@@ -1722,21 +1728,21 @@
   <div class="footer-grid">
     <div>
       <h4>arbeidsdeskundig.com</h4>
-      <a onclick="setView('home')">Home</a>
-      <a onclick="setView('calculator')">Rekentool</a>
-      <a onclick="setView('offerte')">Offerte</a>
+      <a href="/" onclick="event.preventDefault(); setView('home')">Home</a>
+      <a href="/rekentool" onclick="event.preventDefault(); setView('calculator')">Rekentool</a>
+      <a href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Offerte</a>
     </div>
     <div>
       <h4>Kennis</h4>
-      <a onclick="setView('kennisbank')">Kennisbank</a>
-      <a onclick="setView('faq')">Veelgestelde vragen</a>
-      <a onclick="setView('over')">Over ons</a>
+      <a href="/kennisbank" onclick="event.preventDefault(); setView('kennisbank')">Kennisbank</a>
+      <a href="/veelgestelde-vragen" onclick="event.preventDefault(); setView('faq')">Veelgestelde vragen</a>
+      <a href="/over-ons" onclick="event.preventDefault(); setView('over')">Over ons</a>
     </div>
     <div>
       <h4>Netwerk</h4>
-      <a onclick="openArtikel('spoor2')">Best Match Re-integratie (spoor 2 & 3)</a>
-      <a onclick="openArtikel('whk')">Wat is de WHK-premie?</a>
-      <a onclick="setView('over')">Matchvermogen B.V. (moederbedrijf)</a>
+      <a href="/kennisbank/spoor2" onclick="event.preventDefault(); openArtikel('spoor2')">Best Match Re-integratie (spoor 2 & 3)</a>
+      <a href="/kennisbank/whk" onclick="event.preventDefault(); openArtikel('whk')">Wat is de WHK-premie?</a>
+      <a href="/over-ons" onclick="event.preventDefault(); setView('over')">Matchvermogen B.V. (moederbedrijf)</a>
     </div>
     <div>
       <h4>Contact</h4>
@@ -1782,9 +1788,11 @@
       <p class="eyebrow">Gratis checklist</p>
       <h2 style="font-size:1.25rem; margin-top:8px; color:var(--ink);">Arbeidsdeskundig onderzoek & Spoor 2: alle valkuilen op een rij</h2>
       <p style="margin-top:10px; font-size:.88rem; color:var(--muted);">Vul je gegevens in en ontvang de checklist direct — inclusief de meest gemaakte fouten die loonsancties en vertraging veroorzaken.</p>
-      <label class="field" style="margin-top:16px;"><span class="lbl">Naam <span class="req">*</span></span><input type="text" id="cl-naam"></label>
-      <label class="field"><span class="lbl">E-mail <span class="req">*</span></span><input type="email" id="cl-email"></label>
-      <button class="btn-primary" style="width:100%;" onclick="submitChecklist()">Verstuur & bekijk checklist</button>
+      <label class="field" style="margin-top:16px;"><span class="lbl">Naam <span class="req">*</span></span><input type="text" id="cl-naam" autocomplete="name"></label>
+      <label class="field"><span class="lbl">E-mail <span class="req">*</span></span><input type="email" id="cl-email" autocomplete="email"></label>
+      <label class="hp-field" aria-hidden="true"><span>Website</span><input type="text" id="cl-website" name="website" tabindex="-1" autocomplete="off"></label>
+      <p id="cl-error" class="form-error hidden" role="alert"></p>
+      <button type="button" class="btn-primary" style="width:100%;" onclick="submitChecklist()">Verstuur & bekijk checklist</button>
       <p style="font-size:.7rem; color:#98A0A8; margin-top:10px;">Je ontvangt ook een kopie per e-mail. We gebruiken je gegevens niet voor iets anders.</p>
     </div>
     <div id="checklist-result-step" class="hidden">
@@ -1845,8 +1853,9 @@
       <p class="eyebrow">Bel me terug</p>
       <h2 style="font-size:1.25rem; margin-top:8px; color:var(--ink);">Laat je nummer achter, wij bellen jou</h2>
       <p style="margin-top:10px; font-size:.88rem; color:var(--muted);">Geen wachtrij, geen keuzemenu — gewoon een collega die jou terugbelt, meestal dezelfde dag nog.</p>
-      <label class="field" style="margin-top:16px;"><span class="lbl">Naam <span class="req">*</span></span><input type="text" id="bt-naam"></label>
-      <label class="field"><span class="lbl">Telefoonnummer <span class="req">*</span></span><input type="tel" id="bt-telefoon"></label>
+      <label class="field" style="margin-top:16px;"><span class="lbl">Naam <span class="req">*</span></span><input type="text" id="bt-naam" autocomplete="name"></label>
+      <label class="field"><span class="lbl">Telefoonnummer <span class="req">*</span></span><input type="tel" id="bt-telefoon" autocomplete="tel"></label>
+      <label class="hp-field" aria-hidden="true"><span>Website</span><input type="text" id="bt-website" name="website" tabindex="-1" autocomplete="off"></label>
       <label class="field"><span class="lbl">Wanneer schikt het?</span>
         <select id="bt-moment">
           <option value="Zo snel mogelijk" selected>Zo snel mogelijk</option>
@@ -1855,7 +1864,8 @@
           <option value="Morgen">Morgen</option>
         </select>
       </label>
-      <button class="btn-primary" style="width:100%; margin-top:16px;" id="bt-submit-btn" onclick="submitBelTerug()">Bel mij terug</button>
+      <p id="bt-error" class="form-error hidden" role="alert"></p>
+      <button type="button" class="btn-primary" style="width:100%; margin-top:16px;" id="bt-submit-btn" onclick="submitBelTerug()">Bel mij terug</button>
       <p style="font-size:.7rem; color:#98A0A8; margin-top:10px;">We gebruiken je nummer alleen om je terug te bellen over deze aanvraag.</p>
     </div>
     <div id="belterug-result-step" class="hidden" style="text-align:center; padding:12px 0;">
@@ -1975,16 +1985,77 @@
     const data = {};
     document.querySelectorAll(containerSelector + ' [id^="' + idPrefix + '"]').forEach(el=>{
       if(!el.id) return;
+      if(el.tagName === 'P' || el.tagName === 'SPAN' || el.tagName === 'DIV' || el.tagName === 'BUTTON') return;
       data[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
     });
     return data;
   }
-  function submitToBackend(endpoint, fields){
-    fetch(endpoint, {
+  function showFormError(id, messages){
+    const el = document.getElementById(id);
+    const list = (messages || []).filter(Boolean);
+    if(!el){
+      if(list.length) alert(list.join('\n'));
+      return;
+    }
+    if(!list.length){
+      el.classList.add('hidden');
+      el.textContent = '';
+      return;
+    }
+    el.textContent = list.join(' ');
+    el.classList.remove('hidden');
+  }
+  function isPlaceholderName(naam){
+    const n = String(naam || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    return !n || n.length < 2 || n === 'onbekend' || n === 'unknown' || n === 'n/a' || n === 'na' || n === '-' || n === 'geen';
+  }
+  function isValidEmail(email){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(email || '').trim());
+  }
+  function isValidPhone(phone){
+    const digits = String(phone || '').replace(/\D/g, '');
+    return digits.length >= 8 && digits.length <= 15;
+  }
+  function leadClientErrors({ naam, email, telefoon, requireEmail, requirePhone }){
+    const errors = [];
+    if(isPlaceholderName(naam)) errors.push('Vul je naam in.');
+    const hasEmail = isValidEmail(email);
+    const hasPhone = isValidPhone(telefoon);
+    if(requireEmail && !hasEmail) errors.push('Vul een geldig e-mailadres in.');
+    if(requirePhone && !hasPhone) errors.push('Vul een geldig telefoonnummer in.');
+    if(!requireEmail && !requirePhone && !hasEmail && !hasPhone){
+      errors.push('Vul een e-mailadres of telefoonnummer in.');
+    }
+    return errors;
+  }
+  function collectOfferteLead(bron){
+    return {
+      naam: (document.getElementById('of-naam').value || '').trim(),
+      bedrijf: (document.getElementById('of-bedrijf').value || '').trim(),
+      email: (document.getElementById('of-email').value || '').trim(),
+      telefoon: (document.getElementById('of-telefoon').value || '').trim(),
+      grootte: offerteData.grootte || '',
+      vorm: offerteData.vorm || '',
+      omschrijving: (document.getElementById('of-omschrijving').value || '').trim(),
+      website: ((document.getElementById('of-website') || {}).value || '').trim(),
+      bron: bron,
+    };
+  }
+  async function submitToBackend(endpoint, fields){
+    const r = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(fields),
-    }).catch(()=>{ /* stille fout: UI-bevestiging blijft altijd tonen, ongeacht e-maillevering */ });
+    });
+    let data = {};
+    try { data = await r.json(); } catch(e) { data = {}; }
+    if(!r.ok || data.ok === false){
+      const err = new Error(data.error || 'Versturen is niet gelukt. Controleer je gegevens en probeer opnieuw.');
+      err.details = data.details;
+      err.status = r.status;
+      throw err;
+    }
+    return data;
   }
 
   /* ---------- Conversie-tracking: vuurt alleen als GA4/Meta Pixel geconfigureerd zijn ---------- */
@@ -3809,11 +3880,11 @@ whk: `
     const grid = document.getElementById('persona-cards');
     if(!grid) return;
     grid.innerHTML = personaData.map(p => `
-      <button class="persona-card" onclick="openPersona('${p.slug}')">
+      <a class="persona-card" href="/voor/${p.slug}" onclick="event.preventDefault(); openPersona('${p.slug}')">
         <span class="persona-icon" style="background:${p.icon_bg};">${p.icon}</span>
         <h3 style="font-size:1rem; color:var(--ink);">${p.label}</h3>
         <p style="margin-top:6px; font-size:.82rem; color:var(--muted);">Uitleg en praktijkvoorbeelden op maat</p>
-      </button>
+      </a>
     `).join('');
   }
 
@@ -4370,7 +4441,7 @@ whk: `
     const naam = document.getElementById('of-naam').value.trim();
     const email = document.getElementById('of-email').value.trim();
     const tel = document.getElementById('of-telefoon').value.trim();
-    const ok = naam && email && tel;
+    const ok = !leadClientErrors({ naam, email, telefoon: tel, requireEmail: true, requirePhone: true }).length;
     document.getElementById('btn-of-direct').disabled = !ok;
     document.getElementById('btn-of-aanmelden').disabled = !ok;
     document.getElementById('btn-of-contact').disabled = !ok;
@@ -4430,15 +4501,13 @@ whk: `
   }
 
   function genereerOffertePdf(){
-    const payload = {
-      naam: document.getElementById('of-naam').value.trim(),
-      bedrijf: document.getElementById('of-bedrijf').value.trim(),
-      email: document.getElementById('of-email').value.trim(),
-      telefoon: document.getElementById('of-telefoon').value.trim(),
-      grootte: offerteData.grootte || 'midden',
-      vorm: offerteData.vorm || 'Online',
-      omschrijving: document.getElementById('of-omschrijving').value.trim(),
-    };
+    const payload = collectOfferteLead('offerte-pdf');
+    const errors = leadClientErrors({ naam: payload.naam, email: payload.email, telefoon: payload.telefoon, requireEmail: true, requirePhone: true });
+    if(errors.length){
+      showFormError('of-error', errors);
+      return;
+    }
+    showFormError('of-error', []);
 
     // Alles hieronder gebeurt volledig in de browser — geen serveraanroep nodig
     // om de offerte zelf te tonen, dus dit werkt altijd, ongeacht eventuele
@@ -4484,11 +4553,8 @@ whk: `
     // Notificatie naar ons is een bonus, geen vereiste: dit gebeurt altijd op de
     // achtergrond en mag de weergave van de offerte zelf nooit blokkeren of
     // laten mislukken, ook niet als deze aanroep om wat voor reden dan ook faalt.
-    fetch('/api/offerte', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 'of-naam': payload.naam, 'of-email': payload.email, ...payload }),
-    }).catch(() => {});
+    // Incomplete/placeholder data wordt server-side geweigerd (geen "onbekend"-mail).
+    submitToBackend('/api/offerte', payload).catch(() => {});
   }
 
   function printOfferte(){
@@ -4499,14 +4565,28 @@ whk: `
     setTimeout(cleanup, 1500);
   }
 
-  function verstuurContactverzoek(){
-    const naam = document.getElementById('of-naam').value.trim();
-    const voornaam = naam.split(' ')[0] || 'daar';
-    document.getElementById('of-contact-titel').textContent = `Bedankt, ${voornaam} — we nemen binnen 24 uur contact met je op.`;
-    document.getElementById('offerte-form-step').classList.add('hidden');
-    document.getElementById('offerte-contact-result').classList.remove('hidden');
-    trackEvent('lead_offerte_contactverzoek');
-    submitToBackend('/api/offerte', collectFieldsIn('#view-offerte', 'of-'));
+  async function verstuurContactverzoek(){
+    const payload = collectOfferteLead('offerte-contact');
+    const errors = leadClientErrors({ naam: payload.naam, email: payload.email, telefoon: payload.telefoon, requireEmail: true, requirePhone: true });
+    if(errors.length){
+      showFormError('of-error', errors);
+      return;
+    }
+    showFormError('of-error', []);
+    const btn = document.getElementById('btn-of-contact');
+    btn.disabled = true;
+    try {
+      await submitToBackend('/api/offerte', payload);
+      const voornaam = payload.naam.split(' ')[0] || 'daar';
+      document.getElementById('of-contact-titel').textContent = `Bedankt, ${voornaam} — we nemen binnen 24 uur contact met je op.`;
+      document.getElementById('offerte-form-step').classList.add('hidden');
+      document.getElementById('offerte-contact-result').classList.remove('hidden');
+      trackEvent('lead_offerte_contactverzoek');
+    } catch(err){
+      showFormError('of-error', [err.message || 'Versturen is niet gelukt. Probeer het opnieuw.']);
+      btn.disabled = false;
+      checkOfferteForm();
+    }
   }
 
   const formData = { dienst:'', wet:'', vorm:'', grootte:'' };
@@ -4531,7 +4611,11 @@ whk: `
 
   function reqVal(id){ const el = document.getElementById(id); return el ? el.value.trim() : ''; }
   function checkStep2(){
-    const ok = reqVal('inp-rol') && reqVal('inp-aanvrager-naam') && reqVal('inp-aanvrager-werkgever') && reqVal('inp-aanvrager-email') && reqVal('inp-aanvrager-tel');
+    const naam = reqVal('inp-aanvrager-naam');
+    const email = reqVal('inp-aanvrager-email');
+    const tel = reqVal('inp-aanvrager-tel');
+    const contactOk = !leadClientErrors({ naam, email, telefoon: tel, requireEmail: true, requirePhone: true }).length;
+    const ok = reqVal('inp-rol') && contactOk && reqVal('inp-aanvrager-werkgever');
     document.getElementById('btn-to-step3').disabled = !ok;
   }
   ['inp-rol','inp-aanvrager-naam','inp-aanvrager-werkgever','inp-aanvrager-email','inp-aanvrager-tel'].forEach(id=>{
@@ -4667,11 +4751,44 @@ whk: `
         ? `Je ontvangt een bevestiging op ${email || 'je e-mailadres'}. Je gegevens worden ook doorgezet naar Best Match Re-integratie voor de Spoor 2-offerte — zij nemen apart contact op. Kies hieronder alvast een moment voor de intake van het arbeidsdeskundig onderzoek.`
         : `Je ontvangt een bevestiging op ${email || 'je e-mailadres'}. Kies hieronder alvast een moment voor de intake.`;
       trackEvent('lead_aanmelding_voltooid', { spoor2_aangevraagd: spoor2 });
-      const aanmeldFields = collectFieldsIn('#view-aanmelden', 'inp-');
-      aanmeldFields['chk-spoor2'] = spoor2;
-      submitToBackend('/api/aanmelden', aanmeldFields);
     }
     window.scrollTo({top:0, behavior:'instant'});
+  }
+
+  async function submitAanmelding(){
+    const errors = [];
+    if(!formData.dienst) errors.push('Kies het type dienstverlening.');
+    if(!formData.wet) errors.push('Kies om welke wet het gaat.');
+    if(!formData.vorm) errors.push('Kies online of fysiek.');
+    if(!formData.grootte) errors.push('Kies de bedrijfsgrootte.');
+    errors.push(...leadClientErrors({
+      naam: reqVal('inp-aanvrager-naam'),
+      email: reqVal('inp-aanvrager-email'),
+      telefoon: reqVal('inp-aanvrager-tel'),
+      requireEmail: true,
+      requirePhone: true,
+    }));
+    if(errors.length){
+      showFormError('aanmeld-error', errors);
+      return;
+    }
+    showFormError('aanmeld-error', []);
+    const btn = document.getElementById('btn-to-step7');
+    btn.disabled = true;
+    const aanmeldFields = collectFieldsIn('#view-aanmelden', 'inp-');
+    aanmeldFields['chk-spoor2'] = !!(document.getElementById('chk-spoor2') && document.getElementById('chk-spoor2').checked);
+    aanmeldFields.dienst = formData.dienst;
+    aanmeldFields.wet = formData.wet;
+    aanmeldFields.vorm = formData.vorm;
+    aanmeldFields.grootte = formData.grootte;
+    try {
+      await submitToBackend('/api/aanmelden', aanmeldFields);
+      goStep(7);
+    } catch(err){
+      showFormError('aanmeld-error', [err.message || 'Versturen is niet gelukt. Probeer het opnieuw.']);
+      btn.disabled = false;
+      checkStep6();
+    }
   }
 
   /* ================= Adviestool: Spoor 2 & IVA (intern) ================= */
@@ -4849,11 +4966,20 @@ whk: `
   /* ================= Checklist lead magnet ================= */
   function openChecklistModal(){ document.getElementById('checklist-overlay').classList.remove('hidden'); }
   function closeChecklistModal(){ document.getElementById('checklist-overlay').classList.add('hidden'); }
-  function submitChecklist(){
+  async function submitChecklist(){
     const naam = document.getElementById('cl-naam').value.trim();
     const email = document.getElementById('cl-email').value.trim();
-    if(!naam || !email){
-      alert('Vul je naam en e-mailadres in, dan sturen we de checklist meteen door.');
+    const website = ((document.getElementById('cl-website') || {}).value || '').trim();
+    const errors = leadClientErrors({ naam, email, telefoon: '', requireEmail: true, requirePhone: false });
+    if(errors.length){
+      showFormError('cl-error', errors);
+      return;
+    }
+    showFormError('cl-error', []);
+    try {
+      await submitToBackend('/api/checklist', { naam, email, 'cl-naam': naam, 'cl-email': email, website });
+    } catch(err){
+      showFormError('cl-error', [err.message || 'Versturen is niet gelukt. Probeer het opnieuw.']);
       return;
     }
     document.getElementById('checklist-form-step').classList.add('hidden');
@@ -4864,7 +4990,6 @@ whk: `
       el.style.animation = '';
     });
     trackEvent('lead_checklist_download');
-    submitToBackend('/api/checklist', collectFieldsIn('#checklist-overlay', 'cl-'));
   }
   function printChecklist(){
     document.body.classList.add('print-mode');
@@ -4881,34 +5006,37 @@ whk: `
     document.getElementById('belterug-form-step').classList.remove('hidden');
     document.getElementById('belterug-result-step').classList.add('hidden');
   }
-  function submitBelTerug(){
+  async function submitBelTerug(){
     const naam = document.getElementById('bt-naam').value.trim();
     const telefoon = document.getElementById('bt-telefoon').value.trim();
-    if(!naam || !telefoon){
-      alert('Vul je naam en telefoonnummer in, dan bellen we je terug.');
+    const moment = (document.getElementById('bt-moment').value || '').trim();
+    const website = ((document.getElementById('bt-website') || {}).value || '').trim();
+    const errors = leadClientErrors({ naam, email: '', telefoon, requireEmail: false, requirePhone: true });
+    if(errors.length){
+      showFormError('bt-error', errors);
       return;
     }
+    showFormError('bt-error', []);
     const btn = document.getElementById('bt-submit-btn');
     const origLabel = btn.textContent;
     btn.disabled = true;
     btn.textContent = 'Bezig met versturen...';
-
-    const payload = collectFieldsIn('#belterug-overlay', 'bt-');
-    fetch('/api/bel-me-terug', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-      .catch(() => { /* stille fout: de gebruiker ziet altijd de bevestiging, ongeacht e-maillevering */ })
-      .finally(() => {
-        btn.disabled = false;
-        btn.textContent = origLabel;
-        const voornaam = naam.split(' ')[0] || 'daar';
-        document.getElementById('bt-result-titel').textContent = `Bedankt, ${voornaam} — we bellen je zo snel mogelijk terug.`;
-        document.getElementById('belterug-form-step').classList.add('hidden');
-        document.getElementById('belterug-result-step').classList.remove('hidden');
-        trackEvent('lead_bel_me_terug');
+    try {
+      await submitToBackend('/api/bel-me-terug', {
+        naam, telefoon, moment, website,
+        'bt-naam': naam, 'bt-telefoon': telefoon, 'bt-moment': moment,
       });
+      const voornaam = naam.split(' ')[0] || 'daar';
+      document.getElementById('bt-result-titel').textContent = `Bedankt, ${voornaam} — we bellen je zo snel mogelijk terug.`;
+      document.getElementById('belterug-form-step').classList.add('hidden');
+      document.getElementById('belterug-result-step').classList.remove('hidden');
+      trackEvent('lead_bel_me_terug');
+    } catch(err){
+      showFormError('bt-error', [err.message || 'Versturen is niet gelukt. Probeer het opnieuw.']);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = origLabel;
+    }
   }
 
   /* ================= Gerelateerde artikelen ================= */

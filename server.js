@@ -10,6 +10,16 @@ const compression = require('compression');
 const helmet = require('helmet');
 const path = require('path');
 const fs = require('fs');
+const {
+    isHoneypotTriggered,
+    isTestLead,
+    leadDedupeKey,
+    notifyIsSafe,
+    validateOfferteLead,
+    validateAanmeldLead,
+    validateChecklistLead,
+    validateBelMeTerugLead,
+} = require('./lead-validation');
 
 const app = express();
 
@@ -23,7 +33,9 @@ process.on('unhandledRejection', (err) => {
     console.error('[proces] Onverwachte afgewezen promise (proces blijft draaien):', err);
 });
 const PORT = process.env.PORT || 3000;
-const BASE_URL = process.env.BASE_URL || 'https://www.arbeidsdeskundig.com';
+// Altijd zonder trailing slash, zodat sitemap/canonicals nooit // in de URL krijgen
+// als BASE_URL in Railway per ongeluk mét slash is gezet.
+const BASE_URL = (process.env.BASE_URL || 'https://www.arbeidsdeskundig.com').replace(/\/$/, '');
 
 const INDEX_HTML = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8');
 
@@ -49,53 +61,105 @@ try {
 // enige bron van waarheid. Geen los posts.json-bestand meer om synchroon te
 // houden: pas je een artikel aan in index.html, dan klopt de routing vanzelf.
 function extractPosts(html) {
-    const start = html.indexOf('const posts = [');
-    const end = html.indexOf('\n  ];', start);
-    const block = html.slice(start, end);
-    const lines = block.match(/\{ tag:.*? \},?/gs) || [];
-    const field = (name, line) => {
-        const m = line.match(new RegExp(name + ':"((?:[^"\\\\]|\\\\.)*)"'));
-        return m ? m[1].replace(/\\"/g, '"') : null;
-    };
-    const extractFaq = (line) => {
-        const idx = line.indexOf('faq:[');
-        if (idx === -1) return null;
-        // Balanced-bracket scan vanaf 'faq:' tot de bijbehorende sluit-bracket.
-        let depth = 0, i = idx + 4, startIdx = -1;
-        for (; i < line.length; i++) {
-            if (line[i] === '[') { if (depth === 0) startIdx = i; depth++; }
-            else if (line[i] === ']') { depth--; if (depth === 0) { i++; break; } }
+    try {
+        const start = html.indexOf('const posts = [');
+        if (start === -1) {
+            console.error('[seo] Geen `const posts = [` gevonden in index.html — kennisbank-URLs ontbreken in sitemap.');
+            return [];
         }
-        const raw = line.slice(startIdx, i);
-        try { return JSON.parse(raw); } catch (e) { return null; }
-    };
-    return lines
-        .map((line) => ({
-            slug: field('slug', line),
-            title: field('title', line),
-            meta: field('meta', line),
-            tag: field('tag', line),
-            faq: extractFaq(line),
-        }))
-        .filter((p) => p.slug);
+        const end = html.indexOf('\n  ];', start);
+        const block = end === -1 ? html.slice(start) : html.slice(start, end);
+        const lines = block.match(/\{ tag:.*? \},?/gs) || [];
+        const field = (name, line) => {
+            const m = line.match(new RegExp(name + ':"((?:[^"\\\\]|\\\\.)*)"'));
+            return m ? m[1].replace(/\\"/g, '"') : null;
+        };
+        const extractBracketArray = (key, line) => {
+            const needle = key + ':[';
+            const idx = line.indexOf(needle);
+            if (idx === -1) return null;
+            // Balanced-bracket scan vanaf 'key:' tot de bijbehorende sluit-bracket.
+            let depth = 0, i = idx + key.length, startIdx = -1;
+            for (; i < line.length; i++) {
+                if (line[i] === '[') { if (depth === 0) startIdx = i; depth++; }
+                else if (line[i] === ']') { depth--; if (depth === 0) { i++; break; } }
+            }
+            const raw = line.slice(startIdx, i);
+            try { return JSON.parse(raw); } catch (e) { return null; }
+        };
+        return lines
+            .map((line) => ({
+                slug: field('slug', line),
+                title: field('title', line),
+                meta: field('meta', line),
+                tag: field('tag', line),
+                read: field('read', line),
+                kernpunten: extractBracketArray('kernpunten', line),
+                faq: extractBracketArray('faq', line),
+            }))
+            .filter((p) => p.slug);
+    } catch (err) {
+        console.error('[seo] Posts uit index.html lezen mislukt — sitemap valt terug op statische pagina\'s:', err);
+        return [];
+    }
 }
 
 const posts = extractPosts(INDEX_HTML);
 
+// Artikelteksten (template literals in `articleContent`) — nodig om kennisbank-
+// URL's zonder JavaScript al unieke, crawlbare content te geven. Zonder dit
+// ziet Google op elke artikel-URL dezelfde homepage (view-home is standaard
+// `active`, `#artikel-body` is leeg) en classificeert dat als soft-404.
+function extractArticleBodies(html) {
+    const startMarker = 'const articleContent = {';
+    const start = html.indexOf(startMarker);
+    if (start === -1) return {};
+    const end = html.indexOf('\n  const kGrid = ', start);
+    if (end === -1) return {};
+    const block = html.slice(start + startMarker.length, end);
+    const bodies = {};
+    const re = /(?:^|\n)(?:"([^"]+)"|([A-Za-z0-9_]+))\s*:\s*`([\s\S]*?)`\s*,?/g;
+    let m;
+    while ((m = re.exec(block))) {
+        bodies[m[1] || m[2]] = m[3];
+    }
+    return bodies;
+}
+
+const articleBodies = extractArticleBodies(INDEX_HTML);
+
+// Oude of verkeerd geschreven slugs die Google nog crawlt → huidige artikel.
+// Alleen permanente 301's naar een live equivalent; geen nieuwe pagina's.
+const KENNISBANK_SLUG_REDIRECTS = {
+    'mediations-arbeidsconflict': 'mediation-arbeidsconflict',
+};
+
 // personaData is pure JSON (gegenereerd met json.dumps), dus simpel te parsen —
 // geen regex-gepuzzel zoals bij de `posts`-array met zijn JS-objectliteral-syntax.
 function extractPersonas(html) {
-    const start = html.indexOf('const personaData = ');
-    const jsonStart = html.indexOf('[', start);
-    let depth = 0, i = jsonStart;
-    for (; i < html.length; i++) {
-        if (html[i] === '[') depth++;
-        else if (html[i] === ']') { depth--; if (depth === 0) { i++; break; } }
+    try {
+        const start = html.indexOf('const personaData = ');
+        if (start === -1) {
+            console.error('[seo] Geen `const personaData` gevonden in index.html — /voor/-URLs ontbreken in sitemap.');
+            return [];
+        }
+        const jsonStart = html.indexOf('[', start);
+        if (jsonStart === -1) return [];
+        let depth = 0, i = jsonStart;
+        for (; i < html.length; i++) {
+            if (html[i] === '[') depth++;
+            else if (html[i] === ']') { depth--; if (depth === 0) { i++; break; } }
+        }
+        const parsed = JSON.parse(html.slice(jsonStart, i));
+        return Array.isArray(parsed) ? parsed.filter((p) => p && p.slug) : [];
+    } catch (e) {
+        console.error('[seo] Personas uit index.html lezen mislukt — sitemap slaat /voor/-URLs over:', e);
+        return [];
     }
-    try { return JSON.parse(html.slice(jsonStart, i)); } catch (e) { return []; }
 }
 
 const personas = extractPersonas(INDEX_HTML);
+console.log(`[seo] ${posts.length} kennisbank-artikelen en ${personas.length} doelgroep-pagina's geladen`);
 const DEFAULT_TITLE = 'arbeidsdeskundig.com — Arbeidsdeskundig onderzoek, online én fysiek';
 const DEFAULT_DESC = 'Arbeidsdeskundig onderzoek vanaf €1.095,-. Online of fysiek, door heel Nederland. Specialist in WGA, Ziektewet en Wet Poortwachter.';
 
@@ -106,7 +170,15 @@ app.disable('x-powered-by');
 // helmet-headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy,
 // HSTS, enz.) staan wel aan — dat is winst zonder risico. Wil je later een
 // strikte CSP, dan hoort daar eerst een refactor naar externe .js/.css bij.
-app.use(helmet({ contentSecurityPolicy: false }));
+// CORP staat op cross-origin: dit is een publieke marketingsite. Helmet's
+// default `same-origin` laat browsers (en sommige SEO-/fetch-tools) de
+// sitemap als geblokkeerde cross-origin resource behandelen — dat wordt
+// vaak als HTTP 500 of "couldn't fetch sitemap" gerapporteerd, terwijl
+// curl wél 200 ziet.
+app.use(helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
 app.use(express.json({ limit: '200kb' }));
 
 // SEO: forceer één canonieke versie van de site. Zonder dit ziet Google
@@ -152,12 +224,60 @@ function escapeHtml(str) {
     }[c]));
 }
 
+function activateView(html, view) {
+    if (!view || view === 'home') return html;
+    html = html.replace('<div class="view active" id="view-home">', '<div class="view" id="view-home">');
+    const viewId = 'view-' + view;
+    html = html.replace(`<div class="view" id="${viewId}">`, `<div class="view active" id="${viewId}">`);
+    return html;
+}
+
+function hydrateArtikelView(html, post, body) {
+    if (!post) return html;
+    html = html.replace(
+        'id="artikel-tag" onclick="filterKennisbankVanArtikel()">Ziektewet</button>',
+        `id="artikel-tag" onclick="filterKennisbankVanArtikel()">${escapeHtml(post.tag)}</button>`
+    );
+    html = html.replace('id="artikel-titel">Titel</h1>', `id="artikel-titel">${escapeHtml(post.title)}</h1>`);
+    html = html.replace('id="artikel-breadcrumb-tag"></span>', `id="artikel-breadcrumb-tag">${escapeHtml(post.tag)}</span>`);
+    html = html.replace('id="artikel-breadcrumb-titel"></span>', `id="artikel-breadcrumb-titel">${escapeHtml(post.title)}</span>`);
+    const readLabel = post.read ? `Leestijd: ${escapeHtml(post.read)} · Laatst bijgewerkt: 2026` : 'Laatst bijgewerkt: 2026';
+    html = html.replace('id="artikel-meta">Leestijd: 6 minuten · Laatst bijgewerkt: 2026</p>', `id="artikel-meta">${readLabel}</p>`);
+    html = html.replace('id="artikel-metadesc"></p>', `id="artikel-metadesc">${escapeHtml(post.meta || '')}</p>`);
+    if (post.kernpunten && post.kernpunten.length) {
+        const items = post.kernpunten.map((k) => `<li>${escapeHtml(k)}</li>`).join('');
+        html = html.replace(
+            'id="artikel-kernpunten" style="margin:8px 0 0; padding-left:18px; font-size:.87rem; color:var(--muted); line-height:1.6;"></ul>',
+            `id="artikel-kernpunten" style="margin:8px 0 0; padding-left:18px; font-size:.87rem; color:var(--muted); line-height:1.6;">${items}</ul>`
+        );
+    }
+    if (body) {
+        html = html.replace('id="artikel-body"></div>', `id="artikel-body">${body}</div>`);
+    }
+    if (post.faq && post.faq.length) {
+        const faqHtml = post.faq.map(([q, a]) => (
+            `<div class="accordion-item open">` +
+            `<button class="accordion-head" onclick="toggleAccordion(this)">${escapeHtml(q)}<span class="accordion-icon">+</span></button>` +
+            `<div class="accordion-body" style="max-height:none;"><div class="accordion-body-inner">${escapeHtml(a)}</div></div>` +
+            `</div>`
+        )).join('');
+        html = html.replace('id="artikel-faq-wrap" class="hidden"', 'id="artikel-faq-wrap"');
+        html = html.replace('id="artikel-faq-list" style="margin-top:12px;"></div>', `id="artikel-faq-list" style="margin-top:12px;">${faqHtml}</div>`);
+    }
+    return html;
+}
+
 function renderPage(res, { title, description, canonicalPath, route, articleJsonLd, breadcrumbJsonLd, faqJsonLd, statusCode }) {
-    const canonical = BASE_URL.replace(/\/$/, '') + canonicalPath;
+    const canonical = BASE_URL + canonicalPath;
     const safeTitle = escapeHtml(title || DEFAULT_TITLE);
     const safeDesc = escapeHtml(description || DEFAULT_DESC);
 
     let html = INDEX_HTML;
+    html = activateView(html, route && route.view);
+    if (route && route.view === 'artikel' && route.slug) {
+        const post = posts.find((p) => p.slug === route.slug);
+        html = hydrateArtikelView(html, post, articleBodies[route.slug]);
+    }
 
     // <title>
     html = html.replace(/<title>.*?<\/title>/s, `<title>${safeTitle}</title>`);
@@ -210,9 +330,53 @@ function breadcrumbFor(items) {
             '@type': 'ListItem',
             position: i + 1,
             name: it.name,
-            item: BASE_URL.replace(/\/$/, '') + it.path,
+            item: BASE_URL + it.path,
         })),
     };
+}
+
+function xmlEscape(str) {
+    return String(str || '').replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;',
+    }[c]));
+}
+
+function absoluteUrl(pathname) {
+    if (!pathname || pathname === '/') return BASE_URL + '/';
+    return BASE_URL + (pathname.startsWith('/') ? pathname : '/' + pathname);
+}
+
+function sitemapUrlEl(loc, { changefreq = 'weekly', priority = '0.7' } = {}) {
+    const today = new Date().toISOString().slice(0, 10);
+    return `  <url><loc>${xmlEscape(loc)}</loc><lastmod>${today}</lastmod><changefreq>${changefreq}</changefreq><priority>${priority}</priority></url>`;
+}
+
+function buildSitemapXml() {
+    const staticPaths = [
+        '/', '/rekentool', '/keuzehulp', '/veelgestelde-vragen',
+        '/over-ons', '/offerte-aanvragen', '/aanmelden', '/kennisbank',
+    ];
+    const personaList = Array.isArray(personas) ? personas : [];
+    const postList = Array.isArray(posts) ? posts : [];
+    const urls = [
+        ...staticPaths.map((p) => sitemapUrlEl(absoluteUrl(p), {
+            changefreq: 'weekly',
+            priority: p === '/' ? '1.0' : '0.7',
+        })),
+        ...personaList
+            .filter((p) => p && p.slug)
+            .map((p) => sitemapUrlEl(absoluteUrl('/voor/' + p.slug), {
+                changefreq: 'monthly',
+                priority: '0.7',
+            })),
+        ...postList
+            .filter((p) => p && p.slug)
+            .map((p) => sitemapUrlEl(absoluteUrl('/kennisbank/' + p.slug), {
+                changefreq: 'monthly',
+                priority: '0.6',
+            })),
+    ];
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -304,6 +468,9 @@ app.get('/voor/:slug', (req, res, next) => {
 });
 
 app.get('/kennisbank/:slug', (req, res, next) => {
+    const alias = KENNISBANK_SLUG_REDIRECTS[req.params.slug];
+    if (alias) return res.redirect(301, '/kennisbank/' + alias);
+
     const post = posts.find((p) => p.slug === req.params.slug);
     if (!post) return next(); // -> 404 handler
 
@@ -317,7 +484,7 @@ app.get('/kennisbank/:slug', (req, res, next) => {
         inLanguage: 'nl-NL',
         author: { '@type': 'Organization', name: 'Matchvermogen B.V.' },
         publisher: { '@type': 'Organization', name: 'arbeidsdeskundig.com' },
-        mainEntityOfPage: BASE_URL.replace(/\/$/, '') + '/kennisbank/' + post.slug,
+        mainEntityOfPage: BASE_URL + '/kennisbank/' + post.slug,
     };
 
     // Elk artikel met FAQ-items krijgt zijn eigen FAQPage-schema — los van het
@@ -352,21 +519,27 @@ app.get('/kennisbank/:slug', (req, res, next) => {
 });
 
 // ---------------------------------------------------------------------------
-// sitemap.xml — dynamisch, inclusief alle kennisbank-artikelen
+// sitemap.xml — dynamisch, inclusief alle kennisbank-artikelen.
+// Mag nooit 500 teruggeven: ontbrekende posts/personas → weglaten, niet crashen.
 // ---------------------------------------------------------------------------
+function sendSitemap(res, xml) {
+    res.status(200)
+        .set({
+            'Content-Type': 'application/xml; charset=utf-8',
+            'Cache-Control': 'public, max-age=3600',
+            'Access-Control-Allow-Origin': '*',
+        })
+        .send(xml);
+}
+
 app.get('/sitemap.xml', (req, res) => {
-    const today = new Date().toISOString().slice(0, 10);
-    const staticPaths = [
-        '/', '/rekentool', '/keuzehulp', '/veelgestelde-vragen',
-        '/over-ons', '/offerte-aanvragen', '/aanmelden', '/kennisbank',
-    ];
-    const urls = [
-        ...staticPaths.map((p) => `  <url><loc>${BASE_URL}${p}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>${p === '/' ? '1.0' : '0.7'}</priority></url>`),
-        ...personas.map((p) => `  <url><loc>${BASE_URL}/voor/${p.slug}</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>`),
-        ...posts.map((p) => `  <url><loc>${BASE_URL}/kennisbank/${p.slug}</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>`),
-    ];
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>`;
-    res.set('Content-Type', 'application/xml').send(xml);
+    try {
+        sendSitemap(res, buildSitemapXml());
+    } catch (err) {
+        console.error('[sitemap] generatie mislukt, stuur minimale fallback:', err);
+        const fallback = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrlEl(absoluteUrl('/'), { changefreq: 'weekly', priority: '1.0' })}\n</urlset>`;
+        sendSitemap(res, fallback);
+    }
 });
 
 // ---------------------------------------------------------------------------
@@ -401,7 +574,10 @@ Allow: /
 
 Sitemap: ${BASE_URL}/sitemap.xml
 `;
-    res.set('Content-Type', 'text/plain').send(txt);
+    res.set({
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Access-Control-Allow-Origin': '*',
+    }).send(txt);
 });
 
 // ---------------------------------------------------------------------------
@@ -411,6 +587,7 @@ Sitemap: ${BASE_URL}/sitemap.xml
 // kan alleen helpen bij vindbaarheid in ChatGPT/Perplexity/Claude e.d.
 // ---------------------------------------------------------------------------
 app.get('/llms.txt', (req, res) => {
+    try {
     const byTag = {};
     posts.forEach((p) => {
         if (!byTag[p.tag]) byTag[p.tag] = [];
@@ -447,6 +624,10 @@ ${personas.map((p) => `- [${p.title}](${BASE_URL}/voor/${p.slug}): ${p.meta}`).j
         });
     });
     res.set('Content-Type', 'text/plain; charset=utf-8').send(txt);
+    } catch (err) {
+        console.error('[llms.txt] generatie mislukt:', err);
+        res.status(200).set('Content-Type', 'text/plain; charset=utf-8').send(`# arbeidsdeskundig.com\n\n${BASE_URL}/\n`);
+    }
 });
 
 // Health check (handig voor Railway se deploy-status)
@@ -493,9 +674,99 @@ async function sendEmail({ to, subject, html, replyTo, attachments }) {
 // Zet een { veldnaam: waarde }-object om in een nette HTML-lijst voor in de e-mail.
 function fieldsToHtml(fields) {
     return Object.entries(fields)
-        .filter(([, v]) => v !== undefined && v !== null && v !== '')
-        .map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0; color:#666; vertical-align:top;">${escapeHtml(k)}</td><td style="padding:4px 0;">${escapeHtml(String(v))}</td></tr>`)
+        .filter(([, v]) => v !== undefined && v !== null && v !== '' && v !== false)
+        .map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0; color:#666; vertical-align:top;">${escapeHtml(k)}</td><td style="padding:4px 0;">${escapeHtml(v === true ? 'Ja' : String(v))}</td></tr>`)
         .join('');
+}
+
+function rejectLead(res, result) {
+    return res.status(400).json({
+        ok: false,
+        error: (result.errors && result.errors[0]) || 'Controleer je gegevens en probeer opnieuw.',
+        details: result.errors || [],
+    });
+}
+
+function ignoreHoneypot(res, fields, label) {
+    if (!isHoneypotTriggered(fields)) return false;
+    console.log(`[${label}] honeypot gevuld — geen e-mail verstuurd`);
+    res.json({ ok: true });
+    return true;
+}
+
+function offerteMailFields(lead) {
+    const bronLabel = lead.bron === 'offerte-pdf'
+        ? 'PDF-offerte'
+        : (lead.bron === 'offerte-contact' ? 'Contactverzoek' : 'Offerte');
+    return {
+        Aanvraag: bronLabel,
+        Dienst: lead.dienst || 'Arbeidsdeskundig onderzoek',
+        Naam: lead.naam,
+        Bedrijf: lead.bedrijf,
+        'E-mail': lead.email,
+        Telefoon: lead.telefoon,
+        Bedrijfsgrootte: OFFERTE_GROOTTE_LABELS[lead.grootte] || lead.grootte,
+        Onderzoeksvorm: lead.vorm,
+        Omschrijving: lead.omschrijving,
+    };
+}
+
+function leftoverFormFields(raw, skipKeys) {
+    const skip = new Set(skipKeys);
+    const out = {};
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
+    for (const [key, val] of Object.entries(raw)) {
+        if (skip.has(key)) continue;
+        if (/(^|-)(website|url|honeypot|_hp)$/i.test(key)) continue;
+        if (key.startsWith('of-doc-')) continue;
+        if (val === undefined || val === null || val === '') continue;
+        out[key] = val;
+    }
+    return out;
+}
+
+// Voorkomt dat dezelfde lead binnen een paar seconden twee keer als
+// sales-mail binnenkomt (dubbele klik, bot-retry). Alleen de notificatie
+// naar info@ wordt overgeslagen; de HTTP-response blijft 200.
+const recentLeadNotifies = new Map();
+const LEAD_DEDUPE_MS = 8000;
+
+function shouldSkipDuplicateNotify(kind, lead) {
+    const now = Date.now();
+    for (const [key, ts] of recentLeadNotifies) {
+        if (now - ts > LEAD_DEDUPE_MS) recentLeadNotifies.delete(key);
+    }
+    const key = leadDedupeKey(kind, lead);
+    const prev = recentLeadNotifies.get(key);
+    if (prev && now - prev < LEAD_DEDUPE_MS) return true;
+    recentLeadNotifies.set(key, now);
+    return false;
+}
+
+async function deliverSalesLead({ kind, lead, rawFields, notifySubject, notifyHtml, replyTo, visitor }) {
+    if (isTestLead(lead, rawFields)) {
+        console.log(`[${kind}] testdata — geen sales-notificatie naar info@ (${lead.naam || ''}, ${lead.email || lead.telefoon || ''})`);
+        return { ok: true, test: true };
+    }
+    if (!notifyIsSafe(notifySubject, notifyHtml, lead)) {
+        // Productiemail 16 sep: subject "... — onbekend" + lege <table></table>.
+        console.error(`[${kind}] geblokkeerd: onveilige notificatie (lege tabel, onbekend of ontbrekende contactgegevens)`);
+        return { ok: false, blocked: true };
+    }
+    if (shouldSkipDuplicateNotify(kind, lead)) {
+        console.log(`[${kind}] dubbele inzending binnen ${LEAD_DEDUPE_MS / 1000}s — tweede mail naar info@ overgeslagen`);
+        return { ok: true, duplicate: true };
+    }
+    await sendEmail({
+        to: NOTIFY_EMAIL,
+        subject: notifySubject,
+        html: notifyHtml,
+        replyTo,
+    });
+    if (visitor && visitor.to) {
+        await sendEmail(visitor);
+    }
+    return { ok: true };
 }
 
 // ---------------------------------------------------------------------------
@@ -566,7 +837,7 @@ function saniteerVoorNummer(tekst) {
 function volgendOfferteNummer(klantBedrijf, klantNaam, klantEmail) {
     const jaar = new Date().getFullYear();
     // Sleutel voor de telling: bedrijfsnaam als die er is, anders naam, anders e-mail.
-    const sleutelBron = (klantBedrijf || klantNaam || klantEmail || 'onbekend').trim().toLowerCase();
+    const sleutelBron = (klantBedrijf || klantNaam || klantEmail || 'klant').trim().toLowerCase();
     const sleutel = sleutelBron.replace(/[^a-z0-9]/g, '');
     // Weergave in het nummer zelf: dezelfde voorkeursvolgorde.
     const weergaveNaam = klantBedrijf || klantNaam || 'Klant';
@@ -714,20 +985,28 @@ function genereerOffertePdf(fields) {
 app.post('/api/offerte-pdf', async (req, res) => {
     console.log('[offerte-pdf] verzoek ontvangen');
     const fields = req.body || {};
-    const naam = (fields.naam || '').trim();
-    const email = (fields.email || '').trim();
-    const telefoon = (fields.telefoon || '').trim();
-    if (!naam || !email || !telefoon) {
+    if (ignoreHoneypot(res, fields, 'offerte-pdf')) return;
+    const parsed = validateOfferteLead(fields);
+    if (!parsed.ok) {
         console.log('[offerte-pdf] verplichte velden ontbreken, 400');
-        return res.status(400).json({ ok: false, error: 'Naam, e-mail en telefoon zijn verplicht.' });
+        return rejectLead(res, parsed);
     }
+    const lead = parsed.lead;
 
     try {
         console.log('[offerte-pdf] PDF genereren...');
-        const pdfBuffer = await genereerOffertePdf(fields);
+        const pdfBuffer = await genereerOffertePdf({
+            naam: lead.naam,
+            bedrijf: lead.bedrijf,
+            email: lead.email,
+            telefoon: lead.telefoon,
+            grootte: lead.grootte || 'midden',
+            vorm: lead.vorm || 'Online',
+            omschrijving: lead.omschrijving,
+        });
         console.log('[offerte-pdf] PDF klaar,', pdfBuffer.length, 'bytes');
         const pdfBase64 = pdfBuffer.toString('base64');
-        const voornaam = naam.split(' ')[0] || 'daar';
+        const voornaam = lead.naam.split(' ')[0] || 'daar';
         const attachments = [{ filename: 'offerte-arbeidsdeskundig-onderzoek.pdf', content: pdfBase64 }];
 
         // De PDF gaat rechtstreeks als bestand terug (geen JSON/base64-omweg meer).
@@ -742,19 +1021,23 @@ app.post('/api/offerte-pdf', async (req, res) => {
         console.log('[offerte-pdf] PDF-bestand verstuurd naar browser');
 
         sendEmail({
-            to: email,
+            to: lead.email,
             subject: 'Je vrijblijvende offerte — arbeidsdeskundig.com',
             html: `<p>Bedankt, ${escapeHtml(voornaam)} — hierbij je vrijblijvende offerte als PDF. Geen verplichtingen: neem gerust de tijd, en stel vooral vragen als iets niet duidelijk is.</p>`,
             attachments,
         }).then(() => console.log('[offerte-pdf] e-mail naar aanvrager verstuurd')).catch((err) => console.error('[offerte-pdf] e-mail naar aanvrager mislukt:', err));
 
-        sendEmail({
-            to: NOTIFY_EMAIL,
-            subject: `Nieuwe PDF-offerte gegenereerd — ${naam}`,
-            html: `<h2>Vrijblijvende offerte gegenereerd via arbeidsdeskundig.com</h2><table>${fieldsToHtml(fields)}</table>`,
-            replyTo: email,
-            attachments,
-        }).then(() => console.log('[offerte-pdf] notificatiemail verstuurd')).catch((err) => console.error('[offerte-pdf] notificatiemail mislukt:', err));
+        if (!isTestLead(lead, fields) && !shouldSkipDuplicateNotify('offerte-pdf', lead)) {
+            sendEmail({
+                to: NOTIFY_EMAIL,
+                subject: `Nieuwe PDF-offerte gegenereerd — ${lead.naam}`,
+                html: `<h2>Vrijblijvende offerte gegenereerd via arbeidsdeskundig.com</h2><table>${fieldsToHtml(offerteMailFields({ ...lead, bron: lead.bron || 'offerte-pdf' }))}</table>`,
+                replyTo: lead.email,
+                attachments,
+            }).then(() => console.log('[offerte-pdf] notificatiemail verstuurd')).catch((err) => console.error('[offerte-pdf] notificatiemail mislukt:', err));
+        } else {
+            console.log('[offerte-pdf] testdata of duplicaat — geen sales-notificatie');
+        }
     } catch (err) {
         console.error('[offerte-pdf] FOUT tijdens verwerking:', err);
         if (!res.headersSent) {
@@ -765,89 +1048,138 @@ app.post('/api/offerte-pdf', async (req, res) => {
 
 app.post('/api/offerte', async (req, res) => {
     const fields = req.body || {};
-    const email = fields['of-email'] || fields.email;
-    const naam = fields['of-naam'] || fields.naam || '';
-    const voornaam = naam.split(' ')[0] || 'daar';
-
-    await sendEmail({
-        to: NOTIFY_EMAIL,
-        subject: `Nieuwe offerteaanvraag — ${naam || 'onbekend'}`,
-        html: `<h2>Nieuwe offerteaanvraag via arbeidsdeskundig.com</h2><table>${fieldsToHtml(fields)}</table>`,
-        replyTo: email,
-    });
-    if (email) {
-        await sendEmail({
-            to: email,
+    if (ignoreHoneypot(res, fields, 'offerte')) return;
+    const parsed = validateOfferteLead(fields);
+    if (!parsed.ok) {
+        console.log('[offerte] afgewezen:', parsed.errors.join('; '));
+        return rejectLead(res, parsed);
+    }
+    const lead = parsed.lead;
+    const voornaam = lead.naam.split(' ')[0] || 'daar';
+    const delivered = await deliverSalesLead({
+        kind: 'offerte',
+        lead,
+        rawFields: fields,
+        notifySubject: `Nieuwe offerteaanvraag — ${lead.naam}`,
+        notifyHtml: `<h2>Nieuwe offerteaanvraag via arbeidsdeskundig.com</h2><table>${fieldsToHtml(offerteMailFields(lead))}</table>`,
+        replyTo: lead.email,
+        visitor: {
+            to: lead.email,
             subject: 'Bedankt voor je offerteaanvraag — arbeidsdeskundig.com',
             html: `<p>Bedankt, ${escapeHtml(voornaam)} — we hebben je offerteaanvraag ontvangen en nemen binnen 24 uur contact met je op.</p>`,
-        });
+        },
+    });
+    if (delivered.blocked) {
+        return res.status(500).json({ ok: false, error: 'De aanvraag is ontvangen maar kon niet veilig worden doorgestuurd. Probeer het opnieuw of bel ons.' });
     }
-    res.json({ ok: true });
+    res.json({ ok: true, test: !!delivered.test });
 });
 
 app.post('/api/aanmelden', async (req, res) => {
     const fields = req.body || {};
-    const email = fields['inp-aanvrager-email'] || fields.email;
-    const naam = fields['inp-aanvrager-naam'] || fields.naam || '';
-    const voornaam = naam.split(' ')[0] || 'daar';
-    const spoor2 = !!fields['chk-spoor2'];
+    if (ignoreHoneypot(res, fields, 'aanmelden')) return;
+    const parsed = validateAanmeldLead(fields);
+    if (!parsed.ok) {
+        console.log('[aanmelden] afgewezen:', parsed.errors.join('; '));
+        return rejectLead(res, parsed);
+    }
+    const lead = parsed.lead;
+    const voornaam = lead.naam.split(' ')[0] || 'daar';
+    const notifyFields = {
+        Aanvraag: 'Aanmelding',
+        'Type dienstverlening': lead.dienst,
+        Wet: lead.wet,
+        Onderzoeksvorm: lead.vorm,
+        Bedrijfsgrootte: OFFERTE_GROOTTE_LABELS[lead.grootte] || lead.grootte,
+        'Naam aanvrager': lead.naam,
+        'E-mail aanvrager': lead.email,
+        'Telefoon aanvrager': lead.telefoon,
+        'Spoor 2 aangevraagd': lead.spoor2 ? 'Ja' : 'Nee',
+        ...leftoverFormFields(fields, [
+            'dienst', 'wet', 'vorm', 'grootte', 'naam', 'email', 'telefoon', 'spoor2',
+            'chk-spoor2', 'inp-aanvrager-naam', 'inp-aanvrager-email', 'inp-aanvrager-tel',
+            'bron', 'aanvraagtype',
+        ]),
+    };
 
-    await sendEmail({
-        to: NOTIFY_EMAIL,
-        subject: `Nieuwe aanmelding${spoor2 ? ' (incl. Spoor 2)' : ''} — ${naam || 'onbekend'}`,
-        html: `<h2>Nieuwe aanmelding via arbeidsdeskundig.com</h2><table>${fieldsToHtml(fields)}</table>`,
-        replyTo: email,
-    });
-    if (email) {
-        await sendEmail({
-            to: email,
+    const delivered = await deliverSalesLead({
+        kind: 'aanmelden',
+        lead,
+        rawFields: fields,
+        notifySubject: `Nieuwe aanmelding${lead.spoor2 ? ' (incl. Spoor 2)' : ''} — ${lead.naam}`,
+        notifyHtml: `<h2>Nieuwe aanmelding via arbeidsdeskundig.com</h2><table>${fieldsToHtml(notifyFields)}</table>`,
+        replyTo: lead.email,
+        visitor: {
+            to: lead.email,
             subject: 'Bedankt voor je aanmelding — arbeidsdeskundig.com',
             html: `<p>Bedankt, ${escapeHtml(voornaam)} — we hebben je aanmelding ontvangen en pakken dit binnen 24 uur op.</p>`,
-        });
+        },
+    });
+    if (delivered.blocked) {
+        return res.status(500).json({ ok: false, error: 'De aanvraag is ontvangen maar kon niet veilig worden doorgestuurd. Probeer het opnieuw of bel ons.' });
     }
-    res.json({ ok: true });
+    res.json({ ok: true, test: !!delivered.test });
 });
 
 app.post('/api/checklist', async (req, res) => {
     const fields = req.body || {};
-    const email = fields['cl-email'] || fields.email;
-    const naam = fields['cl-naam'] || fields.naam || '';
-
-    await sendEmail({
-        to: NOTIFY_EMAIL,
-        subject: `Checklist aangevraagd — ${naam || 'onbekend'}`,
-        html: `<h2>Gratis checklist aangevraagd via arbeidsdeskundig.com</h2><table>${fieldsToHtml(fields)}</table>`,
-        replyTo: email,
-    });
-    if (email) {
-        await sendEmail({
-            to: email,
-            subject: 'Je gratis checklist — arbeidsdeskundig.com',
-            html: `<p>Bedankt${naam ? ', ' + escapeHtml(naam) : ''} — hierbij de checklist waar je om vroeg.</p>`,
-        });
+    if (ignoreHoneypot(res, fields, 'checklist')) return;
+    const parsed = validateChecklistLead(fields);
+    if (!parsed.ok) {
+        console.log('[checklist] afgewezen:', parsed.errors.join('; '));
+        return rejectLead(res, parsed);
     }
-    res.json({ ok: true });
+    const lead = parsed.lead;
+
+    const delivered = await deliverSalesLead({
+        kind: 'checklist',
+        lead,
+        rawFields: fields,
+        notifySubject: `Checklist aangevraagd — ${lead.naam}`,
+        notifyHtml: `<h2>Gratis checklist aangevraagd via arbeidsdeskundig.com</h2><table>${fieldsToHtml({ Aanvraag: 'Checklist', Dienst: lead.dienst, Naam: lead.naam, 'E-mail': lead.email })}</table>`,
+        replyTo: lead.email,
+        visitor: {
+            to: lead.email,
+            subject: 'Je gratis checklist — arbeidsdeskundig.com',
+            html: `<p>Bedankt, ${escapeHtml(lead.naam)} — hierbij de checklist waar je om vroeg.</p>`,
+        },
+    });
+    if (delivered.blocked) {
+        return res.status(500).json({ ok: false, error: 'De aanvraag is ontvangen maar kon niet veilig worden doorgestuurd. Probeer het opnieuw of bel ons.' });
+    }
+    res.json({ ok: true, test: !!delivered.test });
 });
 
 app.post('/api/bel-me-terug', async (req, res) => {
     const fields = req.body || {};
-    const naam = fields['bt-naam'] || fields.naam || '';
-    const telefoon = fields['bt-telefoon'] || fields.telefoon || '';
-    const moment = fields['bt-moment'] || fields.moment || 'Niet opgegeven';
+    if (ignoreHoneypot(res, fields, 'bel-me-terug')) return;
+    const parsed = validateBelMeTerugLead(fields);
+    if (!parsed.ok) {
+        console.log('[bel-me-terug] afgewezen:', parsed.errors.join('; '));
+        return rejectLead(res, parsed);
+    }
+    const lead = parsed.lead;
 
-    console.log('[bel-me-terug] verzoek ontvangen van', naam || 'onbekend');
+    console.log('[bel-me-terug] verzoek ontvangen van', lead.naam);
     try {
-        await sendEmail({
-            to: NOTIFY_EMAIL,
-            subject: `Bel-me-terug verzoek — ${naam || 'onbekend'}`,
-            html: `<h2>Iemand wil teruggebeld worden</h2><table>${fieldsToHtml({ Naam: naam, Telefoonnummer: telefoon, Moment: moment })}</table>`,
+        await deliverSalesLead({
+            kind: 'bel-me-terug',
+            lead,
+            rawFields: fields,
+            notifySubject: `Bel-me-terug verzoek — ${lead.naam}`,
+            notifyHtml: `<h2>Iemand wil teruggebeld worden</h2><table>${fieldsToHtml({
+                Aanvraag: 'Bel-me-terug',
+                Dienst: lead.dienst,
+                Naam: lead.naam,
+                Telefoonnummer: lead.telefoon,
+                'E-mail': lead.email,
+                Moment: lead.moment,
+            })}</table>`,
         });
     } catch (err) {
         console.error('[bel-me-terug] e-mail mislukt:', err);
-        // Geen res.status(500) hier: de bezoeker heeft zijn gegevens al ingevuld en
-        // moet altijd de bevestiging zien — een falende notificatiemail is voor
-        // ons een probleem om op te lossen, niet iets waar de bezoeker last van
-        // hoort te hebben.
+        // Validatie is al geslaagd; een falende notificatiemail is voor ons om
+        // op te lossen. De bezoeker krijgt hieronder alsnog ok:true.
     }
     res.json({ ok: true });
 });
@@ -873,7 +1205,6 @@ app.use((req, res) => {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pagina niet gevonden (404) — arbeidsdeskundig.com</title>
 <meta name="robots" content="noindex, follow">
-<link rel="canonical" href="${BASE_URL}${req.path}">
 <style>
   body{font-family:Arial,sans-serif; background:#EDEFEA; color:#12203A; margin:0; display:flex; align-items:center; justify-content:center; min-height:100vh; text-align:center; padding:24px;}
   .box{max-width:480px;}
@@ -890,9 +1221,28 @@ app.use((req, res) => {
   </div>
 </body>
 </html>`;
-    res.status(404).set('Content-Type', 'text/html; charset=utf-8').send(html);
+    res.status(404).set({
+        'Content-Type': 'text/html; charset=utf-8',
+        'X-Robots-Tag': 'noindex, follow',
+    }).send(html);
 });
 
-app.listen(PORT, () => {
-    console.log(`arbeidsdeskundig.com draait op poort ${PORT}`);
+// Vangnet: een throw in een route mag nooit een onduidelijke proxy-500 worden
+// zonder logregel. Sitemap heeft zijn eigen try/catch en hoort hier niet te komen.
+app.use((err, req, res, next) => {
+    console.error('[express] Onverwachte fout op', req.method, req.path, err);
+    if (res.headersSent) return next(err);
+    if (req.path === '/sitemap.xml') {
+        const fallback = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrlEl(absoluteUrl('/'), { changefreq: 'weekly', priority: '1.0' })}\n</urlset>`;
+        return sendSitemap(res, fallback);
+    }
+    res.status(500).type('txt').send('Internal Server Error');
 });
+
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`arbeidsdeskundig.com draait op poort ${PORT}`);
+    });
+}
+
+module.exports = { app };

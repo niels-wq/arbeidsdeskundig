@@ -252,3 +252,83 @@ describe('kennisbank article: nadelen arbeidsdeskundig onderzoek', () => {
         }
     });
 });
+
+const RIV_BA_SLUG = 'riv-toets-bedrijfsarts-leidend';
+const RIV_BA_PATH = '/kennisbank/' + RIV_BA_SLUG;
+const RIV_BA_RESERVED = [
+    'nadelen-arbeidsdeskundig-onderzoek',
+    'tips-werknemer-arbeidsdeskundig-onderzoek',
+    'verplicht-arbeidsdeskundig-onderzoek',
+    'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
+    'kosten-arbeidsdeskundig-onderzoek',
+    'fml-izp-lezen-belastbaarheid',
+    'wat-doet-arbeidsdeskundige',
+    'voorbereiden-gesprek-arbeidsdeskundige',
+    'passende-arbeid',
+    'psychische-klachten-werkhervatting',
+    'werkplekaanpassingen-subsidie',
+    'mediation-arbeidsconflict',
+];
+
+describe('kennisbank article: RIV-toets bedrijfsarts leidend', () => {
+    it('serves unique actualiteit article HTML with SEO tags and schema', async () => {
+        const res = await fetch(base + RIV_BA_PATH);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        assert.match(html, /<title>RIV-toets: bedrijfsarts leidend — wat betekent dat voor een arbeidsdeskundig onderzoek\? — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<meta name="description" content="RIV-toets: bedrijfsarts leidend \(wetsvoorstel 27 maart 2026\)\. Wat verandert voor het re-integratieverslag, wat AD nog onderbouwt\. Plan een onderzoek\.">/);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${RIV_BA_PATH}">`));
+        assert.match(html, /"@type":"Article"/);
+        assert.match(html, /"@type":"FAQPage"/);
+
+        const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
+        assert.ok(h1Match, 'SSR H1 missing');
+        assert.equal(h1Match[1], 'RIV-toets: bedrijfsarts leidend — wat betekent dat voor een arbeidsdeskundig onderzoek?');
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>RIV-toets: bedrijfsarts leidend — wat betekent dat voor een arbeidsdeskundig onderzoek\?<\/h2>/);
+        assert.match(body, /RIV-toets/);
+        assert.match(body, /bedrijfsarts leidend/);
+        assert.match(body, /wetsvoorstel/);
+        assert.match(body, /voorgestelde wetgeving/);
+        assert.match(body, /geen geldend recht/);
+        assert.match(body, /re-integratieverslag/);
+        assert.match(body, /27 maart 2026/);
+        assert.match(body, /1 januari 2028/);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /online of fysiek/i);
+        assert.doesNotMatch(body, /keuzehulp/);
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 100).join(' ');
+        assert.match(firstWords, /RIV-toets/);
+        assert.match(firstWords, /bedrijfsarts leidend/);
+
+        assert.match(html, /kennisbank\/verplicht-arbeidsdeskundig-onderzoek/);
+        assert.match(html, /kennisbank\/arbeidsdeskundig-onderzoek-na-1-jaar-ziekte/);
+        assert.match(html, /kennisbank\/kosten-arbeidsdeskundig-onderzoek/);
+        assert.match(html, /kennisbank\/wat-doet-arbeidsdeskundige/);
+        assert.match(html, /kennisbank\/fml-izp-lezen-belastbaarheid/);
+        assert.match(html, /kennisbank\/riv-toets/);
+        assert.match(html, /\/offerte-aanvragen/);
+        assert.match(html, /\/aanmelden/);
+        assert.match(html, /calendly\.com\/matchvermogen\/call-15-min/);
+    });
+
+    it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {
+        const res = await fetch(base + '/sitemap.xml');
+        assert.equal(res.status, 200);
+        const xml = await res.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${RIV_BA_PATH}`));
+        assert.equal((xml.match(new RegExp(RIV_BA_SLUG, 'g')) || []).length, 1);
+        for (const slug of RIV_BA_RESERVED) {
+            assert.notEqual(slug, RIV_BA_SLUG);
+            assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
+        }
+    });
+});

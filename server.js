@@ -74,11 +74,12 @@ function extractPosts(html) {
             const m = line.match(new RegExp(name + ':"((?:[^"\\\\]|\\\\.)*)"'));
             return m ? m[1].replace(/\\"/g, '"') : null;
         };
-        const extractFaq = (line) => {
-            const idx = line.indexOf('faq:[');
+        const extractBracketArray = (key, line) => {
+            const needle = key + ':[';
+            const idx = line.indexOf(needle);
             if (idx === -1) return null;
-            // Balanced-bracket scan vanaf 'faq:' tot de bijbehorende sluit-bracket.
-            let depth = 0, i = idx + 4, startIdx = -1;
+            // Balanced-bracket scan vanaf 'key:' tot de bijbehorende sluit-bracket.
+            let depth = 0, i = idx + key.length, startIdx = -1;
             for (; i < line.length; i++) {
                 if (line[i] === '[') { if (depth === 0) startIdx = i; depth++; }
                 else if (line[i] === ']') { depth--; if (depth === 0) { i++; break; } }
@@ -92,7 +93,9 @@ function extractPosts(html) {
                 title: field('title', line),
                 meta: field('meta', line),
                 tag: field('tag', line),
-                faq: extractFaq(line),
+                read: field('read', line),
+                kernpunten: extractBracketArray('kernpunten', line),
+                faq: extractBracketArray('faq', line),
             }))
             .filter((p) => p.slug);
     } catch (err) {
@@ -102,6 +105,34 @@ function extractPosts(html) {
 }
 
 const posts = extractPosts(INDEX_HTML);
+
+// Artikelteksten (template literals in `articleContent`) — nodig om kennisbank-
+// URL's zonder JavaScript al unieke, crawlbare content te geven. Zonder dit
+// ziet Google op elke artikel-URL dezelfde homepage (view-home is standaard
+// `active`, `#artikel-body` is leeg) en classificeert dat als soft-404.
+function extractArticleBodies(html) {
+    const startMarker = 'const articleContent = {';
+    const start = html.indexOf(startMarker);
+    if (start === -1) return {};
+    const end = html.indexOf('\n  const kGrid = ', start);
+    if (end === -1) return {};
+    const block = html.slice(start + startMarker.length, end);
+    const bodies = {};
+    const re = /(?:^|\n)(?:"([^"]+)"|([A-Za-z0-9_]+))\s*:\s*`([\s\S]*?)`\s*,?/g;
+    let m;
+    while ((m = re.exec(block))) {
+        bodies[m[1] || m[2]] = m[3];
+    }
+    return bodies;
+}
+
+const articleBodies = extractArticleBodies(INDEX_HTML);
+
+// Oude of verkeerd geschreven slugs die Google nog crawlt → huidige artikel.
+// Alleen permanente 301's naar een live equivalent; geen nieuwe pagina's.
+const KENNISBANK_SLUG_REDIRECTS = {
+    'mediations-arbeidsconflict': 'mediation-arbeidsconflict',
+};
 
 // personaData is pure JSON (gegenereerd met json.dumps), dus simpel te parsen —
 // geen regex-gepuzzel zoals bij de `posts`-array met zijn JS-objectliteral-syntax.
@@ -193,12 +224,60 @@ function escapeHtml(str) {
     }[c]));
 }
 
+function activateView(html, view) {
+    if (!view || view === 'home') return html;
+    html = html.replace('<div class="view active" id="view-home">', '<div class="view" id="view-home">');
+    const viewId = 'view-' + view;
+    html = html.replace(`<div class="view" id="${viewId}">`, `<div class="view active" id="${viewId}">`);
+    return html;
+}
+
+function hydrateArtikelView(html, post, body) {
+    if (!post) return html;
+    html = html.replace(
+        'id="artikel-tag" onclick="filterKennisbankVanArtikel()">Ziektewet</button>',
+        `id="artikel-tag" onclick="filterKennisbankVanArtikel()">${escapeHtml(post.tag)}</button>`
+    );
+    html = html.replace('id="artikel-titel">Titel</h1>', `id="artikel-titel">${escapeHtml(post.title)}</h1>`);
+    html = html.replace('id="artikel-breadcrumb-tag"></span>', `id="artikel-breadcrumb-tag">${escapeHtml(post.tag)}</span>`);
+    html = html.replace('id="artikel-breadcrumb-titel"></span>', `id="artikel-breadcrumb-titel">${escapeHtml(post.title)}</span>`);
+    const readLabel = post.read ? `Leestijd: ${escapeHtml(post.read)} · Laatst bijgewerkt: 2026` : 'Laatst bijgewerkt: 2026';
+    html = html.replace('id="artikel-meta">Leestijd: 6 minuten · Laatst bijgewerkt: 2026</p>', `id="artikel-meta">${readLabel}</p>`);
+    html = html.replace('id="artikel-metadesc"></p>', `id="artikel-metadesc">${escapeHtml(post.meta || '')}</p>`);
+    if (post.kernpunten && post.kernpunten.length) {
+        const items = post.kernpunten.map((k) => `<li>${escapeHtml(k)}</li>`).join('');
+        html = html.replace(
+            'id="artikel-kernpunten" style="margin:8px 0 0; padding-left:18px; font-size:.87rem; color:var(--muted); line-height:1.6;"></ul>',
+            `id="artikel-kernpunten" style="margin:8px 0 0; padding-left:18px; font-size:.87rem; color:var(--muted); line-height:1.6;">${items}</ul>`
+        );
+    }
+    if (body) {
+        html = html.replace('id="artikel-body"></div>', `id="artikel-body">${body}</div>`);
+    }
+    if (post.faq && post.faq.length) {
+        const faqHtml = post.faq.map(([q, a]) => (
+            `<div class="accordion-item open">` +
+            `<button class="accordion-head" onclick="toggleAccordion(this)">${escapeHtml(q)}<span class="accordion-icon">+</span></button>` +
+            `<div class="accordion-body" style="max-height:none;"><div class="accordion-body-inner">${escapeHtml(a)}</div></div>` +
+            `</div>`
+        )).join('');
+        html = html.replace('id="artikel-faq-wrap" class="hidden"', 'id="artikel-faq-wrap"');
+        html = html.replace('id="artikel-faq-list" style="margin-top:12px;"></div>', `id="artikel-faq-list" style="margin-top:12px;">${faqHtml}</div>`);
+    }
+    return html;
+}
+
 function renderPage(res, { title, description, canonicalPath, route, articleJsonLd, breadcrumbJsonLd, faqJsonLd, statusCode }) {
     const canonical = BASE_URL + canonicalPath;
     const safeTitle = escapeHtml(title || DEFAULT_TITLE);
     const safeDesc = escapeHtml(description || DEFAULT_DESC);
 
     let html = INDEX_HTML;
+    html = activateView(html, route && route.view);
+    if (route && route.view === 'artikel' && route.slug) {
+        const post = posts.find((p) => p.slug === route.slug);
+        html = hydrateArtikelView(html, post, articleBodies[route.slug]);
+    }
 
     // <title>
     html = html.replace(/<title>.*?<\/title>/s, `<title>${safeTitle}</title>`);
@@ -389,6 +468,9 @@ app.get('/voor/:slug', (req, res, next) => {
 });
 
 app.get('/kennisbank/:slug', (req, res, next) => {
+    const alias = KENNISBANK_SLUG_REDIRECTS[req.params.slug];
+    if (alias) return res.redirect(301, '/kennisbank/' + alias);
+
     const post = posts.find((p) => p.slug === req.params.slug);
     if (!post) return next(); // -> 404 handler
 

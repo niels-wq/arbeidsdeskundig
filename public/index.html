@@ -76,6 +76,7 @@
   .btn-primary{background:var(--amber); color:var(--ink); font-weight:600; border:none; padding:12px 22px; border-radius:2px; cursor:pointer; font-size:.95rem; transition:transform .12s ease, box-shadow .12s ease;}
   .btn-primary:hover{transform:translateY(-1px); box-shadow:0 6px 16px rgba(216,160,61,.35);}
   .btn-primary:disabled{opacity:.4; cursor:not-allowed; transform:none; box-shadow:none;}
+  a.btn-primary, a.btn-ghost, a.btn-ghost-header{display:inline-block; text-decoration:none; box-sizing:border-box; text-align:center;}
   .btn-ghost{background:transparent; border:1.5px solid var(--ink); color:var(--ink); font-weight:600; padding:11px 20px; border-radius:2px; cursor:pointer; font-size:.95rem;}
   .btn-ghost:hover{background:var(--ink); color:var(--paper);}
   /* Variant voor op de donkere header, waar de gewone .btn-ghost onzichtbaar
@@ -195,7 +196,7 @@
   .footer-bottom{text-align:center; font-size:.72rem; color:#5F6B7A; margin-top:28px; border-top:1px solid #23375B; padding-top:20px;}
 
   .sticky-cta{position:fixed; bottom:0; left:0; right:0; background:var(--ink); border-top:1px solid var(--amber); z-index:40;}
-  .sticky-cta button{width:100%; padding:14px;}
+  .sticky-cta button, .sticky-cta a{width:100%; padding:14px; text-decoration:none; display:block; box-sizing:border-box; text-align:center;}
   @media(min-width:640px){ .sticky-cta{display:none;} }
 
   .view{display:none;}
@@ -323,13 +324,29 @@
 <header class="site">
   <div class="navbar">
     <a class="logo" href="/" onclick="event.preventDefault(); setView('home');" style="text-decoration:none; cursor:pointer;">arbeidsdeskundig<span>.com</span></a>
-    <nav class="desktop" id="navDesktop"></nav>
+    <nav class="desktop" id="navDesktop">
+      <a href="/" data-key="home" onclick="event.preventDefault(); setView('home')">Home</a>
+      <a href="/rekentool" data-key="calculator" onclick="event.preventDefault(); setView('calculator')">Rekentool</a>
+      <a href="/offerte-aanvragen" data-key="offerte" onclick="event.preventDefault(); setView('offerte')">Offerte</a>
+      <a href="/kennisbank" data-key="kennisbank" onclick="event.preventDefault(); setView('kennisbank')">Kennisbank</a>
+      <a href="/veelgestelde-vragen" data-key="faq" onclick="event.preventDefault(); setView('faq')">FAQ</a>
+      <a href="/over-ons" data-key="over" onclick="event.preventDefault(); setView('over')">Over ons</a>
+      <a href="/keuzehulp" data-key="advies" onclick="event.preventDefault(); setView('advies')">Adviestool</a>
+    </nav>
     <div style="display:flex; align-items:center; gap:10px;">
       <button class="btn-ghost-header" style="white-space:nowrap;" onclick="openBelTerugModal()">📞 Bel me terug</button>
-      <button class="btn-primary" style="padding:10px 18px; font-size:.85rem;" onclick="setView('offerte')">Direct offerte</button>
+      <a class="btn-primary" href="/offerte-aanvragen" style="padding:10px 18px; font-size:.85rem;" onclick="event.preventDefault(); setView('offerte')">Direct offerte</a>
     </div>
   </div>
-  <nav class="mobile" id="navMobile"></nav>
+  <nav class="mobile" id="navMobile">
+    <a href="/" data-key="home" onclick="event.preventDefault(); setView('home')">Home</a>
+    <a href="/rekentool" data-key="calculator" onclick="event.preventDefault(); setView('calculator')">Rekentool</a>
+    <a href="/offerte-aanvragen" data-key="offerte" onclick="event.preventDefault(); setView('offerte')">Offerte</a>
+    <a href="/kennisbank" data-key="kennisbank" onclick="event.preventDefault(); setView('kennisbank')">Kennisbank</a>
+    <a href="/veelgestelde-vragen" data-key="faq" onclick="event.preventDefault(); setView('faq')">FAQ</a>
+    <a href="/over-ons" data-key="over" onclick="event.preventDefault(); setView('over')">Over ons</a>
+    <a href="/keuzehulp" data-key="advies" onclick="event.preventDefault(); setView('advies')">Adviestool</a>
+  </nav>
 </header>
 
 <!-- ============= HOME ============= -->
@@ -1756,7 +1773,7 @@
 </footer>
 
 <div class="sticky-cta">
-  <button class="btn-primary" onclick="setView('offerte')">Direct offerte & planning — reactie binnen 24 uur</button>
+  <a class="btn-primary" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Direct offerte & planning — reactie binnen 24 uur</a>
 </div>
 
 <!-- WhatsApp -->
@@ -1898,18 +1915,6 @@
 </div>
 
 <script>
-  const NAV_ITEMS = [["home","Home"],["calculator","Rekentool"],["offerte","Offerte"],["kennisbank","Kennisbank"],["faq","FAQ"],["over","Over ons"],["advies","Adviestool"]];
-  function buildNav(){
-    const d = document.getElementById('navDesktop');
-    const m = document.getElementById('navMobile');
-    NAV_ITEMS.forEach(([key,label])=>{
-      const path = VIEW_TO_PATH[key] || '/';
-      const b1 = document.createElement('a'); b1.href = path; b1.textContent = label; b1.onclick = (e)=>{ e.preventDefault(); setView(key); }; b1.dataset.key = key;
-      d.appendChild(b1);
-      const b2 = document.createElement('a'); b2.href = path; b2.textContent = label; b2.onclick = (e)=>{ e.preventDefault(); setView(key); }; b2.dataset.key = key;
-      m.appendChild(b2);
-    });
-  }
   /* ---------- Calendly: alleen de popup-widget (exit-intent-popup), lichtgewicht ----------
      Geen inline embed meer op de offertepagina — dat maakte die pagina te traag.
      Daar staat nu een simpele link naar de Calendly-pagina zelf (opent in nieuw tabblad). */
@@ -5619,7 +5624,6 @@ whk: `
     wrap.innerHTML = fallback.map(p=>`<a href="/kennisbank/${p.slug}" class="card" style="text-align:left; cursor:pointer; text-decoration:none; display:block;" onclick="event.preventDefault(); openArtikel('${p.slug}');"><span class="mono eyebrow" style="color:var(--teal); text-transform:uppercase;">${p.tag}</span><p style="font-weight:600; margin-top:6px; font-size:.85rem; color:var(--ink);">${p.title}</p></a>`).join('');
   }
 
-  buildNav();
   renderPersonaCards();
   renderTestimonials();
   initCookieBanner();

@@ -31,16 +31,24 @@ describe('kennisbank article: wanneer AD na 1 jaar ziekte', () => {
         assert.match(html, /<title>Wanneer een arbeidsdeskundig onderzoek \(na 1 jaar ziekte\)\? Timing en valkuilen — arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="Wanneer een arbeidsdeskundig onderzoek na 1 jaar ziekte\? Week 42–52 vs eerder inzetten, valkuilen bij wachten\. Vraag een offerte of kennismaking\.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${PATH}">`));
-        assert.match(html, /Wanneer een arbeidsdeskundig onderzoek na 1 jaar ziekte\?/);
-        assert.match(html, /ijkpunt, geen startsein/);
+        assert.match(html, /"@type":"Article"/);
+        assert.match(html, /"@type":"FAQPage"/);
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>Wanneer een arbeidsdeskundig onderzoek na 1 jaar ziekte\?<\/h2>/);
+        assert.match(body, /ijkpunt, geen startsein/);
+        assert.match(body, /kennisbank\/poortwachter-tijdlijn/);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+
         assert.match(html, /kennisbank\/kosten-arbeidsdeskundig-onderzoek/);
         assert.match(html, /kennisbank\/fml-izp-lezen-belastbaarheid/);
         assert.match(html, /kennisbank\/voorbereiden-gesprek-arbeidsdeskundige/);
         assert.match(html, /kennisbank\/wat-doet-arbeidsdeskundige/);
-        assert.match(html, /kennisbank\/poortwachter-tijdlijn/);
-        assert.match(html, /"@type":"Article"/);
-        assert.match(html, /"@type":"FAQPage"/);
-        assert.doesNotMatch(html, /Dit artikel wordt binnenkort toegevoegd/);
     });
 
     it('is listed in sitemap.xml', async () => {

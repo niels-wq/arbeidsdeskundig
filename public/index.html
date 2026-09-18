@@ -244,7 +244,7 @@
   .kb-intro-cta p{margin:0; font-size:.88rem; color:var(--muted); line-height:1.5;}
   .kb-intro-cta .btn-primary{margin-top:14px;}
 
-  .home-jump{display:flex; gap:8px; overflow-x:auto; padding:10px 0 2px; margin:0; -webkit-overflow-scrolling:touch;}
+  .home-jump{display:flex; gap:8px; overflow-x:auto; padding:0 0 18px; margin:0; -webkit-overflow-scrolling:touch;}
   .home-jump a{flex:0 0 auto; font-size:.78rem; font-weight:600; color:var(--ink); text-decoration:none; padding:7px 12px; border:1px solid var(--rule); background:var(--white); border-radius:20px;}
   .home-jump a:hover{border-color:var(--ink);}
   .home-jump a.home-jump-offerte{border-color:var(--amber); background:#FCF6E9;}
@@ -444,6 +444,15 @@
     </div>
   </section>
 
+  <nav class="wrap home-jump" aria-label="Secties op deze pagina">
+    <a href="/#voor-wie" onclick="goHomeSection('voor-wie', event)">Voor wie</a>
+    <a href="/#proces" onclick="goHomeSection('proces', event)">Hoe het werkt</a>
+    <a href="/#vorm" onclick="goHomeSection('vorm', event)">Online of fysiek</a>
+    <a href="/#onderwerpen" onclick="goHomeSection('onderwerpen', event)">Onderwerpen</a>
+    <a href="/#home-faq" onclick="goHomeSection('home-faq', event)">Vragen</a>
+    <a class="home-jump-offerte" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Offerte</a>
+  </nav>
+
   <div class="dossier">
     <div class="perf" id="perf1"></div>
     <div class="dossier-grid">
@@ -454,15 +463,6 @@
     <div class="perf" id="perf2"></div>
     <p style="text-align:center; font-size:.72rem; color:var(--muted2); padding:0 20px 14px;">* Doorlooptijd hangt af van het gekozen type dienstverlening — zie de aanmeldflow voor de actuele termijnen.</p>
   </div>
-
-  <nav class="wrap home-jump" aria-label="Secties op deze pagina">
-    <a href="/#voor-wie" onclick="goHomeSection('voor-wie', event)">Voor wie</a>
-    <a href="/#proces" onclick="goHomeSection('proces', event)">Hoe het werkt</a>
-    <a href="/#vorm" onclick="goHomeSection('vorm', event)">Online of fysiek</a>
-    <a href="/#onderwerpen" onclick="goHomeSection('onderwerpen', event)">Onderwerpen</a>
-    <a href="/#home-faq" onclick="goHomeSection('home-faq', event)">Vragen</a>
-    <a class="home-jump-offerte" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Offerte</a>
-  </nav>
 
   <section class="wrap">
     <div class="grid3">

@@ -236,6 +236,33 @@
   .filter-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:20px;}
   .filter-chip{font-size:.78rem; padding:6px 14px; border-radius:20px; border:1.5px solid var(--rule); background:var(--white); cursor:pointer;}
   .filter-chip.active{border-color:var(--ink); background:var(--ink); color:var(--paper);}
+  .filter-chip-more{border-color:var(--teal); color:var(--teal); font-weight:600;}
+
+  .kb-intro{display:grid; gap:20px; align-items:stretch;}
+  @media(min-width:800px){ .kb-intro{grid-template-columns:1.4fr .8fr; align-items:end;} }
+  .kb-intro-cta{padding:20px 22px; border-left:4px solid var(--amber); background:var(--white);}
+  .kb-intro-cta p{margin:0; font-size:.88rem; color:var(--muted); line-height:1.5;}
+  .kb-intro-cta .btn-primary{margin-top:14px;}
+
+  .home-jump{display:flex; gap:8px; overflow-x:auto; padding:0 0 18px; margin:0; -webkit-overflow-scrolling:touch;}
+  .home-jump a{flex:0 0 auto; font-size:.78rem; font-weight:600; color:var(--ink); text-decoration:none; padding:7px 12px; border:1px solid var(--rule); background:var(--white); border-radius:20px;}
+  .home-jump a:hover{border-color:var(--ink);}
+  .home-jump a.home-jump-offerte{border-color:var(--amber); background:#FCF6E9;}
+  .home-section{scroll-margin-top:96px;}
+
+  .cookie-banner{
+    position:fixed; z-index:60; left:16px; bottom:16px;
+    max-width:min(380px, calc(100vw - 32px));
+    background:var(--white); color:var(--ink);
+    padding:12px 14px; border:1px solid var(--rule);
+    border-left:3px solid var(--amber); border-radius:2px;
+    box-shadow:0 8px 24px rgba(18,32,58,.12);
+  }
+  .cookie-banner p{margin:0 0 10px; font-size:.76rem; line-height:1.45; color:var(--muted); max-width:none;}
+  .cookie-banner-actions{display:flex; gap:8px; flex-wrap:wrap;}
+  @media(max-width:639px){
+    .cookie-banner{left:12px; right:12px; max-width:none; bottom:calc(70px + var(--fab-bottom-offset, 0px));}
+  }
 
   .article-body h2{font-size:1.55rem; color:var(--ink); margin-top:36px;}
   .article-body h3{font-size:1.22rem; color:var(--ink); margin-top:26px;}
@@ -417,6 +444,15 @@
     </div>
   </section>
 
+  <nav class="wrap home-jump" aria-label="Secties op deze pagina">
+    <a href="/#voor-wie" onclick="goHomeSection('voor-wie', event)">Voor wie</a>
+    <a href="/#proces" onclick="goHomeSection('proces', event)">Hoe het werkt</a>
+    <a href="/#vorm" onclick="goHomeSection('vorm', event)">Online of fysiek</a>
+    <a href="/#onderwerpen" onclick="goHomeSection('onderwerpen', event)">Onderwerpen</a>
+    <a href="/#home-faq" onclick="goHomeSection('home-faq', event)">Vragen</a>
+    <a class="home-jump-offerte" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Offerte</a>
+  </nav>
+
   <div class="dossier">
     <div class="perf" id="perf1"></div>
     <div class="dossier-grid">
@@ -454,7 +490,7 @@
     </div>
   </section>
 
-  <section class="wrap" style="margin-top:56px;">
+  <section class="wrap home-section" id="voor-wie" style="margin-top:56px;">
     <p class="eyebrow">Voor wie is dit</p>
     <h2 style="font-size:1.8rem; color:var(--ink); margin-top:8px;">Kies je rol voor uitleg op maat</h2>
     <p style="max-width:640px; margin-top:10px; color:var(--muted); font-size:.92rem;">Arbeidsdeskundig onderzoek betekent iets anders voor iedereen die erbij betrokken is. Kies hieronder je rol voor gerichte uitleg en praktijkvoorbeelden.</p>
@@ -479,7 +515,7 @@
     <p style="margin-top:20px; font-size:.85rem;"><a class="blog-link" href="https://www.google.com/search?q=Matchvermogen+B.V.+reviews" target="_blank" rel="noopener">Bekijk alle reviews op Google →</a></p>
   </section>
 
-  <section class="panel" style="margin-top:56px;">
+  <section class="panel home-section" id="proces" style="margin-top:56px;">
     <div class="wrap">
       <p class="eyebrow">Hoe het werkt</p>
       <h2 style="font-size:1.8rem; color:var(--ink); margin-top:8px;">Van aanmelding tot advies in vijf stappen</h2>
@@ -522,7 +558,7 @@
     </div>
   </section>
 
-  <section class="wrap">
+  <section class="wrap home-section" id="vorm">
     <p class="eyebrow">Jouw voorkeur</p>
     <h2 style="font-size:1.8rem; color:var(--ink); margin-top:8px;">Online én fysiek — jij kiest</h2>
     <p style="margin-top:10px; font-size:.9rem; color:var(--muted); max-width:640px;">Belangrijk om te weten: een fysiek onderzoek is niet altijd een kwestie van voorkeur. Zijn de werkplek of omstandigheden vanuit de opdrachtgever niet goed objectief in kaart te brengen, dan is een bezoek op locatie soms écht noodzakelijk voor een betrouwbaar advies. Twijfel je? Wij adviseren je hier vrijblijvend in.</p>
@@ -564,7 +600,7 @@
     </div>
   </section>
 
-  <section class="wrap">
+  <section class="wrap home-section" id="onderwerpen">
     <p class="eyebrow">Populaire onderwerpen</p>
     <h2 style="font-size:1.5rem; color:var(--ink); margin-top:8px;">Snel naar een specifiek onderwerp</h2>
     <div class="grid4" style="margin-top:20px;">
@@ -590,7 +626,7 @@
       <div class="stat reveal"><div class="num mono">1 jaar</div><div class="lbl">loon bij een loonsanctie</div></div>
       <div class="stat reveal"><div class="num mono">104 wk</div><div class="lbl">grens Wet Poortwachter</div></div>
     </div>
-    <button class="btn-primary" style="margin-top:28px;" onclick="setView('calculator')">Bereken jouw tijdwinst</button>
+    <button class="btn-ghost" style="margin-top:28px;" onclick="setView('calculator')">Bereken jouw tijdwinst</button>
   </section>
 
   <section class="panel">
@@ -616,7 +652,7 @@
           <h2 style="margin-top:8px;">Spoor 2: naadloos geregeld via Best Match Re-integratie</h2>
           <p style="margin-top:14px; max-width:520px;">Een arbeidsdeskundig onderzoek brengt vaak aan het licht dat spoor 2 de beste weg vooruit is. Je vraagt dit gewoon <strong>meteen mee aan bij je aanmelding</strong> — met 40 coaches door heel Nederland, en een warme overdracht van het dossier zodat werkgever en werknemer niet opnieuw hun verhaal hoeven te doen.</p>
           <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
-            <button class="btn-primary" onclick="setView('offerte')">Vraag onderzoek + Spoor 2 aan</button>
+            <button class="btn-primary" onclick="setView('offerte')">Direct offerte</button>
             <button class="btn-ghost on-dark" onclick="setView('over')">Meer over Best Match Re-integratie</button>
           </div>
         </div>
@@ -642,8 +678,8 @@
       <h3 style="margin-top:6px; font-size:1.2rem;">Waarom dit onderzoek ook je premie raakt</h3>
       <p style="margin-top:10px; font-size:.9rem; color:var(--muted); max-width:680px;">Je gedifferentieerde WHK-premie (WGA en Ziektewet) wordt bepaald door instroom van (ex-)medewerkers in de WGA of Ziektewet, met een terugkijkperiode van twee jaar (T-2). Een tijdig arbeidsdeskundig onderzoek is precies het instrument waarmee je onterechte of vermijdbare instroom kunt voorkomen — en dus je premie jarenlang kunt drukken. Andersom geldt: hoe hoger je huidige premie, hoe groter de kans dat een tijdig onderzoek dat had kunnen voorkomen.</p>
       <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:16px;">
-        <button class="btn-primary" onclick="setView('calculator')">Bereken het effect van vroeg starten</button>
-        <button class="btn-ghost" onclick="openArtikel('whk')">Lees hoe de WHK-premie werkt</button>
+        <button class="btn-ghost" onclick="setView('calculator')">Bereken het effect van vroeg starten</button>
+        <button class="btn-link" onclick="openArtikel('whk')">Lees hoe de WHK-premie werkt</button>
       </div>
     </div>
   </section>
@@ -655,7 +691,7 @@
     </div>
   </section>
 
-  <section class="wrap">
+  <section class="wrap home-section" id="home-faq">
     <p class="eyebrow">Veelgestelde vragen</p>
     <h2 style="font-size:1.8rem; color:var(--ink); margin-top:8px;">Kort antwoord op de belangrijkste vragen</h2>
     <div style="margin-top:24px;">
@@ -1352,9 +1388,19 @@
 <!-- ============= KENNISBANK ============= -->
 <div class="view" id="view-kennisbank">
   <div class="wrap" style="padding-top:48px; padding-bottom:64px;">
-    <p class="eyebrow">Kennisbank</p>
-    <h1 style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Alles over arbeidsdeskundig onderzoek</h1>
-    <p style="margin-top:10px; font-size:.9rem; color:var(--muted); max-width:600px;">Diepgaande, up-to-date artikelen per onderwerp — geschreven om je écht verder te helpen, niet alleen om te scoren in Google. Het cluster <em>arbeidsdeskundig onderzoek</em> start bij de <a class="blog-link" href="/kennisbank/arbeidsdeskundig-onderzoek-gids" onclick="event.preventDefault(); openArtikel('arbeidsdeskundig-onderzoek-gids')">gids</a>.</p>
+    <div class="kb-intro">
+      <div>
+        <p class="eyebrow">Kennisbank</p>
+        <h1 style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Alles over arbeidsdeskundig onderzoek</h1>
+        <p style="margin-top:10px; font-size:.9rem; color:var(--muted); max-width:600px;">Diepgaande, up-to-date artikelen per onderwerp — geschreven om je écht verder te helpen, niet alleen om te scoren in Google. Het cluster <em>arbeidsdeskundig onderzoek</em> start bij de <a class="blog-link" href="/kennisbank/arbeidsdeskundig-onderzoek-gids" onclick="event.preventDefault(); openArtikel('arbeidsdeskundig-onderzoek-gids')">gids</a>.</p>
+      </div>
+      <div class="card kb-intro-cta" id="kb-intro-cta">
+        <p class="eyebrow" style="color:var(--amber);">Twijfel je over jouw dossier?</p>
+        <p style="margin-top:8px; color:var(--ink); font-weight:600;">Vraag vrijblijvend een offerte — reactie binnen 24 uur.</p>
+        <p style="margin-top:6px;">Vanaf €1.095,- · online of fysiek · UWV-proof</p>
+        <a class="btn-primary" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Direct offerte</a>
+      </div>
+    </div>
     <div class="filter-row" id="filter-row"></div>
     <div class="grid3" style="margin-top:24px;" id="kennisbank-grid"></div>
   </div>
@@ -1939,14 +1985,13 @@
   </div>
 </div>
 
-<!-- Cookiebanner: GA4/Meta Pixel laden pas na expliciete keuze hieronder -->
-<div id="cookie-banner" class="hidden" style="position:fixed; left:0; right:0; bottom:0; z-index:60; background:var(--ink); color:var(--paper); padding:16px 20px; box-shadow:0 -4px 20px rgba(0,0,0,.2);">
-  <div style="max-width:1120px; margin:0 auto; display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between;">
-    <p style="margin:0; font-size:.85rem; max-width:640px; color:var(--paper);">We gebruiken alleen functionele cookies om de site te laten werken, en — met jouw toestemming — analytische cookies om te zien welke pagina's nuttig zijn. Geen cookies voor advertenties van derden.</p>
-    <div style="display:flex; gap:10px; flex-shrink:0;">
-      <button class="btn-ghost on-dark btn-small" onclick="setCookieConsent(false)">Alleen noodzakelijk</button>
-      <button class="btn-primary btn-small" onclick="setCookieConsent(true)">Accepteren</button>
-    </div>
+<!-- Cookiebanner: GA4/Meta Pixel laden pas na expliciete keuze hieronder.
+     Compacte kaart i.p.v. volle onderbalk, zodat de eerste viewport vrijer blijft. -->
+<div id="cookie-banner" class="cookie-banner hidden" role="dialog" aria-label="Cookievoorkeuren" aria-describedby="cookie-banner-text">
+  <p id="cookie-banner-text">We gebruiken functionele cookies om de site te laten werken, en — met jouw toestemming — analytische cookies om te zien welke pagina's nuttig zijn. Geen advertentiecookies van derden.</p>
+  <div class="cookie-banner-actions">
+    <button class="btn-ghost btn-small" onclick="setCookieConsent(false)">Alleen noodzakelijk</button>
+    <button class="btn-primary btn-small" onclick="setCookieConsent(true)">Accepteren</button>
   </div>
 </div>
 
@@ -1995,11 +2040,11 @@
      knoppen (WhatsApp, checklist) en de footer aan het oog onttrekken: meet
      welke balk er nu zichtbaar is en schuift alles wat nodig is dienovereenkomstig op. */
   function updateBottomBarOffset(){
-    const cookieBanner = document.getElementById('cookie-banner');
     const stickyBar = document.getElementById('sticky-artikel-cta');
     let offset = 0;
-    if(cookieBanner && !cookieBanner.classList.contains('hidden')) offset = cookieBanner.offsetHeight;
-    else if(stickyBar && !stickyBar.classList.contains('hidden')) offset = stickyBar.offsetHeight;
+    // De cookiebanner is een compacte kaart, geen volle onderbalk — die telt
+    // niet mee in de pagina-offset. Alleen de artikel-CTA-balk schuift FABs op.
+    if(stickyBar && !stickyBar.classList.contains('hidden')) offset = stickyBar.offsetHeight;
     document.documentElement.style.setProperty('--fab-bottom-offset', offset + 'px');
   }
 
@@ -2166,9 +2211,39 @@
       stickyBar.classList.toggle('hidden', view !== 'artikel' || sessionStorage.getItem('stickyCtaDismissed') === '1' || consentPending);
       updateBottomBarOffset();
     }
-    if(!_routerSync && !(opts && opts.skipPush) && VIEW_TO_PATH[view] && location.pathname !== VIEW_TO_PATH[view]){
-      history.pushState({view}, '', VIEW_TO_PATH[view]);
+    if(!_routerSync && !(opts && opts.skipPush) && VIEW_TO_PATH[view]){
+      const next = VIEW_TO_PATH[view];
+      if(location.pathname !== next || (view === 'home' && location.hash)){
+        history.pushState({view}, '', next);
+      }
     }
+    if(view === 'home') applyHomeHash();
+  }
+
+  function goHomeSection(id, ev){
+    if(ev) ev.preventDefault();
+    const home = document.getElementById('view-home');
+    const alreadyHome = home && home.classList.contains('active');
+    if(!alreadyHome) setView('home');
+    if(history.replaceState) history.replaceState({view:'home'}, '', '/#' + id);
+    scrollToHomeSection(id, {smooth: alreadyHome});
+  }
+
+  function scrollToHomeSection(id, opts){
+    const el = document.getElementById(id);
+    if(!el) return;
+    const smooth = opts && opts.smooth;
+    const run = ()=> el.scrollIntoView({behavior: smooth ? 'smooth' : 'instant', block:'start'});
+    if(smooth) run();
+    else requestAnimationFrame(run);
+  }
+
+  function applyHomeHash(){
+    const id = (location.hash || '').replace(/^#/, '');
+    if(!id) return;
+    const home = document.getElementById('view-home');
+    if(!home || !home.classList.contains('active')) return;
+    scrollToHomeSection(id, {smooth:false});
   }
 
   function applyRouteFromPath(pathname){
@@ -4826,17 +4901,41 @@ whk: `
   const kGrid = document.getElementById('kennisbank-grid');
   const filterRow = document.getElementById('filter-row');
   const allTags = ["Alles", ...new Set(posts.map(p=>p.tag))];
+  const PRIMARY_KB_TAGS = ["Alles", "Basiskennis", "Ziektewet", "WGA", "WIA", "Spoor 2", "Loondoorbetaling", "Investering"];
   let activeTag = "Alles";
+  let kbFiltersExpanded = false;
 
   function renderFilters(){
     filterRow.innerHTML = '';
-    allTags.forEach(tag=>{
+    const extraTags = allTags.filter(tag => !PRIMARY_KB_TAGS.includes(tag));
+    const activeIsExtra = extraTags.includes(activeTag);
+    const showExtra = kbFiltersExpanded || activeIsExtra;
+    const visible = showExtra ? allTags : PRIMARY_KB_TAGS.filter(tag => allTags.includes(tag));
+    visible.forEach(tag=>{
       const chip = document.createElement('button');
       chip.className = 'filter-chip' + (tag === activeTag ? ' active' : '');
+      chip.type = 'button';
       chip.textContent = tag;
       chip.onclick = ()=>{ activeTag = tag; renderFilters(); renderPosts(); };
       filterRow.appendChild(chip);
     });
+    if(extraTags.length && !showExtra){
+      const more = document.createElement('button');
+      more.className = 'filter-chip filter-chip-more';
+      more.type = 'button';
+      more.setAttribute('aria-expanded', 'false');
+      more.textContent = 'Meer categorieën (' + extraTags.length + ')';
+      more.onclick = ()=>{ kbFiltersExpanded = true; renderFilters(); };
+      filterRow.appendChild(more);
+    } else if(extraTags.length && kbFiltersExpanded){
+      const less = document.createElement('button');
+      less.className = 'filter-chip filter-chip-more';
+      less.type = 'button';
+      less.setAttribute('aria-expanded', 'true');
+      less.textContent = 'Minder categorieën';
+      less.onclick = ()=>{ kbFiltersExpanded = false; renderFilters(); };
+      filterRow.appendChild(less);
+    }
   }
   function renderPosts(){
     kGrid.innerHTML = '';

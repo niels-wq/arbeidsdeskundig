@@ -675,6 +675,7 @@ Sitemap: ${BASE_URL}/sitemap.xml
 const LLMS_FEATURED_SLUGS = [
     'arbeidsdeskundig-onderzoek-gids',
     'wat-doet-arbeidsdeskundige',
+    'arbeidsdeskundig-rapport-voorbeeld',
     'kosten-arbeidsdeskundig-onderzoek',
     'verplicht-arbeidsdeskundig-onderzoek',
     'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',

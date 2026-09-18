@@ -508,6 +508,7 @@ const GIDS_CLUSTER = [
     'nadelen-arbeidsdeskundig-onderzoek',
     'riv-toets-bedrijfsarts-leidend',
     'beslistermijn-wia-16-weken',
+    'wia-aanvraag-parallel-spoor-2',
     'second-opinion-arbeidsdeskundige',
     'voorbereiden-gesprek-arbeidsdeskundige',
     'passende-arbeid',
@@ -780,6 +781,111 @@ describe('kennisbank article: belastbaarheid verouderd nieuwe FML/IZP', () => {
         assert.equal((xml.match(new RegExp(VEROUDERD_SLUG, 'g')) || []).length, 1);
         for (const slug of VEROUDERD_RESERVED) {
             assert.notEqual(slug, VEROUDERD_SLUG);
+            assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
+        }
+    });
+});
+
+const PARALLEL_SLUG = 'wia-aanvraag-parallel-spoor-2';
+const PARALLEL_PATH = '/kennisbank/' + PARALLEL_SLUG;
+const PARALLEL_RESERVED = [
+    'wia-aanvraag',
+    'spoor2',
+    'spoor2-kosten',
+    'beslistermijn-wia-16-weken',
+    'belastbaarheid-verouderd-nieuwe-fml-izp',
+    'verplicht-arbeidsdeskundig-onderzoek',
+    'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
+    'arbeidsdeskundig-onderzoek-gids',
+    'arbeidsdeskundig-rapport-voorbeeld',
+    'riv-toets',
+    'riv-toets-bedrijfsarts-leidend',
+    'wat-doet-arbeidsdeskundige',
+    'kosten-arbeidsdeskundig-onderzoek',
+];
+
+describe('kennisbank article: WIA-aanvraag parallel aan spoor 2', () => {
+    it('serves unique article HTML with SEO tags and schema', async () => {
+        const res = await fetch(base + PARALLEL_PATH);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        assert.match(html, /<title>WIA-aanvraag parallel aan spoor 2: wie coördineert wat\? — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<meta name="description" content="WIA-aanvraag parallel aan spoor 2: wie doet wat \(werkgever, werknemer, AD, UWV, coach\), valkuilen, en hoe je het dossier bij elkaar houdt\. Offerte\.">/);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${PARALLEL_PATH}">`));
+        assert.match(html, /"@type":"Article"/);
+        assert.match(html, /"@type":"FAQPage"/);
+
+        const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
+        assert.ok(h1Match, 'SSR H1 missing');
+        assert.equal(h1Match[1], 'WIA-aanvraag parallel aan spoor 2: wie coördineert wat?');
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>WIA-aanvraag parallel aan spoor 2: wie coördineert wat\?<\/h2>/);
+        assert.match(body, /WIA-aanvraag/);
+        assert.match(body, /spoor 2/);
+        assert.match(body, /wie coördineert wat/);
+        assert.match(body, /Waarom ze vaak tegelijk lopen/);
+        assert.match(body, /Wie doet wat/);
+        assert.match(body, /Coördinatievalkuilen/);
+        assert.match(body, /Wat HR en casemanagers wél doen/);
+        assert.match(body, /werkgever/i);
+        assert.match(body, /werknemer/i);
+        assert.match(body, /arbeidsdeskundige/i);
+        assert.match(body, /UWV/);
+        assert.match(body, /coach/i);
+        assert.match(body, /104 weken/);
+        assert.match(body, /week 88/);
+        assert.match(body, /<table/);
+        assert.match(body, /matchvermogen\.nl/);
+        assert.match(body, /bestmatchbv\.nl/);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /Doe de gratis keuzehulp/);
+        assert.doesNotMatch(body, /online of fysiek/i);
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 100).join(' ');
+        assert.match(firstWords, /WIA-aanvraag/i);
+        assert.match(firstWords, /spoor 2/i);
+        assert.match(firstWords, /wie coördineert wat/i);
+
+        assert.match(body, /href="\/kennisbank\/beslistermijn-wia-16-weken"/);
+        assert.match(body, /href="\/kennisbank\/spoor2"/);
+        assert.match(body, /href="\/kennisbank\/verplicht-arbeidsdeskundig-onderzoek"/);
+        assert.match(body, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-na-1-jaar-ziekte"/);
+        assert.match(body, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"/);
+        assert.match(body, /href="\/kennisbank\/arbeidsdeskundig-rapport-voorbeeld"/);
+        assert.match(html, /\/offerte-aanvragen/);
+        assert.match(html, /\/aanmelden/);
+        assert.match(html, /calendly\.com\/matchvermogen\/call-15-min/);
+
+        const pages = [];
+        const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+        let m;
+        while ((m = re.exec(html))) {
+            const block = JSON.parse(m[1]);
+            if (block['@type'] === 'FAQPage') pages.push(block);
+        }
+        assert.equal(pages.length, 1);
+        const names = pages[0].mainEntity.map((q) => q.name);
+        assert.ok(names.some((q) => /parallel lopen/.test(q)));
+        assert.ok(names.some((q) => /Wie coördineert wat/.test(q)));
+        assert.ok(names.some((q) => /spoor 2 stoppen/.test(q)));
+        assert.ok(!names.some((q) => q === 'Kan het onderzoek ook fysiek?'));
+    });
+
+    it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {
+        const res = await fetch(base + '/sitemap.xml');
+        assert.equal(res.status, 200);
+        const xml = await res.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${PARALLEL_PATH}`));
+        assert.equal((xml.match(new RegExp(PARALLEL_SLUG, 'g')) || []).length, 1);
+        for (const slug of PARALLEL_RESERVED) {
+            assert.notEqual(slug, PARALLEL_SLUG);
             assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
         }
     });

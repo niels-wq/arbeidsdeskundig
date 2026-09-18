@@ -673,6 +673,7 @@ Sitemap: ${BASE_URL}/sitemap.xml
 // kan alleen helpen bij vindbaarheid in ChatGPT/Perplexity/Claude e.d.
 // ---------------------------------------------------------------------------
 const LLMS_FEATURED_SLUGS = [
+    'arbeidsdeskundig-onderzoek-gids',
     'wat-doet-arbeidsdeskundige',
     'kosten-arbeidsdeskundig-onderzoek',
     'verplicht-arbeidsdeskundig-onderzoek',

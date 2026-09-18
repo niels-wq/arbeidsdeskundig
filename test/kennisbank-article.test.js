@@ -493,3 +493,97 @@ describe('kennisbank article: second opinion arbeidsdeskundige', () => {
         }
     });
 });
+
+const GIDS_SLUG = 'arbeidsdeskundig-onderzoek-gids';
+const GIDS_PATH = '/kennisbank/' + GIDS_SLUG;
+const GIDS_CLUSTER = [
+    'wat-doet-arbeidsdeskundige',
+    'fml-izp-lezen-belastbaarheid',
+    'kosten-arbeidsdeskundig-onderzoek',
+    'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
+    'verplicht-arbeidsdeskundig-onderzoek',
+    'tips-werknemer-arbeidsdeskundig-onderzoek',
+    'nadelen-arbeidsdeskundig-onderzoek',
+    'riv-toets-bedrijfsarts-leidend',
+    'beslistermijn-wia-16-weken',
+    'second-opinion-arbeidsdeskundige',
+    'voorbereiden-gesprek-arbeidsdeskundige',
+    'passende-arbeid',
+];
+
+describe('kennisbank hub: gids arbeidsdeskundig onderzoek', () => {
+    it('serves a unique pillar page with SEO tags and crawlable cluster links', async () => {
+        const res = await fetch(base + GIDS_PATH);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        assert.match(html, /<title>Alles over arbeidsdeskundig onderzoek: de gids — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<meta name="description" content="Gids arbeidsdeskundig onderzoek: wat het is, of het moet, timing, kosten, werknemersrechten en UWV\. Links naar de diepte-artikelen\. Offerte of aanmelden\.">/);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${GIDS_PATH}">`));
+        assert.match(html, /"@type":"Article"/);
+        assert.match(html, /"@type":"FAQPage"/);
+
+        const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
+        assert.ok(h1Match, 'SSR H1 missing');
+        assert.equal(h1Match[1], 'Alles over arbeidsdeskundig onderzoek: de gids');
+        assert.notEqual(h1Match[1], 'Arbeidsdeskundig onderzoek. Vanaf €1.095,-.');
+        assert.notEqual(h1Match[1], 'Alles over arbeidsdeskundig onderzoek');
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>Alles over arbeidsdeskundig onderzoek: de gids<\/h2>/);
+        assert.match(body, /gids arbeidsdeskundig onderzoek/);
+        assert.match(body, /kaart van het cluster/);
+        assert.match(body, /Wat het onderzoek is — en wat niet/);
+        assert.match(body, /Moet het, wanneer, en wat kost het/);
+        assert.match(body, /Als je werknemer bent/);
+        assert.match(body, /Als het wringt of je twijfelt/);
+        assert.match(body, /Richting UWV: RIV en de WIA-wacht/);
+        assert.match(body, /matchvermogen\.nl/);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /Doe de gratis keuzehulp/);
+        assert.doesNotMatch(body, /Vanaf €1\.095/);
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 80).join(' ');
+        assert.match(firstWords, /gids arbeidsdeskundig onderzoek/i);
+        assert.doesNotMatch(firstWords, /Binnen 24 uur opgepakt/);
+
+        for (const slug of GIDS_CLUSTER) {
+            const hrefRe = new RegExp(`<a[^>]+href="/kennisbank/${slug}"`);
+            assert.match(body, hrefRe, `hub missing crawlable href to ${slug}`);
+        }
+
+        assert.match(html, /\/offerte-aanvragen/);
+        assert.match(html, /\/aanmelden/);
+        assert.match(html, /calendly\.com\/matchvermogen\/call-15-min/);
+    });
+
+    it('is listed once in sitemap.xml and does not collide with cluster slugs', async () => {
+        const res = await fetch(base + '/sitemap.xml');
+        assert.equal(res.status, 200);
+        const xml = await res.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${GIDS_PATH}`));
+        assert.equal((xml.match(new RegExp(GIDS_SLUG, 'g')) || []).length, 1);
+        for (const slug of GIDS_CLUSTER) {
+            assert.notEqual(slug, GIDS_SLUG);
+            assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
+        }
+    });
+
+    it('is linked lightly from homepage and kennisbank listing', async () => {
+        const home = await fetch(base + '/');
+        assert.equal(home.status, 200);
+        const homeHtml = await home.text();
+        assert.match(homeHtml, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"/);
+
+        const listing = await fetch(base + '/kennisbank');
+        assert.equal(listing.status, 200);
+        const listingHtml = await listing.text();
+        assert.match(listingHtml, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"/);
+        assert.match(listingHtml, /<h1[^>]*>Alles over arbeidsdeskundig onderzoek<\/h1>/);
+    });
+});

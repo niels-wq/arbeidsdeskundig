@@ -509,6 +509,7 @@ const GIDS_CLUSTER = [
     'riv-toets-bedrijfsarts-leidend',
     'beslistermijn-wia-16-weken',
     'wia-aanvraag-parallel-spoor-2',
+    'spoor-2-zonder-spoor-1-afgerond',
     'second-opinion-arbeidsdeskundige',
     'voorbereiden-gesprek-arbeidsdeskundige',
     'passende-arbeid',
@@ -886,6 +887,109 @@ describe('kennisbank article: WIA-aanvraag parallel aan spoor 2', () => {
         assert.equal((xml.match(new RegExp(PARALLEL_SLUG, 'g')) || []).length, 1);
         for (const slug of PARALLEL_RESERVED) {
             assert.notEqual(slug, PARALLEL_SLUG);
+            assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
+        }
+    });
+});
+
+const EARLY_SPOOR2_SLUG = 'spoor-2-zonder-spoor-1-afgerond';
+const EARLY_SPOOR2_PATH = '/kennisbank/' + EARLY_SPOOR2_SLUG;
+const EARLY_SPOOR2_RESERVED = [
+    'wia-aanvraag-parallel-spoor-2',
+    'spoor2',
+    'spoor2-kosten',
+    'spoor1a-spoor1b',
+    'verplicht-arbeidsdeskundig-onderzoek',
+    'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
+    'arbeidsdeskundig-onderzoek-gids',
+    'wat-doet-arbeidsdeskundige',
+    'wia-aanvraag',
+    'poortwachter-tijdlijn',
+    'jaarsevaluatie',
+    'kosten-arbeidsdeskundig-onderzoek',
+];
+
+describe('kennisbank article: spoor 2 zonder spoor 1 afgerond', () => {
+    it('serves unique article HTML with SEO tags and schema', async () => {
+        const res = await fetch(base + EARLY_SPOOR2_PATH);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        assert.match(html, /<title>Spoor 2 starten zonder spoor 1 afgerond: wanneer mag dat wél\? — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<meta name="description" content="Spoor 2 starten zonder spoor 1 afgerond: wanneer dat mag, de mythe van eerst afsluiten, 1 jaar plus 6 weken, en welke documentatie blijft. Offerte.">/);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${EARLY_SPOOR2_PATH}">`));
+        assert.match(html, /"@type":"Article"/);
+        assert.match(html, /"@type":"FAQPage"/);
+
+        const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
+        assert.ok(h1Match, 'SSR H1 missing');
+        assert.equal(h1Match[1], 'Spoor 2 starten zonder spoor 1 afgerond: wanneer mag dat wél?');
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>Spoor 2 starten zonder spoor 1 afgerond: wanneer mag dat wél\?<\/h2>/);
+        assert.match(body, /spoor 2/);
+        assert.match(body, /spoor 1 afgerond/);
+        assert.match(body, /wanneer mag dat wél/i);
+        assert.match(body, /De mythe: eerst spoor 1 afgerond/);
+        assert.match(body, /Wanneer het wél mag/);
+        assert.match(body, /1 jaar plus 6 weken/);
+        assert.match(body, /Documentatie die je wél nodig hebt/);
+        assert.match(body, /Valkuilen/);
+        assert.match(body, /Wat HR en casemanagers wél doen/);
+        assert.match(body, /eerstejaars-evaluatie/);
+        assert.match(body, /<table/);
+        assert.match(body, /bestmatchbv\.nl/);
+        assert.doesNotMatch(body, /matchvermogen\.nl/);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /Doe de gratis keuzehulp/);
+        assert.doesNotMatch(body, /online of fysiek/i);
+        assert.doesNotMatch(body, /—/);
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 100).join(' ');
+        assert.match(firstWords, /Spoor 2 starten/i);
+        assert.match(firstWords, /spoor 1 afgerond/i);
+        assert.match(firstWords, /wanneer mag dat wél/i);
+
+        assert.match(body, /href="\/kennisbank\/spoor2"/);
+        assert.match(body, /href="\/kennisbank\/wia-aanvraag-parallel-spoor-2"/);
+        assert.match(body, /href="\/kennisbank\/verplicht-arbeidsdeskundig-onderzoek"/);
+        assert.match(body, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-na-1-jaar-ziekte"/);
+        assert.match(body, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"/);
+        assert.match(body, /href="\/kennisbank\/wat-doet-arbeidsdeskundige"/);
+        assert.match(html, /\/offerte-aanvragen/);
+        assert.match(html, /\/aanmelden/);
+        assert.match(html, /calendly\.com\/matchvermogen\/call-15-min/);
+
+        const pages = [];
+        const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+        let m;
+        while ((m = re.exec(html))) {
+            const block = JSON.parse(m[1]);
+            if (block['@type'] === 'FAQPage') pages.push(block);
+        }
+        assert.equal(pages.length, 1);
+        const names = pages[0].mainEntity.map((q) => q.name);
+        assert.ok(names.some((q) => /zonder dat spoor 1 is afgerond/.test(q)));
+        assert.ok(names.some((q) => /1 jaar plus 6 weken/.test(q)));
+        assert.ok(names.some((q) => /documentatie/.test(q)));
+        assert.ok(names.some((q) => /mythe/.test(q)));
+        assert.ok(names.some((q) => /valkuilen/.test(q)));
+        assert.ok(!names.some((q) => q === 'Kan het onderzoek ook fysiek?'));
+    });
+
+    it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {
+        const res = await fetch(base + '/sitemap.xml');
+        assert.equal(res.status, 200);
+        const xml = await res.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${EARLY_SPOOR2_PATH}`));
+        assert.equal((xml.match(new RegExp(EARLY_SPOOR2_SLUG, 'g')) || []).length, 1);
+        for (const slug of EARLY_SPOOR2_RESERVED) {
+            assert.notEqual(slug, EARLY_SPOOR2_SLUG);
             assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
         }
     });

@@ -683,6 +683,7 @@ const LLMS_FEATURED_SLUGS = [
     'nadelen-arbeidsdeskundig-onderzoek',
     'tips-werknemer-arbeidsdeskundig-onderzoek',
     'fml-izp-lezen-belastbaarheid',
+    'belastbaarheid-verouderd-nieuwe-fml-izp',
     'riv-toets-bedrijfsarts-leidend',
     'beslistermijn-wia-16-weken',
     'poortwachter-tijdlijn',

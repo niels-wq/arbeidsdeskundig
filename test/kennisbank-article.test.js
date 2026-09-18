@@ -499,6 +499,7 @@ const GIDS_PATH = '/kennisbank/' + GIDS_SLUG;
 const GIDS_CLUSTER = [
     'wat-doet-arbeidsdeskundige',
     'fml-izp-lezen-belastbaarheid',
+    'belastbaarheid-verouderd-nieuwe-fml-izp',
     'arbeidsdeskundig-rapport-voorbeeld',
     'kosten-arbeidsdeskundig-onderzoek',
     'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
@@ -684,6 +685,101 @@ describe('kennisbank article: wat zit er in een arbeidsdeskundig rapport', () =>
         assert.equal((xml.match(new RegExp(RAPPORT_SLUG, 'g')) || []).length, 1);
         for (const slug of RAPPORT_RESERVED) {
             assert.notEqual(slug, RAPPORT_SLUG);
+            assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
+        }
+    });
+});
+
+const VEROUDERD_SLUG = 'belastbaarheid-verouderd-nieuwe-fml-izp';
+const VEROUDERD_PATH = '/kennisbank/' + VEROUDERD_SLUG;
+const VEROUDERD_RESERVED = [
+    'arbeidsdeskundig-rapport-voorbeeld',
+    'arbeidsdeskundig-onderzoek-gids',
+    'fml-izp-lezen-belastbaarheid',
+    'fml-uitleg',
+    'voorbereiden-gesprek-arbeidsdeskundige',
+    'wat-doet-arbeidsdeskundige',
+    'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
+    'verplicht-arbeidsdeskundig-onderzoek',
+    'kosten-arbeidsdeskundig-onderzoek',
+    'nadelen-arbeidsdeskundig-onderzoek',
+    'second-opinion-arbeidsdeskundige',
+    'riv-toets',
+    'passende-arbeid',
+    'arbeidsdeskundige-vs-bedrijfsarts-casemanager',
+];
+
+describe('kennisbank article: belastbaarheid verouderd nieuwe FML/IZP', () => {
+    it('serves unique article HTML with SEO tags and schema', async () => {
+        const res = await fetch(base + VEROUDERD_PATH);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        assert.match(html, /<title>Belastbaarheid verouderd: wanneer start je geen arbeidsdeskundig onderzoek zonder nieuwe FML\/IZP\? — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<meta name="description" content="Belastbaarheid verouderd\? Wanneer een FML of IZP te oud is om een arbeidsdeskundig onderzoek te starten\. Wie een nieuwe vraagt\. Offerte of aanmelden\.">/);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${VEROUDERD_PATH}">`));
+        assert.match(html, /"@type":"Article"/);
+        assert.match(html, /"@type":"FAQPage"/);
+
+        const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
+        assert.ok(h1Match, 'SSR H1 missing');
+        assert.equal(h1Match[1], 'Belastbaarheid verouderd: wanneer start je geen arbeidsdeskundig onderzoek zonder nieuwe FML/IZP?');
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>Belastbaarheid verouderd: wanneer start je geen arbeidsdeskundig onderzoek zonder nieuwe FML\/IZP\?<\/h2>/);
+        assert.match(body, /belastbaarheid verouderd/);
+        assert.match(body, /geen arbeidsdeskundig onderzoek zonder nieuwe FML/);
+        assert.match(body, /Wat actueel in de praktijk betekent/);
+        assert.match(body, /geen vaste wettelijke geldigheidsduur/);
+        assert.match(body, /Wanneer je wel even wacht/);
+        assert.match(body, /Wie vraagt een nieuwe FML of IZP/);
+        assert.match(body, /bedrijfsarts/);
+        assert.match(body, /Wat je riskeert als je toch start/);
+        assert.match(body, /RIV-toets/);
+        assert.match(body, /matchvermogen\.nl/);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /Doe de gratis keuzehulp/);
+        assert.doesNotMatch(body, /wettelijke houdbaarheid van \d+ (weken|maanden)/);
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 100).join(' ');
+        assert.match(firstWords, /belastbaarheid verouderd/i);
+        assert.match(firstWords, /arbeidsdeskundig onderzoek/i);
+        assert.match(firstWords, /FML of IZP/i);
+
+        assert.match(body, /href="\/kennisbank\/fml-izp-lezen-belastbaarheid"/);
+        assert.match(body, /href="\/kennisbank\/voorbereiden-gesprek-arbeidsdeskundige"/);
+        assert.match(html, /\/offerte-aanvragen/);
+        assert.match(html, /\/aanmelden/);
+        assert.match(html, /calendly\.com\/matchvermogen\/call-15-min/);
+
+        const pages = [];
+        const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+        let m;
+        while ((m = re.exec(html))) {
+            const block = JSON.parse(m[1]);
+            if (block['@type'] === 'FAQPage') pages.push(block);
+        }
+        assert.equal(pages.length, 1);
+        const names = pages[0].mainEntity.map((q) => q.name);
+        assert.ok(names.some((q) => /te oud voor een arbeidsdeskundig onderzoek/.test(q)));
+        assert.ok(names.some((q) => /actuele FML of IZP/.test(q)));
+        assert.ok(names.some((q) => /Wie vraagt een nieuwe FML/.test(q)));
+        assert.ok(!names.some((q) => q === 'Kan het onderzoek ook fysiek?'));
+    });
+
+    it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {
+        const res = await fetch(base + '/sitemap.xml');
+        assert.equal(res.status, 200);
+        const xml = await res.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${VEROUDERD_PATH}`));
+        assert.equal((xml.match(new RegExp(VEROUDERD_SLUG, 'g')) || []).length, 1);
+        for (const slug of VEROUDERD_RESERVED) {
+            assert.notEqual(slug, VEROUDERD_SLUG);
             assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
         }
     });

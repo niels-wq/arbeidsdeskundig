@@ -58,7 +58,24 @@
   .wrap{max-width:1120px; margin:0 auto; padding:0 20px;}
   .hidden{display:none !important;}
   .form-error{color:#9B2C2C; font-size:.85rem; margin:10px 0 0; line-height:1.4;}
+  .field-msg{font-size:.75rem; color:#9B2C2C; margin-top:5px; display:none; line-height:1.35;}
+  label.field.invalid .field-msg{display:block;}
+  label.field.invalid input, label.field.invalid select, label.field.invalid textarea{border-color:#9B2C2C;}
   .hp-field{position:absolute !important; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden;}
+
+  /* Conversiepagina's: één hoofdpad, minder homepage-chrome boven de vouw */
+  .conv-proof{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px;}
+  .conv-proof span{background:var(--white); border:1px solid #DFE2DB; color:var(--ink); font-size:.78rem; font-weight:600; padding:6px 11px; border-radius:2px;}
+  .conv-proof span b{font-weight:700; color:var(--teal);}
+  .conv-after{font-size:.8rem; color:var(--muted); margin:10px 0 0; line-height:1.5;}
+  .conv-twijfel{margin-top:28px; padding:18px 20px; background:var(--panel); border:1px dashed var(--rule); border-radius:2px;}
+  .conv-twijfel .conv-twijfel-actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; align-items:center;}
+  body.conv-page .sticky-cta{display:none;}
+  body.conv-page .fab-checklist{display:none;}
+  body.conv-page .header-offerte-cta{display:none;}
+  @media(max-width:639px){
+    body.conv-page .fab-whatsapp{bottom:calc(20px + var(--fab-bottom-offset, 0px));}
+  }
 
   header.site{position:sticky; top:0; z-index:40; background:var(--ink);}
   .navbar{display:flex; align-items:center; justify-content:space-between; padding:14px 20px; max-width:1120px; margin:0 auto;}
@@ -88,6 +105,7 @@
   .btn-ghost.on-dark:hover{background:var(--paper); color:var(--ink);}
   .btn-small{padding:8px 14px; font-size:.8rem;}
   .btn-link{background:none;border:none;padding:0;color:var(--teal);font-weight:600;text-decoration:underline;cursor:pointer;font-size:inherit;}
+  .btn-link:disabled{opacity:.4; cursor:not-allowed; text-decoration:none;}
 
   .dossier{border-top:1px dashed #98A0A8; border-bottom:1px dashed #98A0A8; background:var(--panel); position:relative;}
   .perf{display:flex; justify-content:space-between; padding:0 6px; transform:translateY(-50%);}
@@ -335,7 +353,7 @@
     </nav>
     <div style="display:flex; align-items:center; gap:10px;">
       <button class="btn-ghost-header" style="white-space:nowrap;" onclick="openBelTerugModal()">📞 Bel me terug</button>
-      <a class="btn-primary" href="/offerte-aanvragen" style="padding:10px 18px; font-size:.85rem;" onclick="event.preventDefault(); setView('offerte')">Direct offerte</a>
+      <a class="btn-primary header-offerte-cta" href="/offerte-aanvragen" style="padding:10px 18px; font-size:.85rem;" onclick="event.preventDefault(); setView('offerte')">Direct offerte</a>
     </div>
   </div>
   <nav class="mobile" id="navMobile">
@@ -846,64 +864,63 @@
 
 <!-- ============= AANMELDEN ============= -->
 <div class="view" id="view-offerte">
-  <div class="wrap" style="max-width:640px; padding-top:48px; padding-bottom:64px;">
-    <p class="eyebrow">Vrijblijvend contact</p>
-    <h1 style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Liever eerst even sparren dan meteen een offerte?</h1>
-
-    <div style="display:flex; gap:16px; align-items:center; margin-top:20px; padding:16px 20px; background:var(--panel); border-radius:2px;">
-      <img src="/assets/niels-koffie.png" alt="Niels Alderding, oprichter arbeidsdeskundig.com" loading="lazy" style="width:64px; height:64px; border-radius:50%; object-fit:cover; flex-shrink:0;" onerror="this.style.display='none';">
-      <p style="font-size:.9rem; color:var(--ink); font-style:italic; margin:0;">"Onder het genot van een kop koffie denk ik net zo makkelijk mee als tijdens een formeel gesprek — plan gerust vrijblijvend 15 minuten in."<br><span style="font-style:normal; font-size:.8rem; color:var(--muted2);">— Niels Alderding, oprichter</span></p>
-    </div>
-
-    <p style="margin-top:16px; font-size:.92rem; color:var(--muted);">Plan direct en geheel vrijblijvend een gratis kennismakingsgesprek van 15 minuten in — geen verplichtingen, geen verkooppraatje.</p>
-
-    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px; align-items:center;">
-      <a href="https://calendly.com/matchvermogen/call-15-min" target="_blank" rel="noopener" class="btn-primary" style="text-decoration:none;">Plan een gratis 15 minuten call →</a>
-      <button class="btn-ghost" onclick="openBelTerugModal()">📞 Of bel me liever terug</button>
-    </div>
-
-    <div style="display:flex; align-items:center; gap:16px; margin:40px 0;">
-      <div style="flex:1; height:1px; background:var(--rule);"></div>
-      <span class="mono eyebrow" style="color:var(--muted2);">of</span>
-      <div style="flex:1; height:1px; background:var(--rule);"></div>
-    </div>
-
+  <div class="wrap" style="max-width:640px; padding-top:40px; padding-bottom:64px;">
     <p class="eyebrow">Vrijblijvende offerte</p>
-    <h2 style="font-size:1.4rem; color:var(--ink); margin-top:8px;">Vraag direct en zonder verplichtingen een offerte aan</h2>
-    <p style="margin-top:10px; font-size:.92rem; color:var(--muted);">Twee minuten werk. Een offerte aanvragen is altijd vrijblijvend — je zit nergens aan vast totdat je zelf akkoord geeft.</p>
+    <h1 style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Vraag je offerte aan — vanaf €1.095,-</h1>
+    <p style="margin-top:10px; font-size:.95rem; color:var(--muted);">Twee minuten werk. Geen verplichting: je zit nergens aan vast totdat je zelf akkoord geeft.</p>
+    <div class="conv-proof" aria-label="Belangrijkste voordelen">
+      <span><b>Vanaf €1.095,-</b> excl. btw</span>
+      <span><b>Binnen 24 uur</b> contact</span>
+      <span><b>4,9/5</b> op Google</span>
+    </div>
 
-    <div id="offerte-form-step">
+    <div id="offerte-form-step" style="margin-top:24px;">
       <div class="grid2" style="margin-top:8px;">
-        <label class="field"><span class="lbl">Naam <span class="req">*</span></span><input type="text" id="of-naam" autocomplete="name"></label>
-        <label class="field"><span class="lbl">Bedrijf</span><input type="text" id="of-bedrijf" autocomplete="organization"></label>
-        <label class="field"><span class="lbl">E-mail <span class="req">*</span></span><input type="email" id="of-email" autocomplete="email"></label>
-        <label class="field"><span class="lbl">Telefoon <span class="req">*</span></span><input type="tel" id="of-telefoon" autocomplete="tel"></label>
+        <label class="field"><span class="lbl">Je naam <span class="req">*</span></span><input type="text" id="of-naam" autocomplete="name" aria-required="true" aria-describedby="of-naam-msg"><span class="field-msg" id="of-naam-msg" role="alert"></span></label>
+        <label class="field"><span class="lbl">Organisatie</span><input type="text" id="of-bedrijf" autocomplete="organization" placeholder="Optioneel"><span class="hint">Mag leeg blijven — handig als je namens een werkgever of arbodienst belt.</span></label>
+        <label class="field"><span class="lbl">Zakelijk e-mailadres <span class="req">*</span></span><input type="email" id="of-email" autocomplete="email" aria-required="true" aria-describedby="of-email-msg"><span class="field-msg" id="of-email-msg" role="alert"></span></label>
+        <label class="field"><span class="lbl">Telefoonnummer <span class="req">*</span></span><input type="tel" id="of-telefoon" autocomplete="tel" aria-required="true" aria-describedby="of-telefoon-msg" placeholder="06 of 085…"><span class="field-msg" id="of-telefoon-msg" role="alert"></span><span class="hint">Zodat we je binnen 24 uur kunnen bereiken.</span></label>
         <label class="hp-field" aria-hidden="true"><span>Website</span><input type="text" id="of-website" name="website" tabindex="-1" autocomplete="off"></label>
       </div>
-      <label class="field"><span class="lbl">Bedrijfsgrootte</span>
-        <div class="choice-row" data-group="of-grootte">
-          <button class="choice" data-value="klein">Tot 5 medewerkers / stichting</button>
-          <button class="choice" data-value="midden">Tot 100 medewerkers</button>
-          <button class="choice" data-value="groot">Groot zakelijk</button>
+      <label class="field"><span class="lbl">Hoe groot is de organisatie?</span>
+        <div class="choice-row" data-group="of-grootte" role="group" aria-label="Bedrijfsgrootte">
+          <button type="button" class="choice" data-value="klein">Tot 5 medewerkers / stichting</button>
+          <button type="button" class="choice" data-value="midden">Tot 100 medewerkers</button>
+          <button type="button" class="choice" data-value="groot">Groot zakelijk</button>
         </div>
+        <span class="hint">Bepaalt het tarief. Twijfel je? Kies tot 100 — we corrigeren dat gratis.</span>
       </label>
       <label class="field"><span class="lbl">Online of fysiek onderzoek?</span>
-        <div class="choice-row" data-group="of-vorm">
-          <button class="choice" data-value="Online">Online (snelst)</button>
-          <button class="choice" data-value="Fysiek">Fysiek, op locatie</button>
-          <button class="choice" data-value="Weet niet">Weet ik nog niet</button>
+        <div class="choice-row" data-group="of-vorm" role="group" aria-label="Onderzoeksvorm">
+          <button type="button" class="choice" data-value="Online">Online (snelst)</button>
+          <button type="button" class="choice" data-value="Fysiek">Fysiek, op locatie</button>
+          <button type="button" class="choice" data-value="Weet niet">Weet ik nog niet</button>
         </div>
+        <span class="hint">Twijfel je? <button type="button" class="btn-link" onclick="setView('advies', {tool:'keuzehulp'})">Doe de keuzehulp</button> of kies “weet ik nog niet”.</span>
       </label>
-      <div class="card" style="margin-top:4px; padding:16px 18px; background:var(--panel); border:1px dashed var(--rule);">
-        <p style="font-size:.85rem; color:var(--muted); margin:0;">Twijfel je tussen online en fysiek? Soms is een fysiek bezoek écht nodig — bijvoorbeeld om de werkplek objectief te beoordelen als de omstandigheden vanuit de opdrachtgever niet goed in kaart te brengen zijn. Wij adviseren je hier vrijblijvend in. <button class="btn-link" onclick="setView('advies', {tool:'keuzehulp'})">Doe de keuzehulp →</button></p>
-      </div>
-      <label class="field" style="margin-top:16px;"><span class="lbl">Korte omschrijving van de situatie</span><textarea id="of-omschrijving" placeholder="Optioneel — helpt ons om snel de juiste inschatting te maken."></textarea></label>
+      <label class="field" style="margin-top:8px;"><span class="lbl">Korte omschrijving van de situatie</span><textarea id="of-omschrijving" placeholder="Optioneel — bijvoorbeeld: week 42, WIA in zicht, of twijfel over spoor 1."></textarea></label>
 
       <p id="of-error" class="form-error hidden" role="alert"></p>
       <div style="display:flex; flex-direction:column; gap:12px; margin-top:20px;">
-        <button type="button" class="btn-primary" id="btn-of-direct" disabled onclick="genereerOffertePdf()">Vrijblijvende offerte genereren (PDF)</button>
+        <button type="button" class="btn-primary" id="btn-of-direct" disabled onclick="genereerOffertePdf()">Offerte aanvragen</button>
+        <p class="conv-after">Je krijgt direct een vrijblijvende PDF. We nemen <strong>binnen 24 uur</strong> contact met je op — geen verplichtingen.</p>
         <button type="button" class="btn-ghost" id="btn-of-aanmelden" disabled onclick="gaNaarAanmelden()">Ik weet het al — direct aanmelden</button>
-        <button type="button" class="btn-ghost" id="btn-of-contact" disabled onclick="verstuurContactverzoek()">Liever eerst contact via e-mail/telefoon</button>
+        <button type="button" class="btn-link" id="btn-of-contact" disabled onclick="verstuurContactverzoek()">Liever alleen een terugbelverzoek via dit formulier</button>
+      </div>
+    </div>
+
+    <div class="conv-twijfel" id="offerte-twijfel">
+      <div style="display:flex; gap:14px; align-items:flex-start;">
+        <img src="/assets/niels-koffie.png" alt="Niels Alderding, oprichter arbeidsdeskundig.com" loading="lazy" width="56" height="56" style="width:56px; height:56px; border-radius:50%; object-fit:cover; flex-shrink:0;" onerror="this.style.display='none';">
+        <div>
+          <p style="font-size:.9rem; color:var(--ink); font-weight:600; margin:0;">Liever eerst kennismaken of bellen?</p>
+          <p style="font-size:.85rem; color:var(--muted); margin:6px 0 0;">Gratis 15 minuten, geen verkooppraatje. Handig als je nog twijfelt of een onderzoek nodig is.</p>
+        </div>
+      </div>
+      <div class="conv-twijfel-actions">
+        <button type="button" class="btn-ghost" onclick="openCalendlyPopup()">Plan 15 min. kennismaking</button>
+        <a href="https://calendly.com/matchvermogen/call-15-min" target="_blank" rel="noopener" class="btn-link">Of open Calendly in een nieuw tabblad</a>
+        <button type="button" class="btn-link" onclick="openBelTerugModal()">Bel me terug</button>
       </div>
     </div>
 
@@ -1033,9 +1050,24 @@
 </div>
 
 <div class="view" id="view-aanmelden">
-  <div class="wrap" style="max-width:760px; padding-top:48px; padding-bottom:64px;">
+  <div class="wrap" style="max-width:760px; padding-top:40px; padding-bottom:64px;">
     <p class="eyebrow">Aanmelden</p>
-    <h1 style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Vraag je onderzoek aan</h1>
+    <h1 style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Meld je onderzoek aan — vanaf €1.095,-</h1>
+    <p style="margin-top:10px; font-size:.95rem; color:var(--muted); max-width:620px;">Zes korte stappen, inclusief ondertekening. We pakken je aanmelding <strong>binnen 24 uur</strong> op.</p>
+    <div class="conv-proof" aria-label="Belangrijkste voordelen">
+      <span><b>Vanaf €1.095,-</b> excl. btw</span>
+      <span><b>Binnen 24 uur</b> contact</span>
+      <span><b>4,9/5</b> op Google</span>
+    </div>
+    <div class="conv-twijfel" id="aanmeld-twijfel" style="margin-top:18px;">
+      <p style="font-size:.9rem; color:var(--ink); font-weight:600; margin:0;">Nog niet zeker? Liever eerst kennismaken of bellen.</p>
+      <p style="font-size:.85rem; color:var(--muted); margin:6px 0 0;">Gratis 15 minuten — of we bellen je terug. Daarna kun je hier verder aanmelden.</p>
+      <div class="conv-twijfel-actions">
+        <button type="button" class="btn-ghost btn-small" onclick="openCalendlyPopup()">Plan 15 min. kennismaking</button>
+        <a href="https://calendly.com/matchvermogen/call-15-min" target="_blank" rel="noopener" class="btn-link">Calendly in nieuw tabblad</a>
+        <button type="button" class="btn-link" onclick="openBelTerugModal()">Bel me terug</button>
+      </div>
+    </div>
 
     <div class="dossier" style="margin-top:28px; overflow-x:auto;">
       <div class="perf" id="perf3"></div>
@@ -1059,6 +1091,7 @@
     <!-- STEP 1: Dienstverlening -->
     <div id="form-step-1" style="margin-top:32px;">
       <p class="form-section-title">Type dienstverlening</p>
+      <p class="conv-after" style="margin:0 0 16px;">Stap 1: kies wat je nodig hebt. Je kunt later nog terug. Na de laatste stap nemen we binnen 24 uur contact op.</p>
       <div class="info-box" style="border-color:var(--teal); background:#E9F1EE;">
         <label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">
           <input type="checkbox" id="chk-spoor2" style="margin-top:3px;">
@@ -1119,10 +1152,10 @@
         <label class="field"><span class="lbl">Rol opdrachtgever <span class="req">*</span></span>
           <select id="inp-rol"><option value="">Kies...</option><option>Werkgever</option><option>Casemanager</option><option>Verzekeraar</option><option>Anders</option></select>
         </label>
-        <label class="field"><span class="lbl">Naam aanvrager/opdrachtgever <span class="req">*</span></span><input type="text" id="inp-aanvrager-naam" autocomplete="name"></label>
-        <label class="field"><span class="lbl">Werkgever aanvrager/opdrachtgever <span class="req">*</span></span><input type="text" id="inp-aanvrager-werkgever" autocomplete="organization"></label>
-        <label class="field"><span class="lbl">Email aanvrager/opdrachtgever <span class="req">*</span></span><input type="email" id="inp-aanvrager-email" autocomplete="email"></label>
-        <label class="field"><span class="lbl">Telefoonnummer aanvrager/opdrachtgever <span class="req">*</span></span><input type="tel" id="inp-aanvrager-tel" autocomplete="tel"></label>
+        <label class="field"><span class="lbl">Jouw naam <span class="req">*</span></span><input type="text" id="inp-aanvrager-naam" autocomplete="name" aria-required="true" aria-describedby="inp-aanvrager-naam-msg"><span class="field-msg" id="inp-aanvrager-naam-msg" role="alert"></span></label>
+        <label class="field"><span class="lbl">Organisatie / werkgever <span class="req">*</span></span><input type="text" id="inp-aanvrager-werkgever" autocomplete="organization"></label>
+        <label class="field"><span class="lbl">Jouw e-mailadres <span class="req">*</span></span><input type="email" id="inp-aanvrager-email" autocomplete="email" aria-required="true" aria-describedby="inp-aanvrager-email-msg"><span class="field-msg" id="inp-aanvrager-email-msg" role="alert"></span></label>
+        <label class="field"><span class="lbl">Jouw telefoonnummer <span class="req">*</span></span><input type="tel" id="inp-aanvrager-tel" autocomplete="tel" aria-required="true" aria-describedby="inp-aanvrager-tel-msg"><span class="field-msg" id="inp-aanvrager-tel-msg" role="alert"></span></label>
         <label class="hp-field" aria-hidden="true"><span>Website</span><input type="text" id="inp-website" name="website" tabindex="-1" autocomplete="off"></label>
       </div>
       <label class="field"><span class="lbl">Opmerkingen</span><textarea id="inp-aanvrager-opmerkingen" placeholder="Vertel hier iets over het dossier."></textarea></label>
@@ -1246,9 +1279,10 @@
         </div>
       </div>
       <p id="aanmeld-error" class="form-error hidden" role="alert"></p>
+      <p class="conv-after">Na ondertekenen pakken we dit <strong>binnen 24 uur</strong> op. Je ontvangt een bevestiging per e-mail.</p>
       <div style="display:flex; gap:12px; margin-top:16px;">
         <button class="btn-ghost" onclick="goStep(5)">Terug</button>
-        <button class="btn-primary" id="btn-to-step7" disabled onclick="submitAanmelding()">Onderteken & plan intake</button>
+        <button class="btn-primary" id="btn-to-step7" disabled onclick="submitAanmelding()">Onderteken &amp; plan intake</button>
       </div>
     </div>
 
@@ -2010,6 +2044,39 @@
     el.textContent = list.join(' ');
     el.classList.remove('hidden');
   }
+  function setFieldValidity(input, message){
+    if(!input) return;
+    const field = input.closest('label.field');
+    const msgEl = field && (field.querySelector('.field-msg') || document.getElementById(input.id + '-msg'));
+    if(message){
+      if(field) field.classList.add('invalid');
+      input.setAttribute('aria-invalid', 'true');
+      if(msgEl) msgEl.textContent = message;
+    } else {
+      if(field) field.classList.remove('invalid');
+      input.removeAttribute('aria-invalid');
+      if(msgEl) msgEl.textContent = '';
+    }
+  }
+  function fieldMessageFor(kind, value){
+    if(kind === 'naam') return isPlaceholderName(value) ? 'Vul je naam in.' : '';
+    if(kind === 'email') return isValidEmail(value) ? '' : 'Vul een geldig e-mailadres in.';
+    if(kind === 'telefoon') return isValidPhone(value) ? '' : 'Vul een geldig telefoonnummer in.';
+    return '';
+  }
+  function bindInlineField(id, kind){
+    const el = document.getElementById(id);
+    if(!el) return;
+    const show = () => {
+      el.dataset.touched = '1';
+      setFieldValidity(el, fieldMessageFor(kind, el.value));
+    };
+    const live = () => {
+      if(el.dataset.touched === '1') setFieldValidity(el, fieldMessageFor(kind, el.value));
+    };
+    el.addEventListener('blur', show);
+    el.addEventListener('input', live);
+  }
   function isPlaceholderName(naam){
     const n = String(naam || '').trim().toLowerCase().replace(/\s+/g, ' ');
     return !n || n.length < 2 || n === 'onbekend' || n === 'unknown' || n === 'n/a' || n === 'na' || n === '-' || n === 'geen';
@@ -2083,6 +2150,10 @@
     document.querySelectorAll('#navDesktop a, #navMobile a').forEach(b=>{
       b.classList.toggle('active', b.dataset.key === view);
     });
+    const isConv = view === 'offerte' || view === 'aanmelden';
+    document.body.classList.toggle('conv-page', isConv);
+    document.body.classList.toggle('conv-offerte', view === 'offerte');
+    document.body.classList.toggle('conv-aanmelden', view === 'aanmelden');
     window.scrollTo({top:0, behavior:'instant'});
     revealCheck();
     if(view === 'aanmelden'){ setTimeout(initSignaturePad, 50); }
@@ -5013,6 +5084,9 @@ whk: `
     const el = document.getElementById(id);
     if(el) el.addEventListener('input', checkOfferteForm);
   });
+  bindInlineField('of-naam', 'naam');
+  bindInlineField('of-email', 'email');
+  bindInlineField('of-telefoon', 'telefoon');
   function checkOfferteForm(){
     const naam = document.getElementById('of-naam').value.trim();
     const email = document.getElementById('of-email').value.trim();
@@ -5021,6 +5095,14 @@ whk: `
     document.getElementById('btn-of-direct').disabled = !ok;
     document.getElementById('btn-of-aanmelden').disabled = !ok;
     document.getElementById('btn-of-contact').disabled = !ok;
+  }
+  function revealOfferteFieldErrors(){
+    ['of-naam','of-email','of-telefoon'].forEach((id, i)=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.dataset.touched = '1';
+      setFieldValidity(el, fieldMessageFor(['naam','email','telefoon'][i], el.value));
+    });
   }
   function gaNaarAanmelden(){
     document.getElementById('inp-aanvrager-naam').value = document.getElementById('of-naam').value.trim();
@@ -5080,6 +5162,7 @@ whk: `
     const payload = collectOfferteLead('offerte-pdf');
     const errors = leadClientErrors({ naam: payload.naam, email: payload.email, telefoon: payload.telefoon, requireEmail: true, requirePhone: true });
     if(errors.length){
+      revealOfferteFieldErrors();
       showFormError('of-error', errors);
       return;
     }
@@ -5123,6 +5206,8 @@ whk: `
     }
 
     document.getElementById('offerte-form-step').classList.add('hidden');
+    const twijfel = document.getElementById('offerte-twijfel');
+    if(twijfel) twijfel.classList.add('hidden');
     document.getElementById('offerte-pdf-result').classList.remove('hidden');
     trackEvent('lead_offerte_pdf_gegenereerd');
 
@@ -5145,6 +5230,7 @@ whk: `
     const payload = collectOfferteLead('offerte-contact');
     const errors = leadClientErrors({ naam: payload.naam, email: payload.email, telefoon: payload.telefoon, requireEmail: true, requirePhone: true });
     if(errors.length){
+      revealOfferteFieldErrors();
       showFormError('of-error', errors);
       return;
     }
@@ -5156,10 +5242,14 @@ whk: `
       const voornaam = payload.naam.split(' ')[0] || 'daar';
       document.getElementById('of-contact-titel').textContent = `Bedankt, ${voornaam} — we nemen binnen 24 uur contact met je op.`;
       document.getElementById('offerte-form-step').classList.add('hidden');
+      const twijfel = document.getElementById('offerte-twijfel');
+      if(twijfel) twijfel.classList.add('hidden');
       document.getElementById('offerte-contact-result').classList.remove('hidden');
       trackEvent('lead_offerte_contactverzoek');
     } catch(err){
-      showFormError('of-error', [err.message || 'Versturen is niet gelukt. Probeer het opnieuw.']);
+      revealOfferteFieldErrors();
+      const extra = Array.isArray(err.details) && err.details.length ? err.details : [err.message || 'Versturen is niet gelukt. Probeer het opnieuw.'];
+      showFormError('of-error', extra);
       btn.disabled = false;
       checkOfferteForm();
     }
@@ -5198,6 +5288,9 @@ whk: `
     const el = document.getElementById(id); if(el) el.addEventListener('input', checkStep2);
     if(el) el.addEventListener('change', checkStep2);
   });
+  bindInlineField('inp-aanvrager-naam', 'naam');
+  bindInlineField('inp-aanvrager-email', 'email');
+  bindInlineField('inp-aanvrager-tel', 'telefoon');
 
   function checkStep3(){
     const ok = reqVal('inp-betrokkene-naam') && reqVal('inp-betrokkene-tel') && reqVal('inp-betrokkene-email') && reqVal('inp-betrokkene-werkgever') && reqVal('inp-geboortedatum') && reqVal('inp-eerste-ziektedag') && reqVal('inp-datum-in-dienst') && reqVal('inp-functienaam') && reqVal('inp-brutoloon') && reqVal('inp-contracturen') && reqVal('inp-adres');
@@ -5289,6 +5382,8 @@ whk: `
     });
     const stapTekstEl = document.getElementById('aanmeld-stap-tekst');
     const progressBarEl = document.getElementById('aanmeld-progress-bar');
+    const aanmeldTwijfel = document.getElementById('aanmeld-twijfel');
+    if(aanmeldTwijfel) aanmeldTwijfel.classList.toggle('hidden', n > 1);
     if(stapTekstEl && n <= 6){
       stapTekstEl.textContent = `Stap ${n} van 6`;
     } else if(stapTekstEl && n === 7){
@@ -5345,6 +5440,12 @@ whk: `
       requirePhone: true,
     }));
     if(errors.length){
+      const naamEl = document.getElementById('inp-aanvrager-naam');
+      const emailEl = document.getElementById('inp-aanvrager-email');
+      const telEl = document.getElementById('inp-aanvrager-tel');
+      if(naamEl){ naamEl.dataset.touched = '1'; setFieldValidity(naamEl, fieldMessageFor('naam', naamEl.value)); }
+      if(emailEl){ emailEl.dataset.touched = '1'; setFieldValidity(emailEl, fieldMessageFor('email', emailEl.value)); }
+      if(telEl){ telEl.dataset.touched = '1'; setFieldValidity(telEl, fieldMessageFor('telefoon', telEl.value)); }
       showFormError('aanmeld-error', errors);
       return;
     }

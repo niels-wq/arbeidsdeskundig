@@ -4650,6 +4650,7 @@ whk: `
     over: { label: 'Lees meer over ons →', view: 'over' },
   };
   const faqList = document.getElementById('faq-list');
+  faqList.innerHTML = '';
   faqs.forEach(([q,a,slug,ctaKey])=>{
     const item = document.createElement('div'); item.className = 'accordion-item';
     const head = document.createElement('button'); head.className = 'accordion-head'; head.onclick = ()=>toggleAccordion(head);

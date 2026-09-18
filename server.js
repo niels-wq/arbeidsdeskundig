@@ -159,7 +159,41 @@ function extractPersonas(html) {
 }
 
 const personas = extractPersonas(INDEX_HTML);
-console.log(`[seo] ${posts.length} kennisbank-artikelen en ${personas.length} doelgroep-pagina's geladen`);
+
+// Zichtbare FAQ's van /veelgestelde-vragen (bron: `const faqs` in index.html).
+// Alleen Q+A — slugs/CTA's zijn client-only. Gebruikt voor JSON-LD én SSR-hydratie
+// zodat Google de vragen ziet zonder JavaScript.
+function extractSiteFaqs(html) {
+    try {
+        const start = html.indexOf('  const faqs = [');
+        if (start === -1) return [];
+        const end = html.indexOf('\n  ];', start);
+        const block = end === -1 ? html.slice(start) : html.slice(start, end);
+        const items = [];
+        const re = /\["((?:[^"\\]|\\.)*)",\s*"((?:[^"\\]|\\.)*)"/g;
+        let m;
+        while ((m = re.exec(block))) {
+            items.push([
+                m[1].replace(/\\"/g, '"'),
+                m[2].replace(/\\"/g, '"'),
+            ]);
+        }
+        return items;
+    } catch (err) {
+        console.error('[seo] Site-FAQ uit index.html lezen mislukt:', err);
+        return [];
+    }
+}
+
+const siteFaqs = extractSiteFaqs(INDEX_HTML);
+
+// Twee vragen die daadwerkelijk in de homepage-HTML staan (niet de volledige FAQ).
+const HOME_VISIBLE_FAQ = [
+    ['Wat kost een arbeidsdeskundig onderzoek?', 'Vanaf €1.095,- exclusief btw. Het exacte tarief hangt af van bedrijfsgrootte. Zie de volledige FAQ voor alle tarieven.'],
+    ['Kan het onderzoek ook fysiek?', 'Ja. Online is het snelst en standaard inbegrepen, maar een bezoek op locatie is altijd bespreekbaar — bijvoorbeeld als een werkplekonderzoek meerwaarde heeft.'],
+];
+
+console.log(`[seo] ${posts.length} kennisbank-artikelen, ${personas.length} doelgroep-pagina's en ${siteFaqs.length} FAQ-vragen geladen`);
 const DEFAULT_TITLE = 'arbeidsdeskundig.com — Arbeidsdeskundig onderzoek, online én fysiek';
 const DEFAULT_DESC = 'Arbeidsdeskundig onderzoek vanaf €1.095,-. Online of fysiek, door heel Nederland. Specialist in WGA, Ziektewet en Wet Poortwachter.';
 
@@ -270,6 +304,53 @@ function hydrateArtikelView(html, post, body) {
     return html;
 }
 
+function faqPageJsonLd(pairs) {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: (pairs || []).map(([q, a]) => ({
+            '@type': 'Question',
+            name: q,
+            acceptedAnswer: { '@type': 'Answer', text: a },
+        })),
+    };
+}
+
+// FAQPage hoort alleen op pagina's die die vragen ook tonen. Het statische
+// @graph-blok in index.html bevatte een site-brede FAQPage — die werd daardoor
+// op elke URL herhaald (homepage, offerte, casussen). Die strippen we hier.
+function stripSitewideFaqPage(html) {
+    return html.replace(
+        /<script type="application\/ld\+json">([\s\S]*?)<\/script>/,
+        (full, json) => {
+            try {
+                const data = JSON.parse(json);
+                if (!Array.isArray(data['@graph'])) return full;
+                const next = data['@graph'].filter((n) => n && n['@type'] !== 'FAQPage');
+                if (next.length === data['@graph'].length) return full;
+                data['@graph'] = next;
+                return `<script type="application/ld+json">${JSON.stringify(data)}</script>`;
+            } catch (e) {
+                return full;
+            }
+        }
+    );
+}
+
+function hydrateFaqView(html, faqs) {
+    if (!faqs || !faqs.length) return html;
+    const faqHtml = faqs.map(([q, a]) => (
+        `<div class="accordion-item">` +
+        `<button class="accordion-head" onclick="toggleAccordion(this)">${escapeHtml(q)}<span class="accordion-icon">+</span></button>` +
+        `<div class="accordion-body"><div class="accordion-body-inner">${escapeHtml(a)}</div></div>` +
+        `</div>`
+    )).join('');
+    return html.replace(
+        'id="faq-list" style="margin-top:20px;"></div>',
+        `id="faq-list" style="margin-top:20px;">${faqHtml}</div>`
+    );
+}
+
 function renderPage(res, { title, description, canonicalPath, route, articleJsonLd, breadcrumbJsonLd, faqJsonLd, statusCode }) {
     const canonical = BASE_URL + canonicalPath;
     const safeTitle = escapeHtml(title || DEFAULT_TITLE);
@@ -281,6 +362,10 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
         const post = posts.find((p) => p.slug === route.slug);
         html = hydrateArtikelView(html, post, articleBodies[route.slug]);
     }
+    if (route && route.view === 'faq') {
+        html = hydrateFaqView(html, siteFaqs);
+    }
+    html = stripSitewideFaqPage(html);
 
     // <title>
     html = html.replace(/<title>.*?<\/title>/s, `<title>${safeTitle}</title>`);
@@ -301,8 +386,10 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
     html = html.replace(/<meta name="twitter:title" content=".*?">/s, `<meta name="twitter:title" content="${safeTitle}">`);
     html = html.replace(/<meta name="twitter:description" content=".*?">/s, `<meta name="twitter:description" content="${safeDesc}">`);
 
-    // Extra per-pagina JSON-LD (Article + BreadcrumbList) vóór </head> toevoegen,
-    // naast het bestaande site-brede JSON-LD-blok (Organization/FAQPage/Blog).
+    // Extra per-pagina JSON-LD (Article + BreadcrumbList + FAQPage waar de
+    // vragen ook zichtbaar zijn) vóór </head> toevoegen, naast het site-brede
+    // JSON-LD-blok (ProfessionalService/Blog). FAQPage staat bewust niet meer
+    // in dat site-brede blok — zie stripSitewideFaqPage().
     let extraJsonLd = '';
     if (articleJsonLd) extraJsonLd += `<script type="application/ld+json">${JSON.stringify(articleJsonLd)}</script>\n`;
     if (breadcrumbJsonLd) extraJsonLd += `<script type="application/ld+json">${JSON.stringify(breadcrumbJsonLd)}</script>\n`;
@@ -386,7 +473,13 @@ function buildSitemapXml() {
 // Routes — één per "view" in de bestaande frontend
 // ---------------------------------------------------------------------------
 app.get('/', (req, res) => {
-    renderPage(res, { title: DEFAULT_TITLE, description: DEFAULT_DESC, canonicalPath: '/', route: { view: 'home' } });
+    renderPage(res, {
+        title: DEFAULT_TITLE,
+        description: DEFAULT_DESC,
+        canonicalPath: '/',
+        route: { view: 'home' },
+        faqJsonLd: faqPageJsonLd(HOME_VISIBLE_FAQ),
+    });
 });
 
 app.get('/rekentool', (req, res) => {
@@ -413,6 +506,7 @@ app.get('/veelgestelde-vragen', (req, res) => {
         description: 'Antwoord op de meest gestelde vragen over arbeidsdeskundig onderzoek: kosten, doorlooptijd, WGA, Ziektewet en meer.',
         canonicalPath: '/veelgestelde-vragen',
         route: { view: 'faq' },
+        faqJsonLd: siteFaqs.length ? faqPageJsonLd(siteFaqs) : null,
         breadcrumbJsonLd: breadcrumbFor([{ name: 'Home', path: '/' }, { name: 'Veelgestelde vragen', path: '/veelgestelde-vragen' }]),
     });
 });
@@ -490,21 +584,9 @@ app.get('/kennisbank/:slug', (req, res, next) => {
         mainEntityOfPage: BASE_URL + '/kennisbank/' + post.slug,
     };
 
-    // Elk artikel met FAQ-items krijgt zijn eigen FAQPage-schema — los van het
-    // site-brede FAQPage-blok voor /veelgestelde-vragen — zodat losse artikelen
-    // ook zelf in aanmerking komen voor FAQ-rich-snippets in Google.
-    let faqJsonLd = null;
-    if (post.faq && post.faq.length) {
-        faqJsonLd = {
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: post.faq.map(([q, a]) => ({
-                '@type': 'Question',
-                name: q,
-                acceptedAnswer: { '@type': 'Answer', text: a },
-            })),
-        };
-    }
+    // Alleen artikelen die zelf FAQ-items tonen krijgen FAQPage-schema — niet
+    // de site-brede FAQ, zodat we geen identieke FAQ-blokken overal herhalen.
+    const faqJsonLd = (post.faq && post.faq.length) ? faqPageJsonLd(post.faq) : null;
 
     renderPage(res, {
         title: post.title + ' — arbeidsdeskundig.com',
@@ -554,6 +636,7 @@ Allow: /
 
 # AI- / LLM-crawlers expliciet toegestaan — relevant voor vindbaarheid in
 # ChatGPT, Perplexity, Claude en vergelijkbare answer engines.
+# Samenvatting voor die crawlers: ${BASE_URL}/llms.txt
 User-agent: GPTBot
 Allow: /
 
@@ -589,49 +672,103 @@ Sitemap: ${BASE_URL}/sitemap.xml
 // en welke content er is. Nog geen officiële standaard, maar kost weinig en
 // kan alleen helpen bij vindbaarheid in ChatGPT/Perplexity/Claude e.d.
 // ---------------------------------------------------------------------------
-app.get('/llms.txt', (req, res) => {
-    try {
-    const byTag = {};
-    posts.forEach((p) => {
-        if (!byTag[p.tag]) byTag[p.tag] = [];
-        byTag[p.tag].push(p);
-    });
-    let txt = `# arbeidsdeskundig.com
+const LLMS_FEATURED_SLUGS = [
+    'wat-doet-arbeidsdeskundige',
+    'kosten-arbeidsdeskundig-onderzoek',
+    'verplicht-arbeidsdeskundig-onderzoek',
+    'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
+    'second-opinion-arbeidsdeskundige',
+    'nadelen-arbeidsdeskundig-onderzoek',
+    'tips-werknemer-arbeidsdeskundig-onderzoek',
+    'fml-izp-lezen-belastbaarheid',
+    'riv-toets-bedrijfsarts-leidend',
+    'beslistermijn-wia-16-weken',
+    'poortwachter-tijdlijn',
+    'online-fysiek',
+];
 
-> arbeidsdeskundig.com (onderdeel van Matchvermogen B.V.) is een Nederlands bureau
-> voor arbeidsdeskundig onderzoek: objectieve beoordeling van wat een werknemer nog
-> kan werken, in het kader van de Wet Poortwachter, WGA, Ziektewet en WIA.
-> Onderzoek vanaf €1.095,-, online of fysiek, door heel Nederland. Reactie op
-> aanvragen binnen 24 uur.
+function buildLlmsTxt() {
+    const featured = LLMS_FEATURED_SLUGS
+        .map((slug) => posts.find((p) => p.slug === slug))
+        .filter(Boolean)
+        .map((p) => `- [${p.title}](${BASE_URL}/kennisbank/${p.slug}): ${p.meta}`)
+        .join('\n');
+
+    return `# arbeidsdeskundig.com
+
+> Arbeidsdeskundig onderzoek vanaf €1.095,- excl. btw. Online of fysiek, door heel Nederland. Binnen 24 uur opgepakt. UWV-proof, door geregistreerde arbeidsdeskundigen.
+
+arbeidsdeskundig.com is het aanvraag- en kennisplatform voor arbeidsdeskundig onderzoek: een objectieve beoordeling van wat een werknemer nog kan werken, in het kader van de Wet Poortwachter, WGA, Ziektewet en WIA. 1.500+ onderzoeken, gemiddeld 4,9/5 op Google.
+
+## Wat we wel doen
+
+- Arbeidsdeskundig onderzoek: past eigen werk nog (spoor 1a), is ander werk intern mogelijk (spoor 1b), of is spoor 2 nodig?
+- Vertalen van FML/IZP (belastbaarheid van de bedrijfsarts) naar concrete arbeidsmogelijkheden
+- UWV-proof rapport voor re-integratieverslag, WGA, Ziektewet en WIA-voorbereiding
+- Online (standaard) of fysiek op locatie, landelijk
+- Warme overdracht naar spoor 2 via Best Match Re-integratie als dat volgt uit het onderzoek
+
+## Wat we niet doen
+
+- Geen medische diagnose, geen behandeling, geen FML (dat is de bedrijfsarts / verzekeringsarts)
+- Geen casemanagement of Poortwachter-procesbewaking
+- Geen UWV-uitkeringsbeslissing (WIA/WGA/IVA)
+- Geen ontslagadvies
+- Geen concurrent van matchvermogen.nl — zie hieronder
+
+## Prijzen (2026, excl. btw)
+
+- Vanaf €1.095,- voor een online onderzoek (tot 5 medewerkers, kleine stichtingen of vrijwilligersorganisaties)
+- Tot 100 medewerkers: €1.125,-
+- Groot zakelijk: €1.395,-
+- Fysiek onderzoek: +€295,-; spoedonderzoek: +€300,-
+- Exact tarief volgt uit de offerte; het tarief hangt af van bedrijfsgrootte, niet van dossiercomplexiteit
+
+## Reactietijd
+
+Reactie op offerte en aanmelding binnen 24 uur. Geen wekenlange wachtlijst.
+
+## Verhouding tot matchvermogen.nl
+
+Complementair, geen concurrentie. [matchvermogen.nl](https://matchvermogen.nl) is het moederbedrijf (Matchvermogen B.V., sinds 2019): breder adviesmerk voor arbeidsdeskundig onderzoek, WHK-advies en re-integratie. arbeidsdeskundig.com is het gespecialiseerde loket om een onderzoek te begrijpen, te vergelijken en aan te vragen (offerte, aanmelden, kennisbank). Spoor 2 en 3 lopen via [Best Match Re-integratie](https://bestmatchbv.nl). WHK-premie via [werkhervattingskas.nl](https://werkhervattingskas.nl).
 
 ## Belangrijkste pagina's
 
-- [Home](${BASE_URL}/): overzicht van diensten, tarieven en werkwijze
-- [Rekentool](${BASE_URL}/rekentool): bereken tijdwinst en besparing van vroeg starten
-- [Gratis keuzehulp](${BASE_URL}/keuzehulp): online of fysiek onderzoek nodig?
-- [Kennisbank](${BASE_URL}/kennisbank): alle artikelen hieronder
-- [Veelgestelde vragen](${BASE_URL}/veelgestelde-vragen)
-- [Over ons](${BASE_URL}/over-ons)
-- [Offerte aanvragen](${BASE_URL}/offerte-aanvragen)
+- [Home](${BASE_URL}/): diensten, tarieven vanaf €1.095,-, werkwijze
+- [Offerte aanvragen](${BASE_URL}/offerte-aanvragen): vrijblijvende offerte, reactie binnen 24 uur
+- [Aanmelden](${BASE_URL}/aanmelden): onderzoek starten, binnen 24 uur opgepakt
+- [Kennisbank](${BASE_URL}/kennisbank): hub — alle artikelen per onderwerp
+- [Veelgestelde vragen](${BASE_URL}/veelgestelde-vragen): hub — tarieven en praktijkvragen
+- [Over ons](${BASE_URL}/over-ons): Matchvermogen B.V., team en werkwijze
 
-## Voor specifieke doelgroepen
+## Hulpmiddelen
 
-${personas.map((p) => `- [${p.title}](${BASE_URL}/voor/${p.slug}): ${p.meta}`).join('\n')}
+- [Rekentool](${BASE_URL}/rekentool): tijdwinst en besparing van vroeg starten
+- [Gratis keuzehulp](${BASE_URL}/keuzehulp): online of fysiek onderzoek?
 
-## Kennisbank, per onderwerp
+## Unieke kennisbank-artikelen
+
+${featured}
+
+De volledige index staat op ${BASE_URL}/kennisbank en in ${BASE_URL}/sitemap.xml — niet hier herhaald, om dunne duplicaten te voorkomen.
 `;
-    Object.keys(byTag).sort().forEach((tag) => {
-        txt += `\n### ${tag}\n`;
-        byTag[tag].forEach((p) => {
-            txt += `- [${p.title}](${BASE_URL}/kennisbank/${p.slug}): ${p.meta}\n`;
-        });
-    });
-    res.set('Content-Type', 'text/plain; charset=utf-8').send(txt);
+}
+
+function sendLlmsTxt(req, res) {
+    try {
+        res.set({
+            'Content-Type': 'text/plain; charset=utf-8',
+            'Cache-Control': 'public, max-age=3600',
+            'Access-Control-Allow-Origin': '*',
+        }).send(buildLlmsTxt());
     } catch (err) {
         console.error('[llms.txt] generatie mislukt:', err);
         res.status(200).set('Content-Type', 'text/plain; charset=utf-8').send(`# arbeidsdeskundig.com\n\n${BASE_URL}/\n`);
     }
-});
+}
+
+app.get('/llms.txt', sendLlmsTxt);
+app.get('/.well-known/llms.txt', sendLlmsTxt);
 
 // Health check (handig voor Railway se deploy-status)
 // ---------------------------------------------------------------------------

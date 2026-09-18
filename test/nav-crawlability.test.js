@@ -61,7 +61,7 @@ describe('primary nav crawlability', () => {
         assert.match(header, /<a class="logo" href="\/"/);
         assert.match(
             header,
-            /<a class="btn-primary" href="\/offerte-aanvragen"[^>]*>\s*Direct offerte\s*<\/a>/
+            /<a class="btn-primary[^"]*" href="\/offerte-aanvragen"[^>]*>\s*Direct offerte\s*<\/a>/
         );
 
         const stickyOpen = html.indexOf('class="sticky-cta"');

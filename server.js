@@ -229,6 +229,9 @@ function activateView(html, view) {
     html = html.replace('<div class="view active" id="view-home">', '<div class="view" id="view-home">');
     const viewId = 'view-' + view;
     html = html.replace(`<div class="view" id="${viewId}">`, `<div class="view active" id="${viewId}">`);
+    if (view === 'offerte' || view === 'aanmelden') {
+        html = html.replace('<body>', `<body class="conv-page conv-${view}">`);
+    }
     return html;
 }
 
@@ -426,7 +429,7 @@ app.get('/over-ons', (req, res) => {
 app.get('/offerte-aanvragen', (req, res) => {
     renderPage(res, {
         title: 'Offerte aanvragen — arbeidsdeskundig.com',
-        description: 'Vraag vrijblijvend een offerte aan voor een arbeidsdeskundig onderzoek. Reactie binnen 24 uur.',
+        description: 'Vraag vrijblijvend een offerte aan. Vanaf €1.095,-, reactie binnen 24 uur, 4,9/5. Of plan eerst 15 minuten kennismaking.',
         canonicalPath: '/offerte-aanvragen',
         route: { view: 'offerte' },
     });
@@ -435,7 +438,7 @@ app.get('/offerte-aanvragen', (req, res) => {
 app.get('/aanmelden', (req, res) => {
     renderPage(res, {
         title: 'Aanmelden voor een arbeidsdeskundig onderzoek — arbeidsdeskundig.com',
-        description: 'Meld je aan voor een arbeidsdeskundig onderzoek. Volledig digitaal, inclusief ondertekening.',
+        description: 'Meld je aan voor een arbeidsdeskundig onderzoek. Vanaf €1.095,-, binnen 24 uur opgepakt. Of plan eerst 15 minuten kennismaking.',
         canonicalPath: '/aanmelden',
         route: { view: 'aanmelden' },
     });

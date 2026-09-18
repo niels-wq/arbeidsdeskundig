@@ -499,6 +499,7 @@ const GIDS_PATH = '/kennisbank/' + GIDS_SLUG;
 const GIDS_CLUSTER = [
     'wat-doet-arbeidsdeskundige',
     'fml-izp-lezen-belastbaarheid',
+    'arbeidsdeskundig-rapport-voorbeeld',
     'kosten-arbeidsdeskundig-onderzoek',
     'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
     'verplicht-arbeidsdeskundig-onderzoek',
@@ -585,5 +586,105 @@ describe('kennisbank hub: gids arbeidsdeskundig onderzoek', () => {
         const listingHtml = await listing.text();
         assert.match(listingHtml, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"/);
         assert.match(listingHtml, /<h1[^>]*>Alles over arbeidsdeskundig onderzoek<\/h1>/);
+    });
+});
+
+const RAPPORT_SLUG = 'arbeidsdeskundig-rapport-voorbeeld';
+const RAPPORT_PATH = '/kennisbank/' + RAPPORT_SLUG;
+const RAPPORT_RESERVED = [
+    'arbeidsdeskundig-onderzoek-gids',
+    'wat-doet-arbeidsdeskundige',
+    'fml-izp-lezen-belastbaarheid',
+    'kosten-arbeidsdeskundig-onderzoek',
+    'verplicht-arbeidsdeskundig-onderzoek',
+    'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
+    'tips-werknemer-arbeidsdeskundig-onderzoek',
+    'nadelen-arbeidsdeskundig-onderzoek',
+    'riv-toets-bedrijfsarts-leidend',
+    'beslistermijn-wia-16-weken',
+    'second-opinion-arbeidsdeskundige',
+    'voorbereiden-gesprek-arbeidsdeskundige',
+    'passende-arbeid',
+    'arbeidsdeskundige-vs-bedrijfsarts-casemanager',
+];
+
+describe('kennisbank article: wat zit er in een arbeidsdeskundig rapport', () => {
+    it('expands the rapport stub into a unique asset article with SEO tags and schema', async () => {
+        const res = await fetch(base + RAPPORT_PATH);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        assert.match(html, /<title>Wat zit er in een arbeidsdeskundig rapport\? Sectie voor sectie, wat UWV verwacht — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<meta name="description" content="Wat zit er in een arbeidsdeskundig rapport\? Sectie voor sectie, wat UWV verwacht, en wat er níet in staat \(geen diagnose\)\. Offerte of kennismaking\.">/);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${RAPPORT_PATH}">`));
+        assert.match(html, /"@type":"Article"/);
+        assert.match(html, /"@type":"FAQPage"/);
+
+        const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
+        assert.ok(h1Match, 'SSR H1 missing');
+        assert.equal(h1Match[1], 'Wat zit er in een arbeidsdeskundig rapport? Sectie voor sectie, wat UWV verwacht');
+        assert.notEqual(h1Match[1], 'Wat staat er in een arbeidsdeskundig rapport? Opbouw en onderdelen');
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>Wat zit er in een arbeidsdeskundig rapport\? Sectie voor sectie, wat UWV verwacht<\/h2>/);
+        assert.match(body, /wat zit er in een arbeidsdeskundig rapport/i);
+        assert.match(body, /zonder echte cliëntgegevens/);
+        assert.match(body, /Sectie 1 — Vraagstelling/);
+        assert.match(body, /Sectie 2 — Geraadpleegde bronnen/);
+        assert.match(body, /Sectie 3 — Analyse/);
+        assert.match(body, /Sectie 4 — Conclusie/);
+        assert.match(body, /Sectie 5 — Advies/);
+        assert.match(body, /Wat UWV verwacht te zien/);
+        assert.match(body, /Wat er níet in het rapport staat/);
+        assert.match(body, /Geen diagnose/);
+        assert.match(body, /matchvermogen\.nl/);
+        assert.match(body, /<table/);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /Doe de gratis keuzehulp/);
+        assert.doesNotMatch(body, /online of fysiek/i);
+        assert.doesNotMatch(body, /Bram/);
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 100).join(' ');
+        assert.match(firstWords, /wat zit er in een arbeidsdeskundig rapport/i);
+
+        assert.match(body, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"/);
+        assert.match(body, /href="\/kennisbank\/fml-izp-lezen-belastbaarheid"/);
+        assert.match(body, /href="\/kennisbank\/wat-doet-arbeidsdeskundige"/);
+        assert.match(body, /href="\/kennisbank\/kosten-arbeidsdeskundig-onderzoek"/);
+        assert.match(body, /href="\/kennisbank\/verplicht-arbeidsdeskundig-onderzoek"/);
+        assert.match(html, /\/offerte-aanvragen/);
+        assert.match(html, /\/aanmelden/);
+        assert.match(html, /calendly\.com\/matchvermogen\/call-15-min/);
+
+        const pages = [];
+        const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+        let m;
+        while ((m = re.exec(html))) {
+            const block = JSON.parse(m[1]);
+            if (block['@type'] === 'FAQPage') pages.push(block);
+        }
+        assert.equal(pages.length, 1);
+        const names = pages[0].mainEntity.map((q) => q.name);
+        assert.ok(names.some((q) => /Wat zit er in een arbeidsdeskundig rapport/.test(q)));
+        assert.ok(names.some((q) => /diagnose/i.test(q)));
+        assert.ok(names.some((q) => /voorbeeldrapport|cliëntgegevens/.test(q)));
+        assert.ok(!names.some((q) => q === 'Kan het onderzoek ook fysiek?'));
+    });
+
+    it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {
+        const res = await fetch(base + '/sitemap.xml');
+        assert.equal(res.status, 200);
+        const xml = await res.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${RAPPORT_PATH}`));
+        assert.equal((xml.match(new RegExp(RAPPORT_SLUG, 'g')) || []).length, 1);
+        for (const slug of RAPPORT_RESERVED) {
+            assert.notEqual(slug, RAPPORT_SLUG);
+            assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
+        }
     });
 });

@@ -258,11 +258,20 @@ function escapeHtml(str) {
     }[c]));
 }
 
+// CSS-only hiding (`.view{display:none}`) leaves every SPA view — and every
+// competing <h1> — in the HTML as if it were still part of the document.
+// Googlebot then sees ~14 headings on kennisbank/offerte/aanmelden URLs and
+// can treat that as a thin/soft-404 homepage clone. The HTML `hidden`
+// attribute is a stronger "not in this document" signal; keep it mutually
+// exclusive with `.active` so `.view.active{display:block}` still wins.
 function activateView(html, view) {
-    if (!view || view === 'home') return html;
-    html = html.replace('<div class="view active" id="view-home">', '<div class="view" id="view-home">');
-    const viewId = 'view-' + view;
-    html = html.replace(`<div class="view" id="${viewId}">`, `<div class="view active" id="${viewId}">`);
+    const activeId = (!view || view === 'home') ? 'view-home' : 'view-' + view;
+    html = html.replace(
+        /<div class="view(?: active)?" id="(view-[^"]+)"(?: hidden)?>/g,
+        (_, id) => (id === activeId
+            ? `<div class="view active" id="${id}">`
+            : `<div class="view" id="${id}" hidden>`)
+    );
     if (view === 'offerte' || view === 'aanmelden') {
         html = html.replace('<body>', `<body class="conv-page conv-${view}">`);
     }

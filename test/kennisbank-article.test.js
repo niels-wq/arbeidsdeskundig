@@ -502,6 +502,7 @@ const GIDS_CLUSTER = [
     'fml-izp-hr-beslissen-actualiseren',
     'belastbaarheid-verouderd-nieuwe-fml-izp',
     'arbeidsdeskundig-rapport-voorbeeld',
+    'arbeidsdeskundig-rapport-checklist',
     'kosten-arbeidsdeskundig-onderzoek',
     'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
     'verplicht-arbeidsdeskundig-onderzoek',
@@ -1155,6 +1156,97 @@ describe('kennisbank article: FML/IZP HR beslissen actualiseren', () => {
         assert.equal((xml.match(new RegExp(FML_HR_SLUG, 'g')) || []).length, 1);
         for (const slug of FML_HR_RESERVED) {
             assert.notEqual(slug, FML_HR_SLUG);
+            assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
+        }
+    });
+});
+
+const CHECKLIST_SLUG = 'arbeidsdeskundig-rapport-checklist';
+const CHECKLIST_PATH = '/kennisbank/' + CHECKLIST_SLUG;
+const CHECKLIST_RESERVED = [
+    'arbeidsdeskundig-rapport-voorbeeld',
+    'riv-toets',
+    'riv-toets-bedrijfsarts-leidend',
+    'spoor-2-zonder-spoor-1-afgerond',
+    'wia-aanvraag-parallel-spoor-2',
+    'belastbaarheid-verouderd-nieuwe-fml-izp',
+    'arbeidsdeskundig-onderzoek-gids',
+    'fml-izp-hr-beslissen-actualiseren',
+    'deskundigenoordeel-vs-arbeidsdeskundig-onderzoek',
+];
+
+describe('kennisbank article: arbeidsdeskundig rapport checklist rechtspraak', () => {
+    it('serves complementary checklist article with SEO tags, case law and schema', async () => {
+        const res = await fetch(base + CHECKLIST_PATH, GOOGLEBOT);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        assert.match(html, /<title>Arbeidsdeskundig rapport: checklist uit recente rechtspraak — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<meta name="description" content="Checklist arbeidsdeskundig rapport: aansluiting op de bedrijfsarts, documenteer afwijking, onderbouw start spoor 2\. Recente rechtspraak 2026\. Offerte of aanmelden\.">/);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${CHECKLIST_PATH}">`));
+        assert.match(html, /"@type":"Article"/);
+        assert.match(html, /"@type":"FAQPage"/);
+
+        const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
+        assert.ok(h1Match, 'SSR H1 missing');
+        assert.equal(h1Match[1], 'Arbeidsdeskundig rapport: checklist uit recente rechtspraak');
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>Arbeidsdeskundig rapport: checklist uit recente rechtspraak<\/h2>/);
+        assert.match(body, /Drie kwaliteitspoorten|drie kwaliteitspoorten/);
+        assert.match(body, /Aansluiting op (het oordeel van )?de bedrijfsarts/);
+        assert.match(body, /Documenteer wanneer de arbeidsdeskundige afwijkt/);
+        assert.match(body, /Onderbouw de start van spoor 2/);
+        assert.match(body, /ECLI:NL:CRVB:2026:834/);
+        assert.match(body, /ECLI:NL:RBGEL:2026:6466/);
+        assert.match(body, /deeplink\.rechtspraak\.nl\/uitspraak\?id=ECLI:NL:CRVB:2026:834/);
+        assert.match(body, /deeplink\.rechtspraak\.nl\/uitspraak\?id=ECLI:NL:RBGEL:2026:6466/);
+        assert.match(body, /eerste aanleg/);
+        assert.match(body, /geen juridisch advies/);
+        assert.match(body, /faalpuntenlijst/);
+        assert.doesNotMatch(body, /Sectie 1/);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /Doe de gratis keuzehulp/);
+        assert.doesNotMatch(body, /—/);
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 80).join(' ');
+        assert.match(firstWords, /arbeidsdeskundig rapport/i);
+
+        assert.match(body, /href="\/kennisbank\/arbeidsdeskundig-rapport-voorbeeld"/);
+        assert.match(body, /href="\/kennisbank\/riv-toets"/);
+        assert.match(body, /href="\/kennisbank\/spoor-2-zonder-spoor-1-afgerond"/);
+        assert.match(html, /\/offerte-aanvragen/);
+        assert.match(html, /\/aanmelden/);
+        assert.match(html, /<div class="view active" id="view-artikel">/);
+        assert.match(html, /<div class="view" id="view-home" hidden>/);
+
+        const pages = [];
+        const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+        let m;
+        while ((m = re.exec(html))) {
+            const block = JSON.parse(m[1]);
+            if (block['@type'] === 'FAQPage') pages.push(block);
+        }
+        assert.equal(pages.length, 1);
+        const names = pages[0].mainEntity.map((q) => q.name);
+        assert.ok(names.some((q) => /checklist voor een arbeidsdeskundig rapport/.test(q)));
+        assert.ok(names.some((q) => /afwijken van de bedrijfsarts/.test(q)));
+        assert.ok(names.some((q) => /spoor 2/.test(q)));
+    });
+
+    it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {
+        const res = await fetch(base + '/sitemap.xml');
+        assert.equal(res.status, 200);
+        const xml = await res.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${CHECKLIST_PATH}`));
+        assert.equal((xml.match(new RegExp(CHECKLIST_SLUG, 'g')) || []).length, 1);
+        for (const slug of CHECKLIST_RESERVED) {
+            assert.notEqual(slug, CHECKLIST_SLUG);
             assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
         }
     });

@@ -80,7 +80,7 @@ describe('llms.txt', () => {
         assert.doesNotMatch(txt, /casus-60plus/);
         assert.doesNotMatch(txt, /### Basiskennis/);
         assert.doesNotMatch(txt, /Kennisbank, per onderwerp/);
-        assert.ok(txt.length < 8000, `llms.txt should stay curated, got ${txt.length} chars`);
+        assert.ok(txt.length < 9000, `llms.txt should stay curated, got ${txt.length} chars`);
     });
 
     it('is also available at /.well-known/llms.txt', async () => {

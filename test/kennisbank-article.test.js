@@ -1206,7 +1206,7 @@ describe('kennisbank article: arbeidsdeskundig rapport checklist rechtspraak', (
         assert.match(body, /ECLI:NL:RBGEL:2026:6466/);
         assert.match(body, /deeplink\.rechtspraak\.nl\/uitspraak\?id=ECLI:NL:CRVB:2026:834/);
         assert.match(body, /deeplink\.rechtspraak\.nl\/uitspraak\?id=ECLI:NL:RBGEL:2026:6466/);
-        assert.match(body, /eerste aanleg/);
+        assert.match(body, /[Ee]erste aanleg/);
         assert.match(body, /geen juridisch advies/);
         assert.match(body, /faalpuntenlijst/);
         assert.doesNotMatch(body, /Sectie 1/);

@@ -686,6 +686,7 @@ const LLMS_FEATURED_SLUGS = [
     'arbeidsdeskundig-onderzoek-gids',
     'wat-doet-arbeidsdeskundige',
     'arbeidsdeskundig-rapport-voorbeeld',
+    'arbeidsdeskundig-rapport-checklist',
     'kosten-arbeidsdeskundig-onderzoek',
     'verplicht-arbeidsdeskundig-onderzoek',
     'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',

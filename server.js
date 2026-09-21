@@ -132,6 +132,7 @@ const articleBodies = extractArticleBodies(INDEX_HTML);
 // Alleen permanente 301's naar een live equivalent; geen nieuwe pagina's.
 const KENNISBANK_SLUG_REDIRECTS = {
     'mediations-arbeidsconflict': 'mediation-arbeidsconflict',
+    'second-opinion': 'second-opinion-arbeidsdeskundige',
 };
 
 // personaData is pure JSON (gegenereerd met json.dumps), dus simpel te parsen —
@@ -689,9 +690,11 @@ const LLMS_FEATURED_SLUGS = [
     'verplicht-arbeidsdeskundig-onderzoek',
     'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
     'second-opinion-arbeidsdeskundige',
+    'deskundigenoordeel-vs-arbeidsdeskundig-onderzoek',
     'nadelen-arbeidsdeskundig-onderzoek',
     'tips-werknemer-arbeidsdeskundig-onderzoek',
     'fml-izp-lezen-belastbaarheid',
+    'fml-izp-hr-beslissen-actualiseren',
     'belastbaarheid-verouderd-nieuwe-fml-izp',
     'riv-toets-bedrijfsarts-leidend',
     'beslistermijn-wia-16-weken',

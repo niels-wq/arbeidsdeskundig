@@ -499,6 +499,7 @@ const GIDS_PATH = '/kennisbank/' + GIDS_SLUG;
 const GIDS_CLUSTER = [
     'wat-doet-arbeidsdeskundige',
     'fml-izp-lezen-belastbaarheid',
+    'fml-izp-hr-beslissen-actualiseren',
     'belastbaarheid-verouderd-nieuwe-fml-izp',
     'arbeidsdeskundig-rapport-voorbeeld',
     'kosten-arbeidsdeskundig-onderzoek',
@@ -511,6 +512,7 @@ const GIDS_CLUSTER = [
     'wia-aanvraag-parallel-spoor-2',
     'spoor-2-zonder-spoor-1-afgerond',
     'second-opinion-arbeidsdeskundige',
+    'deskundigenoordeel-vs-arbeidsdeskundig-onderzoek',
     'voorbereiden-gesprek-arbeidsdeskundige',
     'passende-arbeid',
 ];
@@ -994,3 +996,167 @@ describe('kennisbank article: spoor 2 zonder spoor 1 afgerond', () => {
         }
     });
 });
+
+const GOOGLEBOT = { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' } };
+
+describe('kennisbank redirect: /kennisbank/second-opinion', () => {
+    it('301s the short slug to second-opinion-arbeidsdeskundige', async () => {
+        const res = await fetch(base + '/kennisbank/second-opinion', { redirect: 'manual' });
+        assert.equal(res.status, 301);
+        const location = res.headers.get('location') || '';
+        assert.match(location, /\/kennisbank\/second-opinion-arbeidsdeskundige$/);
+    });
+
+    it('does not list the short slug in sitemap.xml', async () => {
+        const res = await fetch(base + '/sitemap.xml');
+        assert.equal(res.status, 200);
+        const xml = await res.text();
+        assert.doesNotMatch(xml, /kennisbank\/second-opinion</);
+        assert.match(xml, /kennisbank\/second-opinion-arbeidsdeskundige</);
+    });
+});
+
+const VS_SLUG = 'deskundigenoordeel-vs-arbeidsdeskundig-onderzoek';
+const VS_PATH = '/kennisbank/' + VS_SLUG;
+const VS_RESERVED = [
+    'deskundigenoordeel',
+    'second-opinion-arbeidsdeskundige',
+    'arbeidsdeskundig-onderzoek-gids',
+    'riv-toets',
+    'wat-doet-arbeidsdeskundige',
+    'verplicht-arbeidsdeskundig-onderzoek',
+    'belastbaarheid-verouderd-nieuwe-fml-izp',
+    'fml-izp-hr-beslissen-actualiseren',
+];
+
+describe('kennisbank article: deskundigenoordeel vs arbeidsdeskundig onderzoek', () => {
+    it('serves unique comparative article HTML with SEO tags and schema', async () => {
+        const res = await fetch(base + VS_PATH, GOOGLEBOT);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        assert.match(html, /<title>Deskundigenoordeel vs arbeidsdeskundig onderzoek: wanneer welk instrument\? — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<meta name="description" content="Deskundigenoordeel vs arbeidsdeskundig onderzoek: wanneer kies je welk instrument, wanneer beide, wanneer geen\. Voor HR en casemanagers\. Offerte of sparren\.">/);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${VS_PATH}">`));
+        assert.match(html, /"@type":"Article"/);
+        assert.match(html, /"@type":"FAQPage"/);
+
+        const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
+        assert.ok(h1Match, 'SSR H1 missing');
+        assert.equal(h1Match[1], 'Deskundigenoordeel vs arbeidsdeskundig onderzoek: wanneer welk instrument?');
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>Deskundigenoordeel vs arbeidsdeskundig onderzoek: wanneer welk instrument\?<\/h2>/);
+        assert.match(body, /deskundigenoordeel vs arbeidsdeskundig onderzoek/i);
+        assert.match(body, /Twee instrumenten, twee vragen/);
+        assert.match(body, /Wanneer kies je een arbeidsdeskundig onderzoek/);
+        assert.match(body, /Wanneer kies je een deskundigenoordeel/);
+        assert.match(body, /Wanneer beide, en in welke volgorde/);
+        assert.match(body, /Wanneer geen van beide/);
+        assert.match(body, /Mythes die de keuze vertroebelen/);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /Doe de gratis keuzehulp/);
+        assert.doesNotMatch(body, /—/);
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 100).join(' ');
+        assert.match(firstWords, /deskundigenoordeel vs arbeidsdeskundig onderzoek/i);
+
+        assert.match(body, /href="\/kennisbank\/deskundigenoordeel"/);
+        assert.match(body, /href="\/kennisbank\/second-opinion-arbeidsdeskundige"/);
+        assert.match(body, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"/);
+        assert.match(body, /href="\/kennisbank\/riv-toets"/);
+        assert.match(html, /\/offerte-aanvragen/);
+        assert.match(html, /\/aanmelden/);
+        assert.match(html, /calendly\.com\/matchvermogen\/call-15-min/);
+        assert.match(html, /<div class="view active" id="view-artikel">/);
+        assert.match(html, /<div class="view" id="view-home" hidden>/);
+    });
+
+    it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {
+        const res = await fetch(base + '/sitemap.xml');
+        assert.equal(res.status, 200);
+        const xml = await res.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${VS_PATH}`));
+        assert.equal((xml.match(new RegExp(VS_SLUG, 'g')) || []).length, 1);
+        for (const slug of VS_RESERVED) {
+            assert.notEqual(slug, VS_SLUG);
+            assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
+        }
+    });
+});
+
+const FML_HR_SLUG = 'fml-izp-hr-beslissen-actualiseren';
+const FML_HR_PATH = '/kennisbank/' + FML_HR_SLUG;
+const FML_HR_RESERVED = [
+    'fml-izp-lezen-belastbaarheid',
+    'belastbaarheid-verouderd-nieuwe-fml-izp',
+    'fml-uitleg',
+    'wat-doet-arbeidsdeskundige',
+    'arbeidsdeskundig-onderzoek-gids',
+    'arbeidsdeskundige-vs-bedrijfsarts-casemanager',
+    'deskundigenoordeel-vs-arbeidsdeskundig-onderzoek',
+    'riv-toets',
+    'voorbereiden-gesprek-arbeidsdeskundige',
+];
+
+describe('kennisbank article: FML/IZP HR beslissen actualiseren', () => {
+    it('serves complementary HR decision article with SEO tags and schema', async () => {
+        const res = await fetch(base + FML_HR_PATH, GOOGLEBOT);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        assert.match(html, /<title>FML of IZP binnen: wat mag HR beslissen, en wanneer actualiseren\? — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<meta name="description" content="FML of IZP binnen\? Wat HR mag afleiden voor vervolgstappen, wanneer actualiseren, en wanneer je start, wacht of de bedrijfsarts vraagt\. Sparren of offerte\.">/);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${FML_HR_PATH}">`));
+        assert.match(html, /"@type":"Article"/);
+        assert.match(html, /"@type":"FAQPage"/);
+
+        const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
+        assert.ok(h1Match, 'SSR H1 missing');
+        assert.equal(h1Match[1], 'FML of IZP binnen: wat mag HR beslissen, en wanneer actualiseren?');
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>FML of IZP binnen: wat mag HR beslissen, en wanneer actualiseren\?<\/h2>/);
+        assert.match(body, /Wat HR wél mag afleiden/);
+        assert.match(body, /Wat HR niet mag afleiden/);
+        assert.match(body, /Drie beslismomenten: starten, wachten, bedrijfsarts/);
+        assert.match(body, /Wanneer de FML of het IZP te oud is/);
+        assert.match(body, /Van document naar volgende stap/);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /Doe de gratis keuzehulp/);
+        assert.doesNotMatch(body, /—/);
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 80).join(' ');
+        assert.match(firstWords, /FML of het IZP ligt op je bureau/);
+
+        assert.match(body, /href="\/kennisbank\/fml-izp-lezen-belastbaarheid"/);
+        assert.match(body, /href="\/kennisbank\/belastbaarheid-verouderd-nieuwe-fml-izp"/);
+        assert.match(html, /\/offerte-aanvragen/);
+        assert.match(html, /calendly\.com\/matchvermogen\/call-15-min/);
+        assert.match(html, /<div class="view active" id="view-artikel">/);
+        assert.match(html, /<div class="view" id="view-home" hidden>/);
+    });
+
+    it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {
+        const res = await fetch(base + '/sitemap.xml');
+        assert.equal(res.status, 200);
+        const xml = await res.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${FML_HR_PATH}`));
+        assert.equal((xml.match(new RegExp(FML_HR_SLUG, 'g')) || []).length, 1);
+        for (const slug of FML_HR_RESERVED) {
+            assert.notEqual(slug, FML_HR_SLUG);
+            assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
+        }
+    });
+});
+

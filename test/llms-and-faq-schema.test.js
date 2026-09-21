@@ -73,12 +73,14 @@ describe('llms.txt', () => {
         assert.match(txt, /kennisbank\/arbeidsdeskundig-rapport-voorbeeld/);
         assert.match(txt, /kennisbank\/kosten-arbeidsdeskundig-onderzoek/);
         assert.match(txt, /kennisbank\/second-opinion-arbeidsdeskundige/);
+        assert.match(txt, /kennisbank\/deskundigenoordeel-vs-arbeidsdeskundig-onderzoek/);
+        assert.match(txt, /kennisbank\/fml-izp-hr-beslissen-actualiseren/);
         assert.match(txt, /kennisbank\/belastbaarheid-verouderd-nieuwe-fml-izp/);
 
         assert.doesNotMatch(txt, /casus-60plus/);
         assert.doesNotMatch(txt, /### Basiskennis/);
         assert.doesNotMatch(txt, /Kennisbank, per onderwerp/);
-        assert.ok(txt.length < 8000, `llms.txt should stay curated, got ${txt.length} chars`);
+        assert.ok(txt.length < 9000, `llms.txt should stay curated, got ${txt.length} chars`);
     });
 
     it('is also available at /.well-known/llms.txt', async () => {

@@ -58,6 +58,15 @@ describe('primary nav crawlability', () => {
         assertCrawlableNav(sliceById(header, 'navDesktop', '</nav>'), 'navDesktop');
         assertCrawlableNav(sliceById(header, 'navMobile', '</nav>'), 'navMobile');
 
+        assert.match(header, /id="navToggle"/);
+        assert.match(header, /aria-controls="navMobile"/);
+        assert.match(header, /aria-expanded="false"/);
+        assert.match(header, /aria-label="Menu"/);
+        assert.match(header, />\s*Menu\s*</);
+        assert.match(html, /function setMobileNavOpen/);
+        assert.match(html, /Sluiten/);
+        assert.match(html, /e\.key === 'Escape'/);
+
         assert.match(header, /<a class="logo" href="\/"/);
         assert.match(
             header,

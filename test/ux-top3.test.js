@@ -62,6 +62,9 @@ describe('UX top-3: cookie banner, homepage scan, kennisbank listing', () => {
         assert.doesNotMatch(banner, /background:var\(--ink\)/);
         assert.match(html, /\.cookie-banner\{/);
         assert.match(html, /max-width:min\(380px/);
+        assert.match(html, /--cookie-banner-offset/);
+        assert.match(html, /function updateBottomBarOffset/);
+        assert.match(html, /cookieOpen && narrow/);
     });
 
     it('homepage has in-page section jumps and one clear primary CTA family', async () => {

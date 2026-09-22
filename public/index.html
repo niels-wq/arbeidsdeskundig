@@ -74,21 +74,75 @@
   body.conv-page .fab-checklist{display:none;}
   body.conv-page .header-offerte-cta{display:none;}
   @media(max-width:639px){
-    body.conv-page .fab-whatsapp{bottom:calc(20px + var(--fab-bottom-offset, 0px));}
+    body{padding-bottom:calc(var(--cookie-banner-offset, 0px) + var(--cookie-open-sticky-pad, 0px) + var(--fab-bottom-offset, 0px));}
+    body.conv-page .fab-whatsapp{bottom:calc(20px + var(--cookie-banner-offset, 0px) + var(--fab-bottom-offset, 0px));}
   }
 
-  header.site{position:sticky; top:0; z-index:40; background:var(--ink);}
-  .navbar{display:flex; align-items:center; justify-content:space-between; padding:14px 20px; max-width:1120px; margin:0 auto;}
-  .logo{font-weight:700; font-size:1.25rem; color:var(--paper); background:none; border:none; cursor:pointer;}
+  header.site{position:sticky; top:0; z-index:50; background:var(--ink);}
+  .navbar{display:flex; align-items:center; justify-content:space-between; flex-wrap:nowrap; gap:12px; padding:14px 20px; max-width:1120px; margin:0 auto;}
+  .navbar-actions{display:flex; align-items:center; gap:10px; flex:0 0 auto;}
+  .logo{font-weight:700; font-size:1.25rem; color:var(--paper); background:none; border:none; cursor:pointer; text-decoration:none; flex:0 0 auto; white-space:nowrap;}
   .logo span{color:var(--amber);}
+  a.btn-primary.header-offerte-cta{padding:10px 18px; font-size:.85rem; white-space:nowrap;}
   nav.desktop{display:none; gap:24px;}
   nav.desktop button, nav.desktop a{background:none; border:none; color:var(--paper); font-size:.87rem; cursor:pointer; padding-bottom:6px; position:relative; text-decoration:none;}
   nav.desktop button.active::after, nav.desktop a.active::after{content:""; position:absolute; left:0; right:0; bottom:-6px; height:2px; background:var(--amber);}
-  @media(min-width:900px){ nav.desktop{display:flex;} }
-  nav.mobile{display:flex; overflow-x:auto; gap:16px; padding:0 20px 10px;}
-  nav.mobile button, nav.mobile a{background:none; border:none; color:var(--paper); font-size:.76rem; white-space:nowrap; padding-bottom:4px; border-bottom:2px solid transparent; text-decoration:none;}
-  nav.mobile button.active, nav.mobile a.active{border-bottom-color:var(--amber);}
-  @media(min-width:900px){ nav.mobile{display:none;} }
+  .nav-toggle{
+    display:none; align-items:center; gap:8px;
+    background:transparent; color:var(--paper);
+    border:1.5px solid rgba(237,239,234,.55); border-radius:2px;
+    padding:8px 10px; font:600 .8rem/1 'Inter',sans-serif; cursor:pointer;
+  }
+  .nav-toggle:hover{background:rgba(237,239,234,.08);}
+  .nav-toggle-icon{position:relative; width:16px; height:2px; background:var(--paper); display:inline-block; flex:0 0 auto;}
+  .nav-toggle-icon::before, .nav-toggle-icon::after{
+    content:""; position:absolute; left:0; width:16px; height:2px; background:var(--paper);
+  }
+  .nav-toggle-icon::before{top:-5px;}
+  .nav-toggle-icon::after{top:5px;}
+  .nav-toggle[aria-expanded="true"] .nav-toggle-icon{background:transparent;}
+  .nav-toggle[aria-expanded="true"] .nav-toggle-icon::before{top:0; transform:rotate(45deg);}
+  .nav-toggle[aria-expanded="true"] .nav-toggle-icon::after{top:0; transform:rotate(-45deg);}
+  nav.mobile{
+    display:none; flex-direction:column; gap:0;
+    padding:4px 12px 14px; background:var(--ink);
+    border-top:1px solid #23375B;
+    max-height:calc(100dvh - 64px); overflow-y:auto;
+  }
+  nav.mobile.is-open{display:flex;}
+  nav.mobile a{
+    display:block; background:none; border:none; color:var(--paper);
+    font-size:.95rem; text-decoration:none;
+    padding:13px 8px; border-bottom:1px solid #23375B;
+  }
+  nav.mobile a.active{color:var(--amber);}
+  nav.mobile a.mobile-bel{border-bottom:none; color:var(--amber); font-weight:600;}
+  @media(min-width:769px){
+    nav.desktop{display:flex;}
+    nav.mobile, nav.mobile.is-open{display:none;}
+  }
+  /* 769–1099px: logo + 7 links + twee knoppen passen pas vanaf ~1100px.
+     Daartussen blijft de horizontale nav, compacter, zodat niets wordt afgekapt. */
+  @media(min-width:769px) and (max-width:1099px){
+    .navbar{padding:12px 14px; gap:8px;}
+    .logo{font-size:1rem;}
+    nav.desktop{gap:10px;}
+    nav.desktop a{font-size:.78rem;}
+    .header-bel-cta{display:none;}
+    a.btn-primary.header-offerte-cta{padding:8px 12px; font-size:.78rem;}
+  }
+  @media(max-width:768px){
+    .nav-toggle{display:inline-flex;}
+    .header-bel-cta{display:none;}
+    .navbar{padding:10px 14px; gap:8px;}
+    .logo{font-size:1rem;}
+    a.btn-primary.header-offerte-cta{padding:8px 10px; font-size:.78rem;}
+    header.site:has(.nav-toggle[aria-expanded="true"]) .header-offerte-cta{display:none;}
+    nav.mobile{max-height:calc(100dvh - 64px - var(--cookie-banner-offset, 0px) - var(--cookie-open-sticky-pad, 0px));}
+  }
+  @media(max-width:479px){
+    a.btn-primary.header-offerte-cta{display:none;}
+  }
 
   .btn-primary{background:var(--amber); color:var(--ink); font-weight:600; border:none; padding:12px 22px; border-radius:2px; cursor:pointer; font-size:.95rem; transition:transform .12s ease, box-shadow .12s ease;}
   .btn-primary:hover{transform:translateY(-1px); box-shadow:0 6px 16px rgba(216,160,61,.35);}
@@ -213,8 +267,9 @@
   .footer-grid a:hover{color:var(--paper);}
   .footer-bottom{text-align:center; font-size:.72rem; color:#5F6B7A; margin-top:28px; border-top:1px solid #23375B; padding-top:20px;}
 
-  .sticky-cta{position:fixed; bottom:0; left:0; right:0; background:var(--ink); border-top:1px solid var(--amber); z-index:40;}
+  .sticky-cta{position:fixed; bottom:0; left:0; right:0; background:var(--ink); border-top:1px solid var(--amber); z-index:40; transition:bottom .25s ease;}
   .sticky-cta button, .sticky-cta a{width:100%; padding:14px; text-decoration:none; display:block; box-sizing:border-box; text-align:center;}
+  @media(max-width:639px){ .sticky-cta{bottom:var(--cookie-banner-offset, 0px);} }
   @media(min-width:640px){ .sticky-cta{display:none;} }
 
   .view{display:none;}
@@ -262,7 +317,7 @@
   .cookie-banner p{margin:0 0 10px; font-size:.76rem; line-height:1.45; color:var(--muted); max-width:none;}
   .cookie-banner-actions{display:flex; gap:8px; flex-wrap:wrap;}
   @media(max-width:639px){
-    .cookie-banner{left:12px; right:12px; max-width:none; bottom:calc(70px + var(--fab-bottom-offset, 0px));}
+    .cookie-banner{left:12px; right:12px; max-width:none; bottom:12px;}
   }
 
   .article-body h2{font-size:1.55rem; color:var(--ink); margin-top:36px;}
@@ -296,7 +351,7 @@
   /* Floating buttons */
   .fab-whatsapp{position:fixed; right:20px; bottom:calc(20px + var(--fab-bottom-offset, 0px)); z-index:45; width:54px; height:54px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(0,0,0,.25); text-decoration:none; transition:bottom .25s ease;}
   .fab-whatsapp:hover{transform:scale(1.06);}
-  @media(max-width:639px){ .fab-whatsapp{bottom:calc(78px + var(--fab-bottom-offset, 0px)); right:14px; width:48px; height:48px;} }
+  @media(max-width:639px){ .fab-whatsapp{bottom:calc(var(--sticky-cta-clearance, 78px) + var(--cookie-banner-offset, 0px) + var(--fab-bottom-offset, 0px)); right:14px; width:48px; height:48px;} }
 
   .fab-checklist{position:fixed; left:0; top:60%; transform:translateY(-50%) rotate(-90deg); transform-origin:left bottom; z-index:45; background:var(--ink); color:var(--paper); border:none; padding:10px 18px; font-size:.8rem; font-weight:600; cursor:pointer; border-radius:0 0 4px 4px; box-shadow:2px 2px 10px rgba(0,0,0,.15);}
   .fab-checklist:hover{background:var(--ink2);}
@@ -379,9 +434,13 @@
       <a href="/over-ons" data-key="over" onclick="event.preventDefault(); setView('over')">Over ons</a>
       <a href="/keuzehulp" data-key="advies" onclick="event.preventDefault(); setView('advies')">Adviestool</a>
     </nav>
-    <div style="display:flex; align-items:center; gap:10px;">
-      <button class="btn-ghost-header" style="white-space:nowrap;" onclick="openBelTerugModal()">📞 Bel me terug</button>
-      <a class="btn-primary header-offerte-cta" href="/offerte-aanvragen" style="padding:10px 18px; font-size:.85rem;" onclick="event.preventDefault(); setView('offerte')">Direct offerte</a>
+    <div class="navbar-actions">
+      <button class="btn-ghost-header header-bel-cta" style="white-space:nowrap;" onclick="openBelTerugModal()">📞 Bel me terug</button>
+      <a class="btn-primary header-offerte-cta" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Direct offerte</a>
+      <button type="button" class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navMobile" aria-label="Menu">
+        <span class="nav-toggle-icon" aria-hidden="true"></span>
+        <span class="nav-toggle-text">Menu</span>
+      </button>
     </div>
   </div>
   <nav class="mobile" id="navMobile">
@@ -392,6 +451,7 @@
     <a href="/veelgestelde-vragen" data-key="faq" onclick="event.preventDefault(); setView('faq')">FAQ</a>
     <a href="/over-ons" data-key="over" onclick="event.preventDefault(); setView('over')">Over ons</a>
     <a href="/keuzehulp" data-key="advies" onclick="event.preventDefault(); setView('advies')">Adviestool</a>
+    <a class="mobile-bel" href="#bel-me-terug" onclick="event.preventDefault(); openBelTerugModal()">Bel me terug</a>
   </nav>
 </header>
 
@@ -2037,16 +2097,77 @@
     }
   }
 
-  /* Voorkomt dat de vaste onderbalken (cookiebanner / artikel-CTA) de floating
-     knoppen (WhatsApp, checklist) en de footer aan het oog onttrekken: meet
-     welke balk er nu zichtbaar is en schuift alles wat nodig is dienovereenkomstig op. */
+  /* Houdt vaste onderchrome uit elkaars vaarwater.
+     --fab-bottom-offset: hoogte van de artikel-CTA-balk (alleen als die zichtbaar is).
+     --cookie-banner-offset: op smalle schermen de ruimte die de cookiebanner inneemt,
+       zodat sticky CTA en FABs erboven komen zolang de banner open is.
+     --cookie-open-sticky-pad: extra pagina-padding zodat de opgeschoven sticky CTA
+       de inhoud niet bedekt zolang de banner open is.
+     --sticky-cta-clearance: gemeten hoogte van .sticky-cta plus een kleine marge. */
   function updateBottomBarOffset(){
     const stickyBar = document.getElementById('sticky-artikel-cta');
+    const cookie = document.getElementById('cookie-banner');
+    const stickyCta = document.querySelector('.sticky-cta');
+    const rootStyle = document.documentElement.style;
+    const narrow = window.matchMedia('(max-width: 639px)').matches;
     let offset = 0;
-    // De cookiebanner is een compacte kaart, geen volle onderbalk — die telt
-    // niet mee in de pagina-offset. Alleen de artikel-CTA-balk schuift FABs op.
     if(stickyBar && !stickyBar.classList.contains('hidden')) offset = stickyBar.offsetHeight;
-    document.documentElement.style.setProperty('--fab-bottom-offset', offset + 'px');
+
+    const cookieOpen = !!(cookie && !cookie.classList.contains('hidden'));
+    let cookieOffset = 0;
+    let cookieStickyPad = 0;
+    let stickyClearance = 0;
+    if(stickyCta && getComputedStyle(stickyCta).display !== 'none'){
+      stickyClearance = stickyCta.offsetHeight + 10;
+    }
+    if(cookieOpen && narrow){
+      const bottom = parseFloat(getComputedStyle(cookie).bottom) || 0;
+      cookieOffset = cookie.offsetHeight + bottom + 8;
+      if(stickyClearance) cookieStickyPad = stickyCta.offsetHeight;
+    }
+    rootStyle.setProperty('--fab-bottom-offset', offset + 'px');
+    rootStyle.setProperty('--cookie-banner-offset', cookieOffset + 'px');
+    rootStyle.setProperty('--cookie-open-sticky-pad', cookieStickyPad + 'px');
+    rootStyle.setProperty('--sticky-cta-clearance', (stickyClearance || 78) + 'px');
+    document.body.classList.toggle('cookie-open', cookieOpen);
+  }
+
+  function setMobileNavOpen(open){
+    const nav = document.getElementById('navMobile');
+    const btn = document.getElementById('navToggle');
+    if(!nav || !btn) return;
+    const isOpen = !!open && window.matchMedia('(max-width: 768px)').matches;
+    nav.classList.toggle('is-open', isOpen);
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    btn.setAttribute('aria-label', isOpen ? 'Sluiten' : 'Menu');
+    const label = btn.querySelector('.nav-toggle-text');
+    if(label) label.textContent = isOpen ? 'Sluiten' : 'Menu';
+  }
+
+  function initMobileNav(){
+    const nav = document.getElementById('navMobile');
+    const btn = document.getElementById('navToggle');
+    if(!nav || !btn) return;
+    btn.addEventListener('click', ()=>{
+      setMobileNavOpen(btn.getAttribute('aria-expanded') !== 'true');
+    });
+    nav.querySelectorAll('a').forEach(a=>{
+      a.addEventListener('click', ()=> setMobileNavOpen(false));
+    });
+    document.addEventListener('click', (e)=>{
+      if(btn.getAttribute('aria-expanded') !== 'true') return;
+      const header = document.querySelector('header.site');
+      if(header && !header.contains(e.target)) setMobileNavOpen(false);
+    });
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true'){
+        setMobileNavOpen(false);
+        btn.focus();
+      }
+    });
+    window.addEventListener('resize', ()=>{
+      if(window.matchMedia('(min-width: 769px)').matches) setMobileNavOpen(false);
+    });
   }
 
   function setCookieConsent(accepted){
@@ -2065,6 +2186,9 @@
     if(consent === null){ document.getElementById('cookie-banner').classList.remove('hidden'); }
     // bij 'declined' blijft de banner verborgen en laadt er niets.
     updateBottomBarOffset();
+    window.addEventListener('resize', updateBottomBarOffset);
+    window.addEventListener('load', updateBottomBarOffset);
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=> updateBottomBarOffset());
   }
 
   /* ---------- Formulierdata verzamelen en naar de server sturen (Resend, later te activeren) ---------- */
@@ -2203,6 +2327,7 @@
     document.querySelectorAll('#navDesktop a, #navMobile a').forEach(b=>{
       b.classList.toggle('active', b.dataset.key === view);
     });
+    setMobileNavOpen(false);
     const isConv = view === 'offerte' || view === 'aanmelden';
     document.body.classList.toggle('conv-page', isConv);
     document.body.classList.toggle('conv-offerte', view === 'offerte');
@@ -6409,6 +6534,7 @@ whk: `
   renderPersonaCards();
   renderTestimonials();
   initCookieBanner();
+  initMobileNav();
 
   /* Initiële route toepassen: server-side geïnjecteerd (Express), of anders op basis van het URL-pad */
   _routerSync = true;

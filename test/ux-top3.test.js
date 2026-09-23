@@ -65,6 +65,13 @@ describe('UX top-3: cookie banner, homepage scan, kennisbank listing', () => {
         assert.match(html, /--cookie-banner-offset/);
         assert.match(html, /function updateBottomBarOffset/);
         assert.match(html, /cookieOpen && narrow/);
+        assert.match(html, /classList\.toggle\('cookie-prompt-open', cookieOpen\)/);
+        assert.match(html, /localStorage\.getItem\('cookie_consent'\) === null\) document\.body\.classList\.add\('cookie-prompt-open'\)/);
+        assert.match(html, /body\.cookie-prompt-open \.sticky-cta\{display:none;\}/);
+        assert.doesNotMatch(html, /\.sticky-cta\{bottom:var\(--cookie-banner-offset/);
+        assert.match(html, /body\.cookie-prompt-open \.fab-whatsapp\{/);
+        assert.match(html, /body\.cookie-prompt-open \.fab-checklist\{/);
+        assert.match(html, /Math\.max\(cookie\.offsetHeight \+ bottom \+ 8, 220\)/);
     });
 
     it('homepage has in-page section jumps and one clear primary CTA family', async () => {

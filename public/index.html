@@ -75,6 +75,8 @@
   body.conv-page .header-offerte-cta{display:none;}
   @media(max-width:639px){
     body{padding-bottom:calc(var(--cookie-banner-offset, 0px) + var(--cookie-open-sticky-pad, 0px) + var(--fab-bottom-offset, 0px));}
+    /* Reserveer ruimte vóór de meting, zodat de kaart de footer niet bedekt op de eerste paint. */
+    body.cookie-prompt-open{padding-bottom:calc(var(--cookie-banner-offset, 220px) + var(--fab-bottom-offset, 0px));}
     body.conv-page .fab-whatsapp{bottom:calc(20px + var(--cookie-banner-offset, 0px) + var(--fab-bottom-offset, 0px));}
   }
 
@@ -269,7 +271,10 @@
 
   .sticky-cta{position:fixed; bottom:0; left:0; right:0; background:var(--ink); border-top:1px solid var(--amber); z-index:40; transition:bottom .25s ease;}
   .sticky-cta button, .sticky-cta a{width:100%; padding:14px; text-decoration:none; display:block; box-sizing:border-box; text-align:center;}
-  @media(max-width:639px){ .sticky-cta{bottom:var(--cookie-banner-offset, 0px);} }
+  /* Op smalle schermen dekt de cookiebanner (z-index 60, bottom 12px) de sticky CTA
+     (z-index 40) af zolang de offset nog 0 is of de bottom-transitie loopt. Verberg de
+     balk tot de keuze vastligt; dat is betrouwbaarder dan stapelen. */
+  @media(max-width:639px){ body.cookie-prompt-open .sticky-cta{display:none;} }
   @media(min-width:640px){ .sticky-cta{display:none;} }
 
   .view{display:none;}
@@ -352,10 +357,26 @@
   .fab-whatsapp{position:fixed; right:20px; bottom:calc(20px + var(--fab-bottom-offset, 0px)); z-index:45; width:54px; height:54px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(0,0,0,.25); text-decoration:none; transition:bottom .25s ease;}
   .fab-whatsapp:hover{transform:scale(1.06);}
   @media(max-width:639px){ .fab-whatsapp{bottom:calc(var(--sticky-cta-clearance, 78px) + var(--cookie-banner-offset, 0px) + var(--fab-bottom-offset, 0px)); right:14px; width:48px; height:48px;} }
+  @media(max-width:639px){
+    body.cookie-prompt-open .fab-whatsapp{
+      bottom:calc(var(--cookie-banner-offset, 220px) + var(--fab-bottom-offset, 0px));
+      transition:none;
+    }
+  }
 
   .fab-checklist{position:fixed; left:0; top:60%; transform:translateY(-50%) rotate(-90deg); transform-origin:left bottom; z-index:45; background:var(--ink); color:var(--paper); border:none; padding:10px 18px; font-size:.8rem; font-weight:600; cursor:pointer; border-radius:0 0 4px 4px; box-shadow:2px 2px 10px rgba(0,0,0,.15);}
   .fab-checklist:hover{background:var(--ink2);}
   @media(max-width:639px){ .fab-checklist{font-size:.72rem; padding:8px 14px;} }
+  @media(max-width:639px){
+    /* Checklist-tab zit links op 60% en valt op korte schermen in de volle cookiebanner.
+       Zet het anker (linksonder na rotatie) net boven de kaart. */
+    body.cookie-prompt-open .fab-checklist{
+      top:auto;
+      bottom:calc(var(--cookie-banner-offset, 220px) + 4px);
+      transform:rotate(-90deg);
+      transform-origin:left bottom;
+    }
+  }
 
   /* Modal */
   .modal-overlay{position:fixed; inset:0; background:rgba(18,32,58,.55); z-index:60; display:flex; align-items:center; justify-content:center; padding:20px;}
@@ -421,6 +442,9 @@
 </style>
 </head>
 <body>
+<script>
+try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList.add('cookie-prompt-open'); }catch(e){}
+</script>
 
 <header class="site">
   <div class="navbar">
@@ -2098,11 +2122,13 @@
   }
 
   /* Houdt vaste onderchrome uit elkaars vaarwater.
+     body.cookie-prompt-open: banner zichtbaar. Op smalle schermen verbergt CSS dan
+       .sticky-cta; FABs gebruiken --cookie-banner-offset om boven de kaart te blijven.
      --fab-bottom-offset: hoogte van de artikel-CTA-balk (alleen als die zichtbaar is).
-     --cookie-banner-offset: op smalle schermen de ruimte die de cookiebanner inneemt,
-       zodat sticky CTA en FABs erboven komen zolang de banner open is.
-     --cookie-open-sticky-pad: extra pagina-padding zodat de opgeschoven sticky CTA
-       de inhoud niet bedekt zolang de banner open is.
+     --cookie-banner-offset: op smalle schermen de ruimte die de cookiebanner inneemt.
+       Minimaal 220px zolang de banner open is, zodat een te vroege meting de FAB
+       niet in de kaart zet. CSS gebruikt dezelfde fallback vóór de eerste meting.
+     --cookie-open-sticky-pad: blijft 0 nu de sticky CTA verborgen is tijdens de prompt.
      --sticky-cta-clearance: gemeten hoogte van .sticky-cta plus een kleine marge. */
   function updateBottomBarOffset(){
     const stickyBar = document.getElementById('sticky-artikel-cta');
@@ -2114,6 +2140,7 @@
     if(stickyBar && !stickyBar.classList.contains('hidden')) offset = stickyBar.offsetHeight;
 
     const cookieOpen = !!(cookie && !cookie.classList.contains('hidden'));
+    document.body.classList.toggle('cookie-prompt-open', cookieOpen);
     let cookieOffset = 0;
     let cookieStickyPad = 0;
     let stickyClearance = 0;
@@ -2122,14 +2149,12 @@
     }
     if(cookieOpen && narrow){
       const bottom = parseFloat(getComputedStyle(cookie).bottom) || 0;
-      cookieOffset = cookie.offsetHeight + bottom + 8;
-      if(stickyClearance) cookieStickyPad = stickyCta.offsetHeight;
+      cookieOffset = Math.max(cookie.offsetHeight + bottom + 8, 220);
     }
     rootStyle.setProperty('--fab-bottom-offset', offset + 'px');
     rootStyle.setProperty('--cookie-banner-offset', cookieOffset + 'px');
     rootStyle.setProperty('--cookie-open-sticky-pad', cookieStickyPad + 'px');
     rootStyle.setProperty('--sticky-cta-clearance', (stickyClearance || 78) + 'px');
-    document.body.classList.toggle('cookie-open', cookieOpen);
   }
 
   function setMobileNavOpen(open){
@@ -2183,7 +2208,10 @@
   function initCookieBanner(){
     const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
     if(consent === 'accepted'){ initAnalytics(); updateBottomBarOffset(); return; }
-    if(consent === null){ document.getElementById('cookie-banner').classList.remove('hidden'); }
+    if(consent === null){
+      document.body.classList.add('cookie-prompt-open');
+      document.getElementById('cookie-banner').classList.remove('hidden');
+    }
     // bij 'declined' blijft de banner verborgen en laadt er niets.
     updateBottomBarOffset();
     window.addEventListener('resize', updateBottomBarOffset);

@@ -366,15 +366,15 @@
 
   .fab-checklist{position:fixed; left:0; top:60%; transform:translateY(-50%) rotate(-90deg); transform-origin:left bottom; z-index:45; background:var(--ink); color:var(--paper); border:none; padding:10px 18px; font-size:.8rem; font-weight:600; cursor:pointer; border-radius:0 0 4px 4px; box-shadow:2px 2px 10px rgba(0,0,0,.15);}
   .fab-checklist:hover{background:var(--ink2);}
-  @media(max-width:639px){ .fab-checklist{font-size:.72rem; padding:8px 14px;} }
   @media(max-width:639px){
-    /* Checklist-tab zit links op 60% en valt op korte schermen in de volle cookiebanner.
-       Zet het anker (linksonder na rotatie) net boven de kaart. */
+    /* left bottom draait de tab buiten het scherm (breedte naar links). left top houdt
+       hem op de rand, leesbaar van onder naar boven. */
+    .fab-checklist{font-size:.72rem; padding:8px 14px; transform-origin:left top;}
     body.cookie-prompt-open .fab-checklist{
       top:auto;
-      bottom:calc(var(--cookie-banner-offset, 220px) + 4px);
+      bottom:calc(var(--cookie-banner-offset, 220px) + 8px);
       transform:rotate(-90deg);
-      transform-origin:left bottom;
+      transform-origin:left top;
     }
   }
 

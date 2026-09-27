@@ -43,17 +43,17 @@ const INDEX_HTML = fs.readFileSync(path.join(__dirname, 'public', 'index.html'),
 // het bestand ontbreekt (bijv. nog niet geüpload), slaat de PDF dit blok gewoon over.
 let PERSONAL_PHOTO = null;
 try {
-    PERSONAL_PHOTO = fs.readFileSync(path.join(__dirname, 'public', 'assets', 'niels-foto.png'));
+    PERSONAL_PHOTO = fs.readFileSync(path.join(__dirname, 'assets', 'niels-foto.png'));
 } catch (e) {
-    console.log('[Offerte-PDF] Geen persoonlijke foto gevonden op public/assets/niels-foto.png — sectie wordt overgeslagen.');
+    console.log('[Offerte-PDF] Geen persoonlijke foto gevonden op assets/niels-foto.png — sectie wordt overgeslagen.');
 }
 
 let MATCHVERMOGEN_LOGO = null;
 let MATCHVERMOGEN_LOGO_RATIO = 1434 / 383;
 try {
-    MATCHVERMOGEN_LOGO = fs.readFileSync(path.join(__dirname, 'public', 'assets', 'matchvermogen-logo.png'));
+    MATCHVERMOGEN_LOGO = fs.readFileSync(path.join(__dirname, 'assets', 'matchvermogen-logo.png'));
 } catch (e) {
-    console.log('[Offerte-PDF] Geen Matchvermogen-logo gevonden op public/assets/matchvermogen-logo.png — tekstversie wordt gebruikt.');
+    console.log('[Offerte-PDF] Geen Matchvermogen-logo gevonden op assets/matchvermogen-logo.png — tekstversie wordt gebruikt.');
 }
 
 // Artikel-metadata (slug, titel, meta description, tag) wordt bij het opstarten
@@ -233,20 +233,33 @@ app.use((req, res, next) => {
     next();
 });
 
-// Statische assets (indien later toegevoegd, bv. /public/afbeeldingen) cachen agressief.
-// De hoofd-HTML zelf wordt NIET via express.static geserveerd, want die krijgt
-// per route aangepaste <head>-tags — zie renderPage() hieronder.
+// Teamfoto's staan in de repo-map assets/ (niet in public/). Die map op /assets/
+// serveren, mét het juiste content-type via de bestandsextensie. De hoofd-HTML
+// zelf wordt NIET via express.static geserveerd, want die krijgt per route
+// aangepaste <head>-tags — zie renderPage() hieronder. Onbekende paden vallen
+// door naar de normale routes (sitemap, llms.txt, robots, API, SPA-404).
 //
 // LET OP: door 'immutable' hieronder cachen browsers deze bestanden tot 30
 // dagen zonder ooit opnieuw te controleren. Vervang je een bestaand bestand in
-// public/assets/ door een nieuwe versie (bijv. een andere teamfoto), dan blijft
+// assets/ door een nieuwe versie (bijv. een andere teamfoto), dan blijft
 // een browser die de oude versie al eerder heeft opgehaald gewoon de oude
 // versie tonen. Voeg in dat geval altijd een cache-bust toe aan de verwijzing,
 // bijvoorbeeld `/assets/niels-foto.png?v=2` -> `?v=3` bij de volgende wijziging.
-app.use('/assets', express.static(path.join(__dirname, 'public', 'assets'), {
+const ASSETS_DIR = path.join(__dirname, 'assets');
+app.use('/assets', express.static(ASSETS_DIR, {
     maxAge: '30d',
     immutable: true,
+    fallthrough: true,
 }));
+
+// Zelfde SVG als de inline favicon: navy #12203A vierkant, gouden #D8A03D "A".
+app.get('/logo.svg', (req, res) => {
+    res.set({
+        'Content-Type': 'image/svg+xml; charset=utf-8',
+        'Cache-Control': 'public, max-age=2592000',
+    });
+    res.sendFile(path.join(__dirname, 'public', 'logo.svg'));
+});
 
 // ---------------------------------------------------------------------------
 // Helper: render de basis-HTML met per-pagina title/meta/canonical/JSON-LD en
@@ -668,6 +681,15 @@ Allow: /
 User-agent: CCBot
 Allow: /
 
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
 Sitemap: ${BASE_URL}/sitemap.xml
 `;
     res.set({
@@ -703,11 +725,45 @@ const LLMS_FEATURED_SLUGS = [
     'online-fysiek',
 ];
 
+// Korte links naar sitemap-routes die niet in de featured-lijst staan.
+// Volledige titel+meta zou llms.txt te lang maken; alleen opnemen als de slug bestaat.
+const LLMS_EXTRA_ROUTES = [
+    ['fml-uitleg', 'FML-uitleg', 'wat een Functionele Mogelijkhedenlijst is en wie hem opstelt'],
+    ['bezwaar-wia', 'Bezwaar WIA', 'termijn en procedure bij een WIA-beslissing'],
+    ['wia-aanvraag', 'WIA-aanvraag', 'de aanvraag voorbereiden met een arbeidsdeskundig rapport'],
+    ['deskundigenoordeel', 'Deskundigenoordeel', 'wanneer je een deskundigenoordeel bij UWV aanvraagt'],
+    ['hoe-lang-duurt-onderzoek', 'Doorlooptijd', 'hoe lang een arbeidsdeskundig onderzoek duurt'],
+];
+
+// Alleen doelgroepen die personaData (en dus de sitemap) ook echt kent.
+// Eigen korte tekst, zodat llms.txt geen em dash uit een persona-meta overneemt.
+const LLMS_AUDIENCE_BLURBS = {
+    'hr-adviseur': 'Poortwachter-termijnen bij meerdere verzuimdossiers',
+    'werknemer': 'wat een onderzoek inhoudt en welke rechten je hebt',
+    'casemanager': 'een vaste arbeidsdeskundige partner in het re-integratieproces',
+    'wga-specialist': 'onderbouwing bij WHK-premie en WGA-schadelast',
+    'directeur-eigenaar': 'kosten, risico en opbrengst van een onderzoek',
+    'letselschadejurist': 'objectieve onderbouwing van verlies aan verdienvermogen',
+};
+
 function buildLlmsTxt() {
     const featured = LLMS_FEATURED_SLUGS
         .map((slug) => posts.find((p) => p.slug === slug))
         .filter(Boolean)
         .map((p) => `- [${p.title}](${BASE_URL}/kennisbank/${p.slug}): ${p.meta}`)
+        .join('\n');
+
+    const audiences = (Array.isArray(personas) ? personas : [])
+        .filter((p) => p && p.slug)
+        .map((p) => {
+            const blurb = LLMS_AUDIENCE_BLURBS[p.slug] || String(p.label || p.slug);
+            return `- [${p.label}](${BASE_URL}/voor/${p.slug}): ${blurb}`;
+        })
+        .join('\n');
+
+    const extraRoutes = LLMS_EXTRA_ROUTES
+        .filter(([slug]) => posts.some((p) => p.slug === slug))
+        .map(([slug, label, blurb]) => `- [${label}](${BASE_URL}/kennisbank/${slug}): ${blurb}`)
         .join('\n');
 
     return `# arbeidsdeskundig.com
@@ -757,6 +813,10 @@ Complementair, geen concurrentie. [matchvermogen.nl](https://matchvermogen.nl) i
 - [Veelgestelde vragen](${BASE_URL}/veelgestelde-vragen): hub — tarieven en praktijkvragen
 - [Over ons](${BASE_URL}/over-ons): Matchvermogen B.V., team en werkwijze
 
+## Doelgroepen
+
+${audiences}
+
 ## Hulpmiddelen
 
 - [Rekentool](${BASE_URL}/rekentool): tijdwinst en besparing van vroeg starten
@@ -765,6 +825,10 @@ Complementair, geen concurrentie. [matchvermogen.nl](https://matchvermogen.nl) i
 ## Unieke kennisbank-artikelen
 
 ${featured}
+
+## Belangrijke kennisbank-routes
+
+${extraRoutes}
 
 De volledige index staat op ${BASE_URL}/kennisbank en in ${BASE_URL}/sitemap.xml — niet hier herhaald, om dunne duplicaten te voorkomen.
 `;

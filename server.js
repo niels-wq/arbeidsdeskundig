@@ -94,6 +94,9 @@ function extractPosts(html) {
                 meta: field('meta', line),
                 tag: field('tag', line),
                 read: field('read', line),
+                datePublished: field('datePublished', line),
+                dateModified: field('dateModified', line),
+                author: field('author', line),
                 kernpunten: extractBracketArray('kernpunten', line),
                 faq: extractBracketArray('faq', line),
             }))
@@ -302,7 +305,10 @@ function hydrateArtikelView(html, post, body) {
     html = html.replace('id="artikel-titel">Titel</h1>', `id="artikel-titel">${escapeHtml(post.title)}</h1>`);
     html = html.replace('id="artikel-breadcrumb-tag"></span>', `id="artikel-breadcrumb-tag">${escapeHtml(post.tag)}</span>`);
     html = html.replace('id="artikel-breadcrumb-titel"></span>', `id="artikel-breadcrumb-titel">${escapeHtml(post.title)}</span>`);
-    const readLabel = post.read ? `Leestijd: ${escapeHtml(post.read)} · Laatst bijgewerkt: 2026` : 'Laatst bijgewerkt: 2026';
+    const updated = post.dateModified || '2026';
+    const readLabel = post.read
+        ? `Leestijd: ${escapeHtml(post.read)} · Laatst bijgewerkt: ${escapeHtml(updated)}`
+        : `Laatst bijgewerkt: ${escapeHtml(updated)}`;
     html = html.replace('id="artikel-meta">Leestijd: 6 minuten · Laatst bijgewerkt: 2026</p>', `id="artikel-meta">${readLabel}</p>`);
     html = html.replace('id="artikel-metadesc"></p>', `id="artikel-metadesc">${escapeHtml(post.meta || '')}</p>`);
     if (post.kernpunten && post.kernpunten.length) {
@@ -673,10 +679,14 @@ app.get('/kennisbank/:slug', (req, res, next) => {
         articleSection: post.tag,
         keywords: post.tag + ', arbeidsdeskundig onderzoek, Wet Poortwachter',
         inLanguage: 'nl-NL',
-        author: { '@type': 'Organization', name: 'Matchvermogen B.V.' },
+        author: post.author
+            ? { '@type': 'Person', name: post.author, jobTitle: 'geregistreerd arbeidsdeskundige' }
+            : { '@type': 'Organization', name: 'Matchvermogen B.V.' },
         publisher: { '@type': 'Organization', name: 'arbeidsdeskundig.com' },
         mainEntityOfPage: BASE_URL + '/kennisbank/' + post.slug,
     };
+    if (post.datePublished) articleJsonLd.datePublished = post.datePublished;
+    if (post.dateModified) articleJsonLd.dateModified = post.dateModified;
 
     // Alleen artikelen die zelf FAQ-items tonen krijgen FAQPage-schema — niet
     // de site-brede FAQ, zodat we geen identieke FAQ-blokken overal herhalen.
@@ -780,6 +790,7 @@ const LLMS_FEATURED_SLUGS = [
     'wat-doet-arbeidsdeskundige',
     'arbeidsdeskundig-rapport-voorbeeld',
     'arbeidsdeskundig-rapport-checklist',
+    'loonsanctie-voorkomen-dossierfouten',
     'kosten-arbeidsdeskundig-onderzoek',
     'verplicht-arbeidsdeskundig-onderzoek',
     'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',

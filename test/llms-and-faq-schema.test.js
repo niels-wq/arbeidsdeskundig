@@ -72,6 +72,7 @@ describe('llms.txt', () => {
         assert.match(txt, /kennisbank\/wat-doet-arbeidsdeskundige/);
         assert.match(txt, /kennisbank\/arbeidsdeskundig-rapport-voorbeeld/);
         assert.match(txt, /kennisbank\/arbeidsdeskundig-rapport-checklist/);
+        assert.match(txt, /kennisbank\/loonsanctie-voorkomen-dossierfouten/);
         assert.match(txt, /kennisbank\/kosten-arbeidsdeskundig-onderzoek/);
         assert.match(txt, /kennisbank\/second-opinion-arbeidsdeskundige/);
         assert.match(txt, /kennisbank\/deskundigenoordeel-vs-arbeidsdeskundig-onderzoek/);

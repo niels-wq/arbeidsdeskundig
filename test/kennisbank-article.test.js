@@ -503,6 +503,7 @@ const GIDS_CLUSTER = [
     'belastbaarheid-verouderd-nieuwe-fml-izp',
     'arbeidsdeskundig-rapport-voorbeeld',
     'arbeidsdeskundig-rapport-checklist',
+    'loonsanctie-voorkomen-dossierfouten',
     'kosten-arbeidsdeskundig-onderzoek',
     'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
     'verplicht-arbeidsdeskundig-onderzoek',
@@ -1247,6 +1248,122 @@ describe('kennisbank article: arbeidsdeskundig rapport checklist rechtspraak', (
         assert.equal((xml.match(new RegExp(CHECKLIST_SLUG, 'g')) || []).length, 1);
         for (const slug of CHECKLIST_RESERVED) {
             assert.notEqual(slug, CHECKLIST_SLUG);
+            assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
+        }
+    });
+});
+
+const DOSSIER_SLUG = 'loonsanctie-voorkomen-dossierfouten';
+const DOSSIER_PATH = '/kennisbank/' + DOSSIER_SLUG;
+const DOSSIER_RESERVED = [
+    'arbeidsdeskundig-rapport-checklist',
+    'arbeidsdeskundig-onderzoek-gids',
+    'poortwachter-tijdlijn',
+    'riv-toets-bedrijfsarts-leidend',
+    'arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
+    'riv-toets',
+    'spoor-2-zonder-spoor-1-afgerond',
+    'belastbaarheid-verouderd-nieuwe-fml-izp',
+];
+
+describe('kennisbank article: loonsanctie voorkomen dossierfouten', () => {
+    it('serves a prevention checklist with SEO tags, schema and one h1', async () => {
+        const res = await fetch(base + DOSSIER_PATH, GOOGLEBOT);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        assert.match(html, /<title>Loonsanctie voorkomen: 10 dossierfouten die UWV wél ziet — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<meta name="description" content="Loonsanctie voorkomen: dicht de dossiergaten die UWV bij de RIV-toets ziet\. Tien fouten, en waar een tijdig onderzoek helpt\. Vraag een offerte\.">/);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${DOSSIER_PATH}">`));
+        assert.match(html, /"@type":"Article"/);
+        assert.match(html, /"@type":"FAQPage"/);
+        assert.match(html, /"datePublished":"2026-09-29"/);
+        assert.match(html, /"dateModified":"2026-09-29"/);
+        assert.match(html, /"name":"Niels Alderding"/);
+        assert.match(html, /geregistreerd arbeidsdeskundige/);
+        assert.match(html, /<h2[^>]*>Veelgestelde vragen<\/h2>/);
+        assert.match(html, /<div class="view active" id="view-artikel">/);
+        assert.match(html, /<div class="view" id="view-home" hidden>/);
+
+        const h1s = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/g) || [];
+        assert.equal(h1s.length, 1, `expected 1 <h1>, got ${h1s.length}`);
+        assert.match(h1s[0], /id="artikel-titel"/);
+        assert.match(h1s[0], /Loonsanctie voorkomen: 10 dossierfouten die UWV wél ziet/);
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>Loonsanctie voorkomen: 10 dossierfouten die UWV wél ziet<\/h2>/);
+        assert.match(body, /<h3>1\. Geen of te late eerstejaarsevaluatie/);
+        assert.match(body, /<h3>10\. Het RIV-dossier pas vlak voor de WIA/);
+        assert.match(body, /maximaal 52 weken/);
+        assert.match(body, /ECLI:NL:CRVB:2026:834/);
+        assert.match(body, /ECLI:NL:RBGEL:2026:6466/);
+        assert.match(body, /eerste aanleg/);
+        assert.match(body, /geen juridisch advies/);
+        assert.match(body, /zes weken na de eerstejaarsevaluatie/);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /—/);
+        assert.doesNotMatch(body, /bekorten/i);
+        assert.doesNotMatch(body, /sanctierisicoscan/i);
+        assert.doesNotMatch(body, /<h1/i);
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 80).join(' ');
+        assert.match(firstWords, /loonsanctie voorkom je/i);
+        assert.match(firstWords, /RIV-toets/);
+
+        assert.match(body, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"/);
+        assert.match(body, /href="\/kennisbank\/arbeidsdeskundig-rapport-checklist"/);
+        assert.match(body, /href="\/kennisbank\/poortwachter-tijdlijn"/);
+        assert.match(body, /href="\/kennisbank\/riv-toets-bedrijfsarts-leidend"/);
+        assert.match(body, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-na-1-jaar-ziekte"/);
+        assert.match(body, /href="\/offerte-aanvragen"/);
+        assert.match(body, /href="\/aanmelden"/);
+
+        const pages = [];
+        const articles = [];
+        const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+        let m;
+        while ((m = re.exec(html))) {
+            const block = JSON.parse(m[1]);
+            if (block['@type'] === 'FAQPage') pages.push(block);
+            if (block['@type'] === 'Article') articles.push(block);
+        }
+        assert.equal(pages.length, 1);
+        assert.equal(articles.length, 1);
+        assert.equal(articles[0].datePublished, '2026-09-29');
+        assert.equal(articles[0].dateModified, '2026-09-29');
+        assert.equal(articles[0].author['@type'], 'Person');
+        assert.equal(articles[0].author.name, 'Niels Alderding');
+        assert.equal(articles[0].author.jobTitle, 'geregistreerd arbeidsdeskundige');
+        const names = pages[0].mainEntity.map((q) => q.name);
+        assert.ok(names.length >= 4 && names.length <= 6, `expected 4-6 FAQs, got ${names.length}`);
+        assert.ok(names.some((q) => /Hoe voorkom je een loonsanctie/.test(q)));
+        assert.ok(names.some((q) => /checklist voor het arbeidsdeskundig rapport/.test(q)));
+        assert.ok(!names.some((q) => /bekorten/i.test(q)));
+
+        const checklist = await fetch(base + '/kennisbank/arbeidsdeskundig-rapport-checklist', GOOGLEBOT);
+        assert.equal(checklist.status, 200);
+        assert.match(await checklist.text(), /href="\/kennisbank\/loonsanctie-voorkomen-dossierfouten"/);
+        const gids = await fetch(base + '/kennisbank/arbeidsdeskundig-onderzoek-gids', GOOGLEBOT);
+        assert.equal(gids.status, 200);
+        assert.match(await gids.text(), /href="\/kennisbank\/loonsanctie-voorkomen-dossierfouten"/);
+        const tijdlijn = await fetch(base + '/kennisbank/poortwachter-tijdlijn');
+        assert.equal(tijdlijn.status, 200);
+        assert.match(await tijdlijn.text(), /href="\/kennisbank\/loonsanctie-voorkomen-dossierfouten"/);
+    });
+
+    it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {
+        const res = await fetch(base + '/sitemap.xml');
+        assert.equal(res.status, 200);
+        const xml = await res.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${DOSSIER_PATH}`));
+        assert.equal((xml.match(new RegExp(DOSSIER_SLUG, 'g')) || []).length, 1);
+        for (const slug of DOSSIER_RESERVED) {
+            assert.notEqual(slug, DOSSIER_SLUG);
             assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com/kennisbank/${slug}`));
         }
     });

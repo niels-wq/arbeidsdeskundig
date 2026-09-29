@@ -278,6 +278,7 @@ function escapeHtml(str) {
 // can treat that as a thin/soft-404 homepage clone. The HTML `hidden`
 // attribute is a stronger "not in this document" signal; keep it mutually
 // exclusive with `.active` so `.view.active{display:block}` still wins.
+// enforceSingleH1() demotes every other heading so the response has one <h1>.
 function activateView(html, view) {
     const activeId = (!view || view === 'home') ? 'view-home' : 'view-' + view;
     html = html.replace(
@@ -360,6 +361,71 @@ function stripSitewideFaqPage(html) {
     );
 }
 
+function hydratePersonaView(html, persona) {
+    if (!persona) return html;
+    return html.replace(
+        'id="persona-titel">Titel</h1>',
+        `id="persona-titel">${escapeHtml(persona.title)}</h1>`
+    );
+}
+
+// Keep the active view's primary title (class route-h1) as the only <h1>.
+// Tool panels inside /keuzehulp are route-title, not route-h1, so they ship
+// as h2 until the client opens that panel. Inline styles stay on the tag.
+function enforceSingleH1(html, view) {
+    const activeId = (!view || view === 'home') ? 'view-home' : 'view-' + view;
+    const starts = [];
+    const viewRe = /<div class="view(?: active)?" id="(view-[^"]+)"(?: hidden)?>/g;
+    let vm;
+    while ((vm = viewRe.exec(html))) starts.push({ id: vm[1], index: vm.index });
+
+    function viewAt(index) {
+        let current = null;
+        for (const s of starts) {
+            if (s.index <= index) current = s.id;
+            else break;
+        }
+        return current;
+    }
+
+    const h1Re = /<h1\b([^>]*)>([\s\S]*?)<\/h1>/g;
+    const matches = [];
+    let m;
+    while ((m = h1Re.exec(html))) {
+        matches.push({
+            index: m.index,
+            length: m[0].length,
+            attrs: m[1],
+            inner: m[2],
+            full: m[0],
+        });
+    }
+    if (!matches.length) return html;
+
+    let keeper = null;
+    for (const item of matches) {
+        if (viewAt(item.index) !== activeId) continue;
+        if (/\broute-h1\b/.test(item.attrs)) {
+            keeper = item;
+            break;
+        }
+    }
+    if (!keeper) {
+        keeper = matches.find((item) => viewAt(item.index) === activeId) || null;
+    }
+    if (!keeper) return html;
+
+    let out = '';
+    let cursor = 0;
+    for (const item of matches) {
+        out += html.slice(cursor, item.index);
+        out += item === keeper ? item.full : `<h2${item.attrs}>${item.inner}</h2>`;
+        cursor = item.index + item.length;
+    }
+    out += html.slice(cursor);
+    return out;
+}
+
 function hydrateFaqView(html, faqs) {
     if (!faqs || !faqs.length) return html;
     const faqHtml = faqs.map(([q, a]) => (
@@ -385,9 +451,14 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
         const post = posts.find((p) => p.slug === route.slug);
         html = hydrateArtikelView(html, post, articleBodies[route.slug]);
     }
+    if (route && route.view === 'persona' && route.slug) {
+        const persona = personas.find((p) => p.slug === route.slug);
+        html = hydratePersonaView(html, persona);
+    }
     if (route && route.view === 'faq') {
         html = hydrateFaqView(html, siteFaqs);
     }
+    html = enforceSingleH1(html, route && route.view);
     html = stripSitewideFaqPage(html);
 
     // <title>

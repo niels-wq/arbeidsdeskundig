@@ -175,7 +175,8 @@
   section{padding:56px 0;}
   .hero{padding-top:52px; padding-bottom:36px;}
   .eyebrow{font-size:.75rem; letter-spacing:.12em; text-transform:uppercase; color:var(--teal); font-weight:600;}
-  h1.hero-title{font-size:clamp(2rem,5vw,3.2rem); font-weight:700; line-height:1.1; margin:12px 0 0; color:var(--ink);}
+  .route-h1:not(.hero-title), .route-title{font-weight:700; margin-bottom:0.67em;}
+  .hero-title{font-size:clamp(2rem,5vw,3.2rem); font-weight:700; line-height:1.1; margin:12px 0 0; color:var(--ink);}
   .hero-sub{max-width:600px; margin-top:16px; font-size:1.05rem; color:var(--muted); line-height:1.55;}
   .hero-actions{display:flex; flex-wrap:wrap; gap:12px; margin-top:24px;}
   .trust-line{margin-top:20px; font-size:.9rem; color:var(--muted2);}
@@ -486,7 +487,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     <div class="hero-grid">
       <div>
         <p class="eyebrow">Online én fysiek, door heel Nederland · UWV-proof</p>
-        <h1 class="hero-title">Arbeidsdeskundig onderzoek. Vanaf €1.095,-.</h1>
+        <h1 class="hero-title route-h1">Arbeidsdeskundig onderzoek. Vanaf €1.095,-.</h1>
         <p class="hero-sub">Binnen 24 uur opgepakt. Standaard online voor maximale snelheid — een fysiek bezoek op locatie is altijd bespreekbaar. Het voelt soms als een aftikkertje voor de Wet Poortwachter, en dat tempo respecteren we. Maar we zorgen er wel voor dat het een waardevol onderzoek blijft: we denken graag verder met je mee waar dat kansen oplevert.</p>
         <div class="hero-actions">
           <button class="btn-primary" onclick="setView('offerte')">Direct offerte & planning</button>
@@ -810,7 +811,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 <div class="view" id="view-calculator" hidden>
   <div class="wrap" style="max-width:880px; padding-top:48px; padding-bottom:64px;">
     <p class="eyebrow">Rekentool</p>
-    <h1 style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Eerder starten = eerder klaar</h1>
+    <h1 class="route-h1" style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Eerder starten = eerder klaar</h1>
     <p style="margin-top:12px; font-size:.92rem; color:var(--muted); max-width:640px;">Deze rekentool laat zien hoeveel tijd én geld je bespaart door nu te starten in plaats van te wachten tot het gebruikelijke moment (meestal rond de eerstejaars-evaluatie). Hoe eerder je bent, hoe groter het voordeel — hoe later, hoe kleiner. Ook de Ziektewet valt gewoon onder de Wet Verbetering Poortwachter: ook daar levert eerder starten tijdwinst op.</p>
 
     <div class="card" style="margin-top:20px; padding:20px 24px; background:var(--panel); border:1px dashed var(--rule);">
@@ -988,7 +989,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 <div class="view" id="view-offerte" hidden>
   <div class="wrap" style="max-width:640px; padding-top:40px; padding-bottom:64px;">
     <p class="eyebrow">Vrijblijvende offerte</p>
-    <h1 style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Vraag je offerte aan — vanaf €1.095,-</h1>
+    <h1 class="route-h1" style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Vraag je offerte aan — vanaf €1.095,-</h1>
     <p style="margin-top:10px; font-size:.95rem; color:var(--muted);">Twee minuten werk. Geen verplichting: je zit nergens aan vast totdat je zelf akkoord geeft.</p>
     <div class="conv-proof" aria-label="Belangrijkste voordelen">
       <span><b>Vanaf €1.095,-</b> excl. btw</span>
@@ -1153,7 +1154,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 <div class="view" id="view-fysiek-tarief" hidden>
   <div class="wrap" style="max-width:640px; padding-top:48px; padding-bottom:64px;">
     <p class="eyebrow">Twijfel over het fysieke tarief</p>
-    <h1 style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Vind je het tarief voor fysiek onderzoek aan de hoge kant?</h1>
+    <h1 class="route-h1" style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Vind je het tarief voor fysiek onderzoek aan de hoge kant?</h1>
     <p style="margin-top:14px; font-size:.95rem; color:var(--muted); line-height:1.7;">Een fysiek onderzoek kost meer dan een online onderzoek, simpelweg omdat er reistijd en een bezoek op locatie bij komt kijken. Toch snappen we dat dit soms net het verschil maakt in een besluit — en daarom kijken we in bepaalde gevallen graag mee of er ruimte is.</p>
 
     <div class="card" style="margin-top:24px; padding:20px 24px; background:#FCF6E9; border:1px dashed var(--amber);">
@@ -1174,7 +1175,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 <div class="view" id="view-aanmelden" hidden>
   <div class="wrap" style="max-width:760px; padding-top:40px; padding-bottom:64px;">
     <p class="eyebrow">Aanmelden</p>
-    <h1 style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Meld je onderzoek aan — vanaf €1.095,-</h1>
+    <h1 class="route-h1" style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Meld je onderzoek aan — vanaf €1.095,-</h1>
     <p style="margin-top:10px; font-size:.95rem; color:var(--muted); max-width:620px;">Zes korte stappen, inclusief ondertekening. We pakken je aanmelding <strong>binnen 24 uur</strong> op.</p>
     <div class="conv-proof" aria-label="Belangrijkste voordelen">
       <span><b>Vanaf €1.095,-</b> excl. btw</span>
@@ -1455,7 +1456,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 <div class="view" id="view-faq" hidden>
   <div class="wrap" style="max-width:820px; padding-top:48px; padding-bottom:64px;">
     <p class="eyebrow">Veelgestelde vragen</p>
-    <h1 style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Alles wat je wilt weten over arbeidsdeskundig onderzoek</h1>
+    <h1 class="route-h1" style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Alles wat je wilt weten over arbeidsdeskundig onderzoek</h1>
     <div class="card" style="margin-top:20px;">
       <p class="eyebrow" style="color:var(--muted2);">Tarieven (online, excl. btw)</p>
       <div class="grid3" style="margin-top:12px;">
@@ -1476,7 +1477,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     <div class="kb-intro">
       <div>
         <p class="eyebrow">Kennisbank</p>
-        <h1 style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Alles over arbeidsdeskundig onderzoek</h1>
+        <h1 class="route-h1" style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Alles over arbeidsdeskundig onderzoek</h1>
         <p style="margin-top:10px; font-size:.9rem; color:var(--muted); max-width:600px;">Diepgaande, up-to-date artikelen per onderwerp — geschreven om je écht verder te helpen, niet alleen om te scoren in Google. Het cluster <em>arbeidsdeskundig onderzoek</em> start bij de <a class="blog-link" href="/kennisbank/arbeidsdeskundig-onderzoek-gids" onclick="event.preventDefault(); openArtikel('arbeidsdeskundig-onderzoek-gids')">gids</a>.</p>
       </div>
       <div class="card kb-intro-cta" id="kb-intro-cta">
@@ -1498,7 +1499,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <button class="btn-link" style="font-size:.76rem;" onclick="setView('kennisbank')">Kennisbank</button> / <span id="artikel-breadcrumb-tag"></span> / <span id="artikel-breadcrumb-titel"></span>
     </p>
     <button class="eyebrow btn-link" style="margin-top:16px; background:none; border:none; padding:0; cursor:pointer;" id="artikel-tag" onclick="filterKennisbankVanArtikel()">Ziektewet</button>
-    <h1 style="font-size:2.1rem; color:var(--ink); margin-top:8px;" id="artikel-titel">Titel</h1>
+    <h1 class="route-h1" style="font-size:2.1rem; color:var(--ink); margin-top:8px;" id="artikel-titel">Titel</h1>
     <p style="margin-top:8px; font-size:.8rem; color:var(--muted2);" id="artikel-meta">Leestijd: 6 minuten · Laatst bijgewerkt: 2026</p>
     <div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
       <img src="/assets/niels-foto.png?v=2" alt="Niels Alderding" loading="lazy" style="width:28px; height:28px; border-radius:50%; object-fit:cover; flex-shrink:0;" onerror="this.style.display='none';">
@@ -1536,7 +1537,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <button class="btn-link" style="font-size:.76rem;" onclick="setView('home')">Home</button> / <span id="persona-breadcrumb"></span>
     </p>
     <p class="eyebrow" style="margin-top:16px;">Voor <span id="persona-label"></span></p>
-    <h1 style="font-size:2.1rem; color:var(--ink); margin-top:8px;" id="persona-titel">Titel</h1>
+    <h1 class="route-h1" style="font-size:2.1rem; color:var(--ink); margin-top:8px;" id="persona-titel">Titel</h1>
     <p style="margin-top:14px; font-size:1rem; color:var(--muted); max-width:680px;" id="persona-intro"></p>
 
     <div class="grid2" style="margin-top:28px; gap:16px;" id="persona-kernpunten"></div>
@@ -1564,7 +1565,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 
     <div id="advies-chooser">
       <p class="eyebrow">Tools</p>
-      <h1 style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Waar wil je hulp bij?</h1>
+      <h1 class="route-h1" style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Waar wil je hulp bij?</h1>
       <p style="margin-top:10px; font-size:.92rem; color:var(--muted); max-width:640px;">Vijf gratis tools, elk gericht op een andere vraag binnen de Wet Poortwachter. Kies hieronder — je kunt altijd nog wisselen.</p>
       <div class="grid3 advies-choice-grid" style="margin-top:28px; gap:20px;">
         <button class="advies-choice-card" onclick="setView('calculator')">
@@ -1618,7 +1619,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     <div id="advies-section-keuzehulp" class="hidden">
       <button class="btn-link" style="margin-bottom:16px;" onclick="chooseAdviesTool(null)">← Andere tool kiezen</button>
       <p class="eyebrow">Gratis keuzehulp</p>
-    <h1 style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Online of fysiek onderzoek — wat past bij jouw situatie?</h1>
+    <h1 class="route-title" style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Online of fysiek onderzoek — wat past bij jouw situatie?</h1>
     <p style="margin-top:10px; font-size:.92rem; color:var(--muted); max-width:640px;">In circa 80% van de gevallen kan een arbeidsdeskundig onderzoek prima online plaatsvinden. Maar een fysiek onderzoek is soms écht noodzakelijk — dit is geen kwestie van voorkeur, en juist daarom is extra controle vooraf gewenst. Beantwoord twee korte vragen en we geven direct een richting. Twijfel je nog? We adviseren je hier altijd vrijblijvend in, ook telefonisch.</p>
 
     <div class="card" style="margin-top:20px; padding:20px 24px; background:var(--panel); border:1px dashed var(--rule);">
@@ -1675,7 +1676,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     </div>
 
     <p class="eyebrow" style="margin-top:24px;">Adviestool — Spoor 2 &amp; IVA</p>
-    <h2 style="font-size:1.7rem; color:var(--ink); margin-top:8px;">Concept-onderbouwing genereren</h2>
+    <h2 class="route-title" style="font-size:1.7rem; color:var(--ink); margin-top:8px;">Concept-onderbouwing genereren</h2>
     <p style="margin-top:10px; font-size:.88rem; color:var(--muted); max-width:640px;">Gebaseerd op de Werkwijzer Poortwachter en de gehanteerde beslislogica. Vul in wat bekend is uit het dossier — velden die niet van toepassing zijn, laat je leeg.</p>
 
     <div class="card reveal" id="ad-cta-wia" style="margin-top:20px; padding:18px 22px; border-left:4px solid var(--amber); display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between;">
@@ -1756,7 +1757,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     <div id="advies-section-poortwachter" class="hidden">
       <button class="btn-link" style="margin-bottom:16px;" onclick="chooseAdviesTool(null)">← Andere tool kiezen</button>
       <p class="eyebrow">Poortwachter-deadlines</p>
-      <h1 style="font-size:1.7rem; color:var(--ink); margin-top:8px;">Alle wettelijke data op een rij</h1>
+      <h1 class="route-title" style="font-size:1.7rem; color:var(--ink); margin-top:8px;">Alle wettelijke data op een rij</h1>
       <p style="margin-top:10px; font-size:.9rem; color:var(--muted); max-width:560px;">Vul de eerste ziektedag in en zie direct wanneer elke Poortwachter-mijlpaal valt.</p>
 
       <label class="field" style="margin-top:20px; max-width:280px;">
@@ -1779,7 +1780,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     <div id="advies-section-risicoscan" class="hidden">
       <button class="btn-link" style="margin-bottom:16px;" onclick="chooseAdviesTool(null)">← Andere tool kiezen</button>
       <p class="eyebrow">Loonsanctie-risicoscan</p>
-      <h1 style="font-size:1.7rem; color:var(--ink); margin-top:8px;">Hoe groot is het risico in dit dossier?</h1>
+      <h1 class="route-title" style="font-size:1.7rem; color:var(--ink); margin-top:8px;">Hoe groot is het risico in dit dossier?</h1>
       <p style="margin-top:10px; font-size:.9rem; color:var(--muted); max-width:560px;">Vijf korte vragen. Puur indicatief — geen vervanging van een echte beoordeling, wel een eerlijk startpunt.</p>
 
       <div style="margin-top:24px; display:flex; flex-direction:column; gap:20px; max-width:560px;">
@@ -1842,7 +1843,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 <div class="view" id="view-over" hidden>
   <div class="wrap" style="padding-top:48px; padding-bottom:64px;">
     <p class="eyebrow">Over ons</p>
-    <h1 style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Onderdeel van Matchvermogen B.V.</h1>
+    <h1 class="route-h1" style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Onderdeel van Matchvermogen B.V.</h1>
     <p style="margin-top:16px; color:var(--muted); max-width:680px;">arbeidsdeskundig.com is mede mogelijk gemaakt door <a href="https://matchvermogen.nl" target="_blank" rel="noopener" class="blog-link">Matchvermogen B.V.</a> — sinds 2019 actief in arbeidsdeskundig onderzoek, WHK-advies en re-integratie, door heel Nederland. Via ons dochterbedrijf <a href="https://bestmatchbv.nl" target="_blank" rel="noopener" class="blog-link">Best Match Re-integratie</a> regelen we ook spoor 2 en spoor 3, en via <a href="https://werkhervattingskas.nl" target="_blank" rel="noopener" class="blog-link">werkhervattingskas.nl</a> helpen we werkgevers grip te krijgen op hun gedifferentieerde WGA- en Ziektewet-premie.</p>
 
     <div class="hero-grid" style="margin-top:36px;">
@@ -2377,6 +2378,40 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       }
     }
     if(view === 'home') applyHomeHash();
+    syncPageHeadings(view);
+  }
+
+  function retagHeading(el, tag){
+    if(!el || el.tagName.toLowerCase() === tag) return el;
+    const next = document.createElement(tag);
+    for(const attr of el.attributes) next.setAttribute(attr.name, attr.value);
+    while(el.firstChild) next.appendChild(el.firstChild);
+    el.replaceWith(next);
+    return next;
+  }
+
+  // Eén h1 per scherm: de titel van de actieve view (of de open adviestool).
+  // Inactieve views blijven in het document, maar hun titel is dan een h2.
+  function syncPageHeadings(view){
+    const active = document.getElementById('view-' + view);
+    let keeper = null;
+    if(view === 'advies' && typeof ADVIES_TOOL_KEYS !== 'undefined'){
+      for(const key of ADVIES_TOOL_KEYS){
+        const section = document.getElementById('advies-section-' + key);
+        if(section && !section.classList.contains('hidden')){
+          keeper = section.querySelector('.route-title');
+          break;
+        }
+      }
+    }
+    if(!keeper && active) keeper = active.querySelector('.route-h1');
+    document.querySelectorAll('.route-h1, .route-title').forEach(el=>{
+      const next = retagHeading(el, el === keeper ? 'h1' : 'h2');
+      if(el === keeper) keeper = next;
+    });
+    document.querySelectorAll('h1').forEach(el=>{
+      if(el !== keeper) retagHeading(el, 'h2');
+    });
   }
 
   function goHomeSection(id, ev){
@@ -5857,6 +5892,7 @@ whk: `
     justShown.classList.add('checklist-anim-item');
     if(tool) trackEvent('advies_tool_gekozen', { tool });
     if(tool === 'risicoscan') berekenRisicoscan();
+    syncPageHeadings('advies');
   }
 
   function khBind(id, key){

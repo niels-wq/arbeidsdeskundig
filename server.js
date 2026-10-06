@@ -91,6 +91,7 @@ function extractPosts(html) {
             .map((line) => ({
                 slug: field('slug', line),
                 title: field('title', line),
+                seoTitle: field('seoTitle', line),
                 meta: field('meta', line),
                 tag: field('tag', line),
                 read: field('read', line),
@@ -693,7 +694,7 @@ app.get('/kennisbank/:slug', (req, res, next) => {
     const faqJsonLd = (post.faq && post.faq.length) ? faqPageJsonLd(post.faq) : null;
 
     renderPage(res, {
-        title: post.title + ' — arbeidsdeskundig.com',
+        title: post.seoTitle || (post.title + ' — arbeidsdeskundig.com'),
         description: post.meta,
         canonicalPath: '/kennisbank/' + post.slug,
         route: { view: 'artikel', slug: post.slug },
@@ -786,6 +787,7 @@ Sitemap: ${BASE_URL}/sitemap.xml
 // kan alleen helpen bij vindbaarheid in ChatGPT/Perplexity/Claude e.d.
 // ---------------------------------------------------------------------------
 const LLMS_FEATURED_SLUGS = [
+    'urenopbouw-stagneert-arbeidsdeskundig-onderzoek',
     'arbeidsdeskundig-onderzoek-gids',
     'wat-doet-arbeidsdeskundige',
     'arbeidsdeskundig-rapport-voorbeeld',

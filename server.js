@@ -20,6 +20,7 @@ const {
     validateChecklistLead,
     validateBelMeTerugLead,
 } = require('./lead-validation');
+const { createChat } = require('./chat');
 
 const app = express();
 
@@ -219,6 +220,14 @@ app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 app.use(express.json({ limit: '200kb' }));
+
+// Preview-omgevingen (bijv. de chatbot-preview op *.up.railway.app) mogen niet
+// in Google komen: NOINDEX=true zet op elke response X-Robots-Tag: noindex.
+// Productie zet deze variabele niet, dan verandert er niets.
+app.use((req, res, next) => {
+    if (String(process.env.NOINDEX || '').toLowerCase() === 'true') res.set('X-Robots-Tag', 'noindex, nofollow');
+    next();
+});
 
 // SEO: forceer één canonieke versie van de site. Zonder dit ziet Google
 // arbeidsdeskundig.com én www.arbeidsdeskundig.com als twee aparte URL's met
@@ -507,6 +516,11 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
     html = html.replace('</head>', analyticsIdsScript + '</head>');
 
     // __ROUTE__ injecteren zodat de client meteen de juiste view rendert.
+    // Chatbot + contactknop (preview): alleen als CHAT_WIDGET_ENABLED=true. Staat de
+    // vlag uit, dan is snippet() leeg en blijft de HTML exact gelijk.
+    const chatSnippet = chat.snippet();
+    if (chatSnippet) html = html.replace('</body>', chatSnippet + '</body>');
+
     const routeScript = `<script>window.__ROUTE__ = ${JSON.stringify(route)};</script>\n`;
     html = html.replace('<script>', routeScript + '<script>');
 
@@ -1001,7 +1015,7 @@ function ignoreHoneypot(res, fields, label) {
 function offerteMailFields(lead) {
     const bronLabel = lead.bron === 'offerte-pdf'
         ? 'PDF-offerte'
-        : (lead.bron === 'offerte-contact' ? 'Contactverzoek' : 'Offerte');
+        : (lead.bron === 'offerte-contact' ? 'Contactverzoek' : (lead.bron === 'chat' ? 'Chatbot (formulier)' : 'Offerte'));
     return {
         Aanvraag: bronLabel,
         Dienst: lead.dienst || 'Arbeidsdeskundig onderzoek',
@@ -1487,6 +1501,21 @@ app.post('/api/bel-me-terug', async (req, res) => {
     }
     res.json({ ok: true });
 });
+
+// ---------------------------------------------------------------------------
+// Chatbot + contactknop (PREVIEW, standaard UIT). Zie chat/index.js.
+// Aan met CHAT_WIDGET_ENABLED=true; xAI-sleutel alleen via XAI_API_KEY (Railway
+// variable). De kennis komt uitsluitend van deze site: llms.txt, de site-FAQ en
+// de kennisbanklijst. Leads gaan via deliverSalesLead (zelfde mailflow als
+// /api/offerte); het formulier in de chat post naar /api/offerte met bron "chat".
+// ---------------------------------------------------------------------------
+const chat = createChat({
+    getKnowledge: () => ({ llmsTxt: buildLlmsTxt(), faqs: siteFaqs, posts }),
+    deliverLead: deliverSalesLead,
+    escapeHtml,
+    fieldsToHtml,
+});
+chat.register(app);
 
 // Google Search Console eigendomsverificatie (HTML-bestandsmethode). De inhoud
 // moet exact overeenkomen met wat Google in het te downloaden bestand zet.

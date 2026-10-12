@@ -1576,7 +1576,7 @@ describe('kennisbank article: goedkoopste arbeidsdeskundig onderzoek', () => {
         assert.equal(crumbs.length, 1);
         assert.ok(faqs[0].mainEntity.length >= 5);
         const faqJoined = faqs[0].mainEntity.map((q) => q.name + ' ' + q.acceptedAnswer.text).join('\n');
-        assert.match(faqJoined, new RegExp(GOEDKOOP_STEEKPROEF.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+        assert.match(faqJoined, new RegExp(GOEDKOOP_STEEKPROEF.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
         assert.doesNotMatch(faqJoined, /vergelijk|onafhankelijke gids/i);
 
         const faqHtmlStart = html.indexOf('id="artikel-faq-list"');

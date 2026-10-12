@@ -1525,8 +1525,9 @@ describe('kennisbank article: goedkoopste arbeidsdeskundig onderzoek', () => {
         assert.match(body, /maximaal 52 weken/);
         assert.match(body, /11%/);
         assert.match(body, /2018/);
-        assert.match(body, /<!-- TODO MV-URL -->/);
-        assert.match(body, /href="https:\/\/matchvermogen\.nl\/arbeidsdeskundig-onderzoek\/"/);
+        assert.doesNotMatch(body, /TODO MV-URL/);
+        assert.match(body, /href="https:\/\/matchvermogen\.nl\/goedkoop-arbeidsdeskundig-onderzoek\/"/);
+        assert.match(body, /goedkoop arbeidsdeskundig onderzoek: waar je als werkgever echt op bespaart/);
         assert.match(body, /href="\/kennisbank\/kosten-arbeidsdeskundig-onderzoek"/);
         assert.match(body, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"/);
         assert.match(body, /href="\/kennisbank\/loonsanctie-voorkomen-dossierfouten"/);

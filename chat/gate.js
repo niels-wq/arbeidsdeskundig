@@ -10,8 +10,9 @@
 const OWN_PHONES = new Set(['0850870307', '0650213593']);
 const OWN_EMAIL_RE = /@(arbeidsdeskundig\.com|matchvermogen\.nl|bestmatchbv\.nl)$/i;
 
-// Tarieven van de site (2026, excl. btw), zie /llms.txt en de offerte-PDF in server.js.
-const TARIFFS = { klein: 1095, midden: 1125, groot: 1395, fysiek: 295, spoed: 300 };
+// Tarieven van de site (2027, excl. btw), zie /llms.txt en de offerte-PDF in server.js.
+// Geen 2027-tarieflijst voor toeslagen in de repo: fysiek en spoed blijven 295 en 300.
+const TARIFFS = { klein: 1149, midden: 1179, groot: 1449, fysiek: 295, spoed: 300 };
 
 function normalizePhone(raw) {
     const s = String(raw || '').trim();

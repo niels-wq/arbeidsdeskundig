@@ -318,6 +318,11 @@ function hydrateArtikelView(html, post, body) {
             'id="artikel-kernpunten" style="margin:8px 0 0; padding-left:18px; font-size:.87rem; color:var(--muted); line-height:1.6;"></ul>',
             `id="artikel-kernpunten" style="margin:8px 0 0; padding-left:18px; font-size:.87rem; color:var(--muted); line-height:1.6;">${items}</ul>`
         );
+    } else {
+        html = html.replace(
+            'class="card" id="artikel-kernpunten-wrap"',
+            'class="card hidden" id="artikel-kernpunten-wrap"'
+        );
     }
     if (body) {
         html = html.replace('id="artikel-body"></div>', `id="artikel-body">${body}</div>`);
@@ -787,6 +792,7 @@ Sitemap: ${BASE_URL}/sitemap.xml
 // kan alleen helpen bij vindbaarheid in ChatGPT/Perplexity/Claude e.d.
 // ---------------------------------------------------------------------------
 const LLMS_FEATURED_SLUGS = [
+    'goedkoopste-arbeidsdeskundig-onderzoek',
     'urenopbouw-stagneert-arbeidsdeskundig-onderzoek',
     'arbeidsdeskundig-onderzoek-gids',
     'wat-doet-arbeidsdeskundige',

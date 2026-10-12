@@ -534,7 +534,7 @@ describe('kennisbank hub: gids arbeidsdeskundig onderzoek', () => {
         const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
         assert.ok(h1Match, 'SSR H1 missing');
         assert.equal(h1Match[1], 'Alles over arbeidsdeskundig onderzoek: de gids');
-        assert.notEqual(h1Match[1], 'Arbeidsdeskundig onderzoek. Vanaf €1.095,-.');
+        assert.notEqual(h1Match[1], 'Arbeidsdeskundig onderzoek. Vanaf €1.149,-.');
         assert.notEqual(h1Match[1], 'Alles over arbeidsdeskundig onderzoek');
 
         const marker = 'id="artikel-body">';
@@ -554,7 +554,7 @@ describe('kennisbank hub: gids arbeidsdeskundig onderzoek', () => {
         assert.match(body, /matchvermogen\.nl/);
         assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
         assert.doesNotMatch(body, /Doe de gratis keuzehulp/);
-        assert.doesNotMatch(body, /Vanaf €1\.095/);
+        assert.doesNotMatch(body, /Vanaf €1\.149/);
 
         const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 80).join(' ');
         assert.match(firstWords, /gids arbeidsdeskundig onderzoek/i);
@@ -1474,6 +1474,141 @@ describe('kennisbank article: urenopbouw stagneert', () => {
             const rel = await fetch(base + related, GOOGLEBOT);
             assert.equal(rel.status, 200);
             assert.match(await rel.text(), new RegExp(`href="${UREN_PATH}"`));
+        }
+    });
+});
+
+const GOEDKOOP_SLUG = 'goedkoopste-arbeidsdeskundig-onderzoek';
+const GOEDKOOP_PATH = '/kennisbank/' + GOEDKOOP_SLUG;
+const GOEDKOOP_TITLE = 'Goedkoopste arbeidsdeskundig onderzoek | Arbeidsdeskundig.com';
+const GOEDKOOP_H1 = 'Goedkoopste arbeidsdeskundig onderzoek: waar je op let (2026)';
+const GOEDKOOP_META = 'Goedkoopste arbeidsdeskundig onderzoek: waar je op let bij prijs, kwaliteit en de RIV-toets. Steekproef van openbare tarieven, oktober 2026.';
+const GOEDKOOP_STEEKPROEF = 'steekproef van 9 openbare tarieflijsten (oktober 2026): laagste ca. € 1.049, hoogste ca. € 1.625 excl. btw, middengebied ca. € 1.250-1.400';
+
+describe('kennisbank article: goedkoopste arbeidsdeskundig onderzoek', () => {
+    it('serves 200 with one h1, schema, sourced ranges and listing', async () => {
+        const res = await fetch(base + GOEDKOOP_PATH, GOOGLEBOT);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        const title = html.match(/<title>([^<]+)<\/title>/)[1];
+        assert.equal(title, GOEDKOOP_TITLE);
+        assert.ok(title.endsWith(' | Arbeidsdeskundig.com'));
+
+        const desc = html.match(/<meta name="description" content="([^"]*)">/)[1];
+        assert.equal(desc, GOEDKOOP_META);
+        assert.ok(desc.length >= 140 && desc.length <= 155, `meta length ${desc.length}`);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${GOEDKOOP_PATH}">`));
+
+        const h1s = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/g) || [];
+        assert.equal(h1s.length, 1, `expected 1 <h1>, got ${h1s.length}`);
+        assert.equal((html.match(/<h1/g) || []).length, 1);
+        assert.match(h1s[0], /id="artikel-titel"/);
+        assert.match(h1s[0], /Goedkoopste arbeidsdeskundig onderzoek: waar je op let \(2026\)/);
+        assert.doesNotMatch(h1s[0], /onafhankelijke gids/i);
+        assert.doesNotMatch(title + ' ' + desc, /vergelijk|onafhankelijke gids/i);
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>In het kort<\/h2>/);
+        assert.match(body, /<h2>Wanneer de laagste prijs een voordeel is<\/h2>/);
+        assert.match(body, /<h2>Wanneer de laagste prijs een nadeel is<\/h2>/);
+        assert.match(body, /<h2>Checklist voor de offerte<\/h2>/);
+        assert.match(body, /<h2>Openbare tarieven, oktober 2026<\/h2>/);
+        assert.match(body, /<h2>Cijfers zonder bruikbare openbare bron<\/h2>/);
+        assert.match(body, /<h2>Hoe wij het doen<\/h2>/);
+        assert.match(body, new RegExp(GOEDKOOP_STEEKPROEF.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+        assert.match(body, /draagkracht van de onderneming/);
+        assert.match(body, /tussen hoog en laag/);
+        assert.match(body, /vanaf € 1\.149/);
+        assert.doesNotMatch(body, /<table/i);
+        assert.doesNotMatch(body, /vergelijk/i);
+        assert.doesNotMatch(body, /onafhankelijke gids/i);
+        for (const name of ['Arbeidskenners', 'Mieke Zwenger', 'Comens', 'FIT Verzuimbeheer', 'Elabo', 'Arbo Werkt', 'Capability', 'Leuk Personeel', 'Amplooi', 'arbeidskenners.nl', 'miekezwenger.nl', 'comens.nl', 'fitverzuimbeheer.nl', 'elabo.nl', 'arbowerkt.nl', 'capability.nl', 'leukpersoneel.nl', 'amplooi.nl']) {
+            assert.doesNotMatch(body, new RegExp(name, 'i'));
+        }
+        assert.match(body, /geen openbare bron/i);
+        assert.match(body, /een rechtbank oordeelde|Beleidsregel kosten aanvraag deskundigenoordeel/);
+        assert.match(body, /maximaal 52 weken/);
+        assert.match(body, /11%/);
+        assert.match(body, /2018/);
+        assert.doesNotMatch(body, /TODO MV-URL/);
+        assert.match(body, /href="https:\/\/matchvermogen\.nl\/goedkoop-arbeidsdeskundig-onderzoek\/"/);
+        assert.match(body, /goedkoop arbeidsdeskundig onderzoek: waar je als werkgever echt op bespaart/);
+        assert.match(body, /href="\/kennisbank\/kosten-arbeidsdeskundig-onderzoek"/);
+        assert.match(body, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"/);
+        assert.match(body, /href="\/kennisbank\/loonsanctie-voorkomen-dossierfouten"/);
+        assert.match(body, /href="\/kennisbank\/second-opinion-arbeidsdeskundige"/);
+        assert.match(body, /href="\/offerte-aanvragen"/);
+        assert.match(body, /href="\/keuzehulp"/);
+        assert.match(body, /goedkoop arbeidsdeskundig onderzoek/i);
+        assert.doesNotMatch(body, /—/);
+        assert.doesNotMatch(body, /–/);
+        assert.doesNotMatch(body, /<h1/i);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 80).join(' ');
+        assert.match(firstWords, /goedkoopste arbeidsdeskundig onderzoek/i);
+        assert.match(firstWords, /ca\. € 1\.049/);
+        const inHetKortAt = body.indexOf('In het kort');
+        const firstPEnd = body.indexOf('</p>');
+        assert.ok(inHetKortAt > firstPEnd, 'In het kort should follow the opening answer');
+
+        const blocks = [];
+        const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+        let m;
+        while ((m = re.exec(html))) blocks.push(JSON.parse(m[1]));
+        const articles = blocks.filter((b) => b['@type'] === 'Article');
+        const faqs = blocks.filter((b) => b['@type'] === 'FAQPage');
+        const crumbs = blocks.filter((b) => b['@type'] === 'BreadcrumbList');
+        assert.equal(articles.length, 1);
+        assert.equal(articles[0].headline, GOEDKOOP_H1);
+        assert.equal(articles[0].datePublished, '2026-10-12');
+        assert.equal(articles[0].dateModified, '2026-10-12');
+        assert.equal(articles[0].author.name, 'Niels Alderding');
+        assert.equal(articles[0].author.jobTitle, 'geregistreerd arbeidsdeskundige');
+        assert.doesNotMatch(articles[0].headline + ' ' + articles[0].description + ' ' + (articles[0].keywords || ''), /vergelijk|onafhankelijke gids/i);
+        assert.equal(faqs.length, 1);
+        assert.equal(crumbs.length, 1);
+        assert.ok(faqs[0].mainEntity.length >= 5);
+        const faqJoined = faqs[0].mainEntity.map((q) => q.name + ' ' + q.acceptedAnswer.text).join('\n');
+        assert.match(faqJoined, new RegExp(GOEDKOOP_STEEKPROEF.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
+        assert.doesNotMatch(faqJoined, /vergelijk|onafhankelijke gids/i);
+
+        const faqHtmlStart = html.indexOf('id="artikel-faq-list"');
+        const faqHtmlEnd = html.indexOf('Nog een vraag over jouw specifieke dossier', faqHtmlStart);
+        const faqHtml = html.slice(faqHtmlStart, faqHtmlEnd);
+        assert.match(html, /<h2[^>]*>Veelgestelde vragen<\/h2>/);
+        const visible = [...faqHtml.matchAll(/<button class="accordion-head"[^>]*>([\s\S]*?)<span class="accordion-icon">\+<\/span><\/button>\s*<div class="accordion-body"[^>]*><div class="accordion-body-inner">([\s\S]*?)<\/div>/g)];
+        assert.equal(visible.length, faqs[0].mainEntity.length);
+        faqs[0].mainEntity.forEach((q, i) => {
+            assert.equal(visible[i][1], q.name);
+            assert.equal(visible[i][2], q.acceptedAnswer.text);
+        });
+
+        const map = await fetch(base + '/sitemap.xml');
+        assert.equal(map.status, 200);
+        const xml = await map.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${GOEDKOOP_PATH}`));
+        assert.equal((xml.match(new RegExp(GOEDKOOP_SLUG, 'g')) || []).length, 1);
+
+        const llms = await fetch(base + '/llms.txt');
+        assert.equal(llms.status, 200);
+        assert.match(await llms.text(), new RegExp(`https://www\\.arbeidsdeskundig\\.com${GOEDKOOP_PATH}`));
+
+        for (const related of [
+            '/kennisbank/kosten-arbeidsdeskundig-onderzoek',
+            '/kennisbank/arbeidsdeskundig-onderzoek-gids',
+            '/kennisbank/loonsanctie-voorkomen-dossierfouten',
+            '/kennisbank/second-opinion-arbeidsdeskundige',
+        ]) {
+            const rel = await fetch(base + related, GOOGLEBOT);
+            assert.equal(rel.status, 200);
+            assert.match(await rel.text(), new RegExp(`href="${GOEDKOOP_PATH}"`));
         }
     });
 });

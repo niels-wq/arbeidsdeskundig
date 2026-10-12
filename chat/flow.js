@@ -180,8 +180,8 @@ function eur(n) { return '€ ' + Number(n).toLocaleString('nl-NL'); }
 
 function tierFor(mw) {
     if (!mw) return '';
-    if (mw <= 5) return 'klein';
-    if (mw <= 100) return 'midden';
+    if (mw < 10) return 'klein';
+    if (mw <= 50) return 'midden';
     return 'groot';
 }
 
@@ -189,10 +189,11 @@ function priceReply(history, thanks = true) {
     const a = analyse(history);
     const mw = a.known.mw | 0;
     const t = TARIFFS;
-    let s = (thanks ? 'Dank je! ' : '') + 'We werken met vaste tarieven, afhankelijk van de grootte van je organisatie: ' + eur(t.klein) + ' (tot 5 medewerkers of een kleine stichting), ' + eur(t.midden) + ' (tot 100 medewerkers) of ' + eur(t.groot) + ' (groot zakelijk), excl. btw, voor een online onderzoek.';
+    let s = (thanks ? 'Dank je! ' : '') + 'De vanaf-prijs is ' + eur(t.klein) + ' excl. btw. De staffel is een prijs naar draagkracht: ' + eur(t.klein) + ' (MKB klein, minder dan 10 medewerkers, ook zzp), ' + eur(t.midden) + ' (MKB groot, 10 tot 50) of ' + eur(t.groot) + ' (meer dan 50), voor een online onderzoek.';
     const tier = tierFor(mw);
     if (tier) s += ' Met ' + mw + ' medewerkers kom je uit op ' + eur(t[tier]) + ' excl. btw.';
-    s += ' Fysiek op locatie is ' + eur(t.fysiek) + ' extra, spoed ' + eur(t.spoed) + ' extra.';
+    s += ' Onderzoek op locatie is ' + eur(t.fysiek) + ' extra, spoed of tolk ' + eur(t.spoed) + ' extra.';
+    s += ' Loonwaarde of preventief is ' + eur(t.loonwaarde) + '. Pro-forma bezwaar of slagingskansconsult ' + eur(t.proforma) + '. Bezwaar, herbeoordeling of beroep ' + eur(t.bezwaar) + '. Hoorzitting of rechtszaak ' + eur(t.hoorzitting) + '. Addendum ' + eur(t.addendum) + '. Vaste partners krijgen tot 8% korting.';
     s += '\n\nWe nemen je casus altijd eerst even kort door voordat je de definitieve offerte krijgt. Plan hier een gesprek van 15 minuten: ' + CALENDLY + ' of bel ' + PHONE + '. Heb je intussen nog een vraag? Stel hem gerust.';
     return s;
 }
@@ -219,7 +220,7 @@ function statusLines(history, contact, justNow) {
     if (contact) {
         if (justNow) {
             const tier = tierFor(k.mw);
-            b += '\n- VOLGENDE STAP: bedank kort (zonder de gegevens te herhalen). Geef dan de vaste tarieven uit de KENNISBANK (online, excl. btw) en noem ' + (tier ? 'welk tarief past bij ' + k.mw + ' medewerkers' : 'dat het tarief afhangt van de organisatiegrootte; vraag daarna naar het aantal medewerkers') + '. Noem de toeslag voor fysiek en spoed. Zeg dat we de casus altijd eerst kort doornemen voordat de definitieve offerte komt, en stel voor om te bellen (' + PHONE + ') of een gesprek van 15 minuten te plannen via ' + CALENDLY + '. Roep open_lead_form niet aan. Zeg niet dat alles maatwerk is.';
+            b += '\n- VOLGENDE STAP: bedank kort (zonder de gegevens te herhalen). Geef dan de vaste tarieven uit de KENNISBANK (excl. btw) en begin altijd met de vanaf-prijs vanaf € 1.095. Noem ' + (tier ? 'welk tarief past bij ' + k.mw + ' medewerkers' : 'dat de staffel een prijs naar draagkracht is; vraag daarna naar het aantal medewerkers') + '. Noem onderzoek op locatie, spoed of tolk, en de overige producten (loonwaarde, pro-forma, bezwaar, hoorzitting, addendum). Zeg dat we de casus altijd eerst kort doornemen voordat de definitieve offerte komt, en stel voor om te bellen (' + PHONE + ') of een gesprek van 15 minuten te plannen via ' + CALENDLY + '. Roep open_lead_form niet aan. Zeg niet dat alles maatwerk is.';
         }
         return b;
     }

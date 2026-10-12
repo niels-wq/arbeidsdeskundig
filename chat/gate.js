@@ -10,9 +10,20 @@
 const OWN_PHONES = new Set(['0850870307', '0650213593']);
 const OWN_EMAIL_RE = /@(arbeidsdeskundig\.com|matchvermogen\.nl|bestmatchbv\.nl)$/i;
 
-// Tarieven van de site (2027, excl. btw), zie /llms.txt en de offerte-PDF in server.js.
-// Geen 2027-tarieflijst voor toeslagen in de repo: fysiek en spoed blijven 295 en 300.
-const TARIFFS = { klein: 1149, midden: 1179, groot: 1449, fysiek: 295, spoed: 300 };
+// Tarieven 2027 uit de Matchvermogen-folder (excl. btw), zie /llms.txt.
+// Vanaf-prijs € 1.095. De staffel is een prijs naar draagkracht.
+const TARIFFS = {
+    klein: 1095,
+    midden: 1195,
+    groot: 1295,
+    fysiek: 225,
+    spoed: 195,
+    loonwaarde: 1225,
+    proforma: 599,
+    bezwaar: 1599,
+    hoorzitting: 599,
+    addendum: 899,
+};
 
 function normalizePhone(raw) {
     const s = String(raw || '').trim();
@@ -60,8 +71,9 @@ let knownCache = null;
 function knownAmounts() {
     if (knownCache) return knownCache;
     const base = [TARIFFS.klein, TARIFFS.midden, TARIFFS.groot];
-    const set = new Set([...base, TARIFFS.fysiek, TARIFFS.spoed]);
-    for (const b of base) {
+    const extras = [TARIFFS.loonwaarde, TARIFFS.proforma, TARIFFS.bezwaar, TARIFFS.hoorzitting, TARIFFS.addendum];
+    const set = new Set([...base, ...extras, TARIFFS.fysiek, TARIFFS.spoed]);
+    for (const b of [...base, ...extras]) {
         set.add(b + TARIFFS.fysiek);
         set.add(b + TARIFFS.spoed);
         set.add(b + TARIFFS.fysiek + TARIFFS.spoed);

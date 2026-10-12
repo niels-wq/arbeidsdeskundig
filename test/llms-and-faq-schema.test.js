@@ -55,7 +55,7 @@ describe('llms.txt', () => {
         const txt = await res.text();
 
         assert.match(txt, /^# arbeidsdeskundig\.com/m);
-        assert.match(txt, /vanaf €1\.095/);
+        assert.match(txt, /vanaf €1\.149/);
         assert.match(txt, /binnen 24 uur/i);
         assert.match(txt, /## Wat we wel doen/);
         assert.match(txt, /## Wat we niet doen/);
@@ -138,7 +138,7 @@ describe('llms.txt', () => {
         const res = await fetch(base + '/.well-known/llms.txt');
         assert.equal(res.status, 200);
         const txt = await res.text();
-        assert.match(txt, /vanaf €1\.095/);
+        assert.match(txt, /vanaf €1\.149/);
         assert.match(txt, /\/aanmelden/);
     });
 });
@@ -279,7 +279,7 @@ describe('FAQPage structured data is page-specific', () => {
             'Wat kost een arbeidsdeskundig onderzoek?',
             'Kan het onderzoek ook fysiek?',
         ]);
-        assert.match(pages[0].mainEntity[0].acceptedAnswer.text, /€1\.095/);
+        assert.match(pages[0].mainEntity[0].acceptedAnswer.text, /€1\.149/);
         assert.doesNotMatch(graphTypes(html).join(','), /FAQPage.*FAQPage/);
         assert.ok(!graphTypes(html).includes('FAQPage') || pages.length === 1);
         assert.ok(!parseLdJsonBlocks(html).some((b) => Array.isArray(b['@graph']) && b['@graph'].some((n) => n['@type'] === 'FAQPage')));
@@ -293,7 +293,7 @@ describe('FAQPage structured data is page-specific', () => {
         assert.equal(pages.length, 1);
         assert.ok(pages[0].mainEntity.length >= 14, `expected full FAQ, got ${pages[0].mainEntity.length}`);
         assert.ok(pages[0].mainEntity.some((q) => /second opinion/i.test(q.name)));
-        assert.ok(pages[0].mainEntity.some((q) => /€1\.095/.test(q.acceptedAnswer.text)));
+        assert.ok(pages[0].mainEntity.some((q) => /€1\.149/.test(q.acceptedAnswer.text)));
         assert.match(html, /id="faq-list"[^>]*>[\s\S]*Wat kost een arbeidsdeskundig onderzoek\?/);
         assert.match(html, /id="faq-list"[^>]*>[\s\S]*Is een arbeidsdeskundig onderzoek verplicht\?/);
     });

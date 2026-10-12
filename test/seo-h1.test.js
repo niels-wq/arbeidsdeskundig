@@ -5,9 +5,9 @@ const assert = require('node:assert/strict');
 const { app } = require('../server');
 
 const ROUTES = [
-    { path: '/', h1: 'Arbeidsdeskundig onderzoek. Vanaf €1.149,-.' },
-    { path: '/aanmelden', h1: 'Meld je onderzoek aan — vanaf €1.149,-' },
-    { path: '/offerte-aanvragen', h1: 'Vraag je offerte aan — vanaf €1.149,-' },
+    { path: '/', h1: 'Arbeidsdeskundig onderzoek. Vanaf € 1.095.' },
+    { path: '/aanmelden', h1: 'Meld je onderzoek aan — vanaf € 1.095' },
+    { path: '/offerte-aanvragen', h1: 'Vraag je offerte aan — vanaf € 1.095' },
     { path: '/kennisbank', h1: 'Alles over arbeidsdeskundig onderzoek' },
     { path: '/rekentool', h1: 'Eerder starten = eerder klaar' },
     { path: '/keuzehulp', h1: 'Waar wil je hulp bij?' },
@@ -66,7 +66,7 @@ describe('SEO: exactly one h1 per route', () => {
             assert.equal(h1Text(tags[0]), spec.h1);
             if (spec.article) {
                 assert.match(tags[0], /id="artikel-titel"/);
-                assert.doesNotMatch(tags[0], /Arbeidsdeskundig onderzoek\. Vanaf €1\.149,-/);
+                assert.doesNotMatch(tags[0], /Arbeidsdeskundig onderzoek\. Vanaf € 1\.095/);
             }
             assert.match(html, /id="navToggle"/);
             assert.match(html, /id="cookie-banner"/);
@@ -78,7 +78,7 @@ describe('SEO: exactly one h1 per route', () => {
     it('inactive view titles are h2, not a second h1', async () => {
         const html = await (await fetch(base + '/')).text();
         assert.match(html, /<h2[^>]*class="[^"]*\broute-h1\b[^"]*"[^>]*>Eerder starten = eerder klaar<\/h2>/);
-        assert.match(html, /<h2[^>]*class="[^"]*\broute-h1\b[^"]*"[^>]*>Vraag je offerte aan — vanaf €1\.149,-<\/h2>/);
+        assert.match(html, /<h2[^>]*class="[^"]*\broute-h1\b[^"]*"[^>]*>Vraag je offerte aan — vanaf € 1\.095<\/h2>/);
         assert.match(html, /<h2[^>]*id="artikel-titel"[^>]*>Titel<\/h2>/);
         assert.doesNotMatch(html, /<h1[^>]*>Eerder starten = eerder klaar<\/h1>/);
         assert.doesNotMatch(html, /<h1[^>]*>Waar wil je hulp bij\?<\/h1>/);

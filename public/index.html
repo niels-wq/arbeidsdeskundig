@@ -275,7 +275,12 @@
   /* Op smalle schermen dekt de cookiebanner (z-index 60, bottom 12px) de sticky CTA
      (z-index 40) af zolang de offset nog 0 is of de bottom-transitie loopt. Verberg de
      balk tot de keuze vastligt; dat is betrouwbaarder dan stapelen. */
-  @media(max-width:639px){ body.cookie-prompt-open .sticky-cta{display:none;} }
+  @media(max-width:639px){
+    body.cookie-prompt-open .sticky-cta{display:none;}
+    /* Zelfde logica als .sticky-cta: op mobiel de artikel/gids-balk weghalen
+       zolang de cookiebanner open is, zodat ze niet over elkaar vallen. */
+    body.cookie-prompt-open #sticky-artikel-cta{display:none !important;}
+  }
   @media(min-width:640px){ .sticky-cta{display:none;} }
 
   .view{display:none;}
@@ -327,6 +332,12 @@
   }
 
   .article-body h2{font-size:1.55rem; color:var(--ink); margin-top:36px;}
+  .article-body h2[id]{scroll-margin-top:96px;}
+  .gids-toc{margin:8px 0 4px; padding:16px 18px; background:var(--white); border:1px solid var(--rule); border-radius:2px;}
+  .gids-toc ol{margin:8px 0 0; padding-left:1.2em;}
+  .gids-toc a{color:var(--teal); font-weight:600;}
+  .prijsblok ul{margin:10px 0 0; padding-left:1.2em;}
+  .werknemer-aanvraagblok{margin:20px 0; padding:18px 20px;}
   .article-body h3{font-size:1.22rem; color:var(--ink); margin-top:26px;}
   .article-body p{color:var(--muted); line-height:1.8; font-size:1.08rem;}
   .article-body ul, .article-body ol{color:var(--muted); line-height:1.8; font-size:1.08rem;}
@@ -991,6 +1002,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     <p class="eyebrow">Vrijblijvende offerte</p>
     <h1 class="route-h1" style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Vraag je offerte aan — vanaf €1.149,-</h1>
     <p style="margin-top:10px; font-size:.95rem; color:var(--muted);">Twee minuten werk. Geen verplichting: je zit nergens aan vast totdat je zelf akkoord geeft.</p>
+    <p id="of-dienst-note" class="info-box hidden" style="margin-top:16px;"></p>
     <div class="conv-proof" aria-label="Belangrijkste voordelen">
       <span><b>Vanaf €1.149,-</b> excl. btw</span>
       <span><b>Binnen 24 uur</b> contact</span>
@@ -1090,7 +1102,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
             <div>
               <p class="eyebrow" style="color:var(--muted2);">Onderzoek</p>
               <table style="font-size:.87rem; color:var(--ink); margin-top:6px; width:100%;">
-                <tr><td style="color:var(--muted); padding:2px 0;">Dienst</td><td style="font-weight:600; text-align:right;">Arbeidsdeskundig onderzoek</td></tr>
+                <tr><td style="color:var(--muted); padding:2px 0;">Dienst</td><td style="font-weight:600; text-align:right;" id="of-doc-dienst">Arbeidsdeskundig onderzoek</td></tr>
                 <tr><td style="color:var(--muted); padding:2px 0;">Vorm</td><td style="font-weight:600; text-align:right;" id="of-doc-vorm"></td></tr>
                 <tr><td style="color:var(--muted); padding:2px 0;">Bedrijfsgrootte</td><td style="font-weight:600; text-align:right;" id="of-doc-grootte"></td></tr>
               </table>
@@ -2064,9 +2076,16 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 
 <!-- Sticky CTA-balk: alleen zichtbaar tijdens het lezen van een kennisbank-artikel -->
 <div id="sticky-artikel-cta" class="hidden" style="position:fixed; left:0; right:0; bottom:0; z-index:40; background:var(--ink); color:var(--paper); padding:12px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; box-shadow:0 -4px 16px rgba(0,0,0,.15);">
-  <span style="font-size:.84rem; max-width:60%;">Vragen over jouw situatie?</span>
-  <div style="display:flex; gap:10px; flex-shrink:0;">
-    <button class="btn-ghost btn-small on-dark" onclick="setView('offerte')">Offerte aanvragen</button>
+  <span id="sticky-artikel-cta-label" style="font-size:.84rem; max-width:60%;">Vragen over jouw situatie?</span>
+  <div style="display:flex; gap:10px; flex-shrink:0; align-items:center;">
+    <div id="sticky-artikel-cta-default">
+      <button class="btn-ghost btn-small on-dark" onclick="setView('offerte')">Offerte aanvragen</button>
+    </div>
+    <div id="sticky-artikel-cta-gids" class="hidden" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <span>Offerte / Aanmelden</span>
+      <a class="btn-ghost btn-small on-dark" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Offerte</a>
+      <a class="btn-ghost btn-small on-dark" href="/aanmelden" onclick="event.preventDefault(); setView('aanmelden')">Aanmelden</a>
+    </div>
     <button aria-label="Sluiten" onclick="document.getElementById('sticky-artikel-cta').classList.add('hidden'); sessionStorage.setItem('stickyCtaDismissed','1'); updateBottomBarOffset();" style="background:none; border:none; color:var(--paper); font-size:1.1rem; cursor:pointer; padding:0 4px;">×</button>
   </div>
 </div>
@@ -2312,6 +2331,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       omschrijving: (document.getElementById('of-omschrijving').value || '').trim(),
       website: ((document.getElementById('of-website') || {}).value || '').trim(),
       bron: bron,
+      dienst: offerteData.dienst || '',
     };
   }
   async function submitToBackend(endpoint, fields){
@@ -2365,6 +2385,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     revealCheck();
     if(view === 'aanmelden'){ setTimeout(initSignaturePad, 50); }
     if(view === 'advies'){ chooseAdviesTool(opts && opts.tool ? opts.tool : null); }
+    if(view === 'offerte') applyOfferteDienstFromQuery();
     const stickyBar = document.getElementById('sticky-artikel-cta');
     if(stickyBar){
       const consentPending = localStorage.getItem(COOKIE_CONSENT_KEY) === null;
@@ -2759,7 +2780,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     { tag:"Vervroegde inzet", title:"Hoeveel doorlooptijd bespaart een vroeg arbeidsdeskundig onderzoek écht?", slug:"vervroegd", read:"3 min", meta:"Hoeveel doorlooptijd bespaart vroeg starten met een arbeidsdeskundig onderzoek écht? Drie scenario's vergeleken, inclusief onderzoekscijfers.", kernpunten:["Vroeg starten geeft meer ruimte voor een eventueel spoor 2-traject","Wachten tot de jaarsevaluatie maakt de marge kleiner","Onderzoek: vroege inzet kan loonwaarde met bijna 32% verhogen"] , faq:[["Is vroeg starten ook zinvol als spoor 2 waarschijnlijk niet nodig is?", "Ja, ook dan levert vroege duidelijkheid rust en een betere onderbouwing op richting UWV, ook al is de tijdwinst in dat geval minder groot."], ["Vanaf welk moment heeft vroeg starten geen effect meer?", "Zodra de 104-wekengrens al is gepasseerd (WGA-fase) heeft 'vroeg starten' in de zin van tijdwinst geen effect meer — dan verschuift het doel naar uitkeringspercentage en IVA."]] },
     { tag:"Loondoorbetaling", title:"De eerstejaars-evaluatie: waarom dit hét omslagpunt is in de Wet Poortwachter", slug:"jaarsevaluatie", read:"2 min", meta:"Waarom de eerstejaars-evaluatie het traditionele omslagpunt is in de Wet Poortwachter, en waarom eerder starten vaak verstandiger is.", kernpunten:["Week 42-52: het wettelijke ijkpunt van het eerste ziektejaar","UWV toetst hier de re-integratie-inspanningen tot nu toe","Eerder starten dan dit punt vergroot de speelruimte"] , faq:[["Is de eerstejaars-evaluatie wettelijk verplicht?", "Ja, dit is een vast, wettelijk voorgeschreven ijkpunt binnen de Wet Poortwachter."], ["Wat als de eerstejaars-evaluatie wordt overgeslagen?", "Dit werkt door in de RIV-toets bij een latere WIA-aanvraag en kan bijdragen aan een loonsanctie; alsnog een gedegen inhaalslag maken is dan aan te raden."]] },
     { tag:"Investering", title:"Wat kost een arbeidsdeskundig onderzoek — en wat levert het op?", slug:"investering", read:"2 min", meta:"Wat kost een arbeidsdeskundig onderzoek en wat levert het op? Tarieven, doorlooptijden en de opbrengst op een rij, inclusief fysieke meerprijs.", kernpunten:["Vanaf €1.149,- excl. btw, afhankelijk van bedrijfsgrootte","Fysiek onderzoek: €295,- extra bovenop het online tarief","Potentiële besparing is al snel een veelvoud van de investering"] , faq:[["Zijn er extra kosten bovenop het genoemde tarief?", "Alleen bij een fysiek onderzoek (+ €295,-) of een spoedonderzoek (+ €300,-); daarbuiten is het tarief all-in."], ["Is het tarief afhankelijk van de complexiteit van het dossier?", "Nee, het tarief is gebaseerd op bedrijfsgrootte, niet op complexiteit — een complex dossier kost dus niet automatisch meer."]] },
-    { tag:"Investering", title:"Kosten arbeidsdeskundig onderzoek: tarieven en wat je krijgt (2027)", slug:"kosten-arbeidsdeskundig-onderzoek", read:"5 min", meta:"Kosten arbeidsdeskundig onderzoek (2027): vanaf €1.149 excl. btw. Wat je krijgt, wat niet inzit. Vraag een offerte of kennismaking.", kernpunten:["Vanaf €1.149 excl. btw: gesprekken, dossieranalyse en rapport inbegrepen; spoor 2 en second opinion niet","Prijs drijvers: online vs fysiek en bedrijfsgrootte — niet hoe complex het dossier is","Anders dan een second opinion; werkgever betaalt meestal, werknemer kan zelf aanvragen"], faq:[["Wat kost een arbeidsdeskundig onderzoek?","In 2027 vanaf €1.149 excl. btw voor een online onderzoek bij kleine organisaties. Tot 100 medewerkers €1.179, groot zakelijk €1.449. Fysiek +€295, spoed +€300. Het exacte tarief volgt uit de offerte."],["Hangt de prijs arbeidsdeskundig onderzoek af van dossiercomplexiteit?","Nee. Het tarief hangt af van bedrijfsgrootte en van online of fysiek, plus eventueel spoed. Een complex dossier kost hier niet automatisch meer."],["Wat is het verschil met een second opinion?","Dit tarief is voor een regulier arbeidsdeskundig onderzoek (eerste, complete beoordeling). Een second opinion is een later, apart onderzoek naar een bestaand rapport en wordt apart geoffreerd."],["Betaalt de werkgever of kan een werknemer zelf aanvragen?","Meestal betaalt de werkgever, vanuit de Poortwachter-verplichting. Een werknemer mag zelf een onderzoek laten doen; wie de factuur draagt, spreek je vooraf af."]] },
+    { tag:"Investering", title:"Kosten arbeidsdeskundig onderzoek: tarieven en wat je krijgt (2027)", slug:"kosten-arbeidsdeskundig-onderzoek", read:"5 min", meta:"Kosten arbeidsdeskundig onderzoek (2027): vanaf €1.149 excl. btw. Wat je krijgt, wat niet inzit. Vraag een offerte of kennismaking.", kernpunten:["Vanaf €1.149 excl. btw: gesprekken, dossieranalyse en rapport inbegrepen; spoor 2 en second opinion niet","Prijs drijvers: online vs fysiek en bedrijfsgrootte — niet hoe complex het dossier is","Anders dan een second opinion; werkgever betaalt meestal, werknemer kan zelf aanvragen"], faq:[["Wat kost een arbeidsdeskundig onderzoek?","In 2027 vanaf €1.149 excl. btw voor een online onderzoek bij kleine organisaties. Tot 100 medewerkers €1.179, groot zakelijk €1.449. Fysiek +€295, spoed +€300. Het exacte tarief volgt uit de offerte."],["Hangt de prijs arbeidsdeskundig onderzoek af van dossiercomplexiteit?","Nee. Het tarief hangt af van bedrijfsgrootte en van online of fysiek, plus eventueel spoed. Een complex dossier kost hier niet automatisch meer."],["Wat is het verschil met een second opinion?","Dit tarief is voor een regulier arbeidsdeskundig onderzoek (eerste, complete beoordeling). Een second opinion is een later, apart onderzoek naar een bestaand rapport en wordt apart geoffreerd."],["Betaalt de werkgever of kan een werknemer zelf aanvragen?","Meestal betaalt de werkgever, vanuit de Poortwachter-verplichting. Een werknemer mag zelf een onderzoek laten doen; wie de factuur draagt, spreek je vooraf af."],["Betaalt UWV het arbeidsdeskundig onderzoek?","Nee. Bij re-integratie betaalt de werkgever het arbeidsdeskundig onderzoek. De UWV-arbeidsdeskundige bij een WIA-beoordeling is onderdeel van de UWV-procedure."]] },
     { tag:"Spoor 2", title:"Wanneer volgt spoor 2 uit een arbeidsdeskundig onderzoek, en hoe vraag je het aan?", slug:"spoor2", read:"2 min", meta:"Wanneer volgt spoor 2 uit een arbeidsdeskundig onderzoek, en hoe vraag je dit direct mee aan bij Best Match Re-integratie?", kernpunten:["Spoor 2 volgt zodra terugkeer bij de (ex-)werkgever niet haalbaar is","Vraag dit gewoon meteen mee aan in het aanmeldformulier","Het dossier wordt warm overgedragen aan één van de 40 coaches"] , faq:[["Kan Spoor 2 ook los van een arbeidsdeskundig onderzoek worden aangevraagd?", "In de praktijk vormt het arbeidsdeskundig onderzoek vrijwel altijd de basis; een los Spoor 2-traject zonder die onderbouwing is minder goed gefundeerd richting UWV."], ["Wat als de werknemer het niet eens is met de conclusie dat Spoor 2 nodig is?", "Dan kan een deskundigenoordeel bij UWV worden aangevraagd om dit objectief te laten toetsen."]] },
     { tag:"Online vs fysiek", title:"Online of fysiek arbeidsdeskundig onderzoek: wat is het verschil in de praktijk?", slug:"online-fysiek", read:"2 min", meta:"Online of fysiek arbeidsdeskundig onderzoek: de verschillen, voor- en nadelen, kosten en wanneer welke vorm het beste past.", kernpunten:["Online is het snelst en standaard inbegrepen","Fysiek voegt waarde toe bij een concreet werkplekbezoek","Fysiek onderzoek kost €295,- extra bovenop het online tarief"] , faq:[["Is een online onderzoek even grondig als een fysiek onderzoek?", "Ja, de diepgang van het gesprek en de analyse verschilt niet — het verschil zit uitsluitend in het al dan niet fysiek beoordelen van de werkplek zelf."], ["Kan ik na aanmelding nog wisselen tussen online en fysiek?", "Ja, blijkt tijdens het onderzoek dat de andere vorm toch beter past, dan schakelen we hier vrijblijvend in mee."]] },
     { tag:"WHK", title:"Wat is de WHK-premie? Uitleg op een complex stelsel", slug:"whk", read:"2 min", meta:"Wat is de WHK-premie en hoe werkt de T-2-systematiek? Uitleg over een van de meest complexe premiestelsels binnen de sociale zekerheid.", kernpunten:["WHK-premie is gebaseerd op instroom in WGA en Ziektewet-flex","T-2-systematiek: effecten werken pas na twee jaar door","Vroege actie vandaag bepaalt de premie van over jaren"] , faq:[["Geldt de WHK-premie ook voor kleine werkgevers?", "Kleine werkgevers betalen een sectorale premie die minder gevoelig is voor individuele instroom; vanaf een bepaalde loonsom geldt een deels of volledig individueel bepaalde premie."], ["Kan ik de opbouw van mijn eigen WHK-premie opvragen?", "Ja, de premiebeschikking van de Belastingdienst geeft dit inzicht; bij vragen over de opbouw kun je ook terecht op werkhervattingskas.nl."]] },
@@ -2817,7 +2838,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     { tag:"Basiskennis", title:"Werknemer werkt niet mee aan het onderzoek: wat nu?", slug:"onderzoek-weigert-medewerking", read:"1 min", meta:"Wat zijn de gevolgen als een werknemer niet meewerkt aan een arbeidsdeskundig onderzoek, en welke stappen kan een werkgever dan zetten?", kernpunten:["Een werknemer heeft in het kader van de Wet Poortwachter een meewerkverplichting", "Aantoonbare, ongegronde weigering kan gevolgen hebben voor de loondoorbetaling", "Eerst het gesprek aangaan is altijd verstandiger dan direct sanctioneren"], faq:[["Mag loon worden stopgezet bij weigering van het onderzoek?", "Dat kan een uiterste consequentie zijn, maar alleen na een zorgvuldig traject: eerst een schriftelijke waarschuwing, en bij aanhoudende weigering eventueel een deskundigenoordeel bij UWV om de weigering te objectiveren."], ["Wat als de weigering voortkomt uit angst of wantrouwen, niet uit onwil?", "Dat komt regelmatig voor. Een goed gesprek vooraf over het doel en de onafhankelijkheid van het onderzoek lost dit in de praktijk vaak op, zonder dat het tot een formeel geschil hoeft te komen."]] },
     { tag:"Deskundigenoordeel", title:"Deskundigenoordeel vs arbeidsdeskundig onderzoek: wanneer welk instrument?", slug:"deskundigenoordeel-vs-arbeidsdeskundig-onderzoek", read:"6 min", meta:"Deskundigenoordeel vs arbeidsdeskundig onderzoek: wanneer kies je welk instrument, wanneer beide, wanneer geen. Voor HR en casemanagers. Offerte of sparren.", kernpunten:["Twee instrumenten, twee vragen: UWV-oordeel bij geschil versus AD-weging van werk tegen belastbaarheid","Kies AD als je nog geen arbeidskundige weging hebt; kies een deskundigenoordeel als partijen vastzitten","Beide kunnen na elkaar: eerst weging, dan UWV als het geschil blijft","Geen van beide als de FML of het IZP niet actueel is, of als het conflict medisch is"], faq:[["Wat is het verschil tussen een deskundigenoordeel en een arbeidsdeskundig onderzoek?","Een arbeidsdeskundig onderzoek is een privaat onderzoek: een arbeidsdeskundige weegt de FML of het IZP af tegen echt werk. Een deskundigenoordeel is een formeel UWV-instrument bij onenigheid over re-integratie, passend werk of meewerken. Ze vervangen elkaar niet."],["Wanneer kies je een arbeidsdeskundig onderzoek in plaats van een deskundigenoordeel?","Als de vraag is welk werk nog past, en er nog geen actuele arbeidskundige weging ligt. Dat is de standaardroute in de Wet Poortwachter. Een deskundigenoordeel komt later, als werkgever en werknemer het oneens blijven."],["Wanneer heb je beide instrumenten nodig?","Vaak in die volgorde: eerst een arbeidsdeskundig onderzoek, daarna een deskundigenoordeel als het geschil blijft. Een UWV-aanvraag zonder actuele weging is vaak hol. Andersom: een deskundigenoordeel maakt een later onderzoek niet overbodig als de situatie verandert."],["Wanneer kies je geen van beide?","Als de FML of het IZP de situatie van nu niet dekt, vraag je eerst de bedrijfsarts. Als het conflict medisch is, hoort het bij de arts. Als je alleen de uitkomst niet leuk vindt, is toelichting of een zienswijze lichter dan een nieuw instrument."],["Is een deskundigenoordeel hetzelfde als een second opinion arbeidsdeskundige?","Nee. Een second opinion is een privaat tweede onderzoek door een andere arbeidsdeskundige. Een deskundigenoordeel is de formele UWV-route. Beide kunnen naast elkaar, ze zijn niet inwisselbaar."]] },
     { tag:"Deskundigenoordeel", title:"Second opinion arbeidsdeskundige: wanneer twijfel terecht is", slug:"second-opinion-arbeidsdeskundige", read:"5 min", meta:"Second opinion arbeidsdeskundige: wanneer twijfel terecht is, wat het wel en niet is, proces en relatie tot UWV. Vraag een offerte of kennismaking.", kernpunten:["Twijfel is terecht bij feitelijke gaten, een verouderde FML/IZP of intern werk dat niet reëel is getoetst","Een second opinion is een privaat tweede onderzoek — geen eerste AD-onderzoek en geen deskundigenoordeel van UWV","Eerst toelichting en zienswijze; een nieuw onderzoek is een zwaarder middel, geen automatische override","UWV weegt kwaliteit, niet welk bureau je verkiest; beide routes kunnen naast elkaar"], faq:[["Wat is een second opinion arbeidsdeskundige?","Een second opinion arbeidsdeskundige is een tweede, onafhankelijke arbeidskundige blik op een dossier waarin al een rapport ligt. Het is een privaat onderzoek door een andere arbeidsdeskundige, geen formeel UWV-oordeel."],["Wanneer is twijfel over een arbeidsdeskundig rapport terecht?","Terecht bij feitelijke missers, een verouderde of bijgestelde FML/IZP, intern werk dat op papier bestond, of een onderzoek dat de vraagstelling niet dekte. Niet terecht als je alleen de uitkomst niet leuk vindt."],["Wat is het verschil tussen een second opinion en een deskundigenoordeel van UWV?","Een second opinion is privaat advies van een andere arbeidsdeskundige. Een deskundigenoordeel is een formeel, bij UWV aangevraagd oordeel dat zwaarder meeweegt in re-integratie- en WIA-context. Ze vervangen elkaar niet."],["Vervangt een second opinion het eerste arbeidsdeskundig onderzoek?","Nee. Het eerste rapport blijft in het dossier. De second opinion is aanvullend bewijs. UWV weegt kwaliteit en logica, niet welk bureau je het liefst hoort."],["Wie vraagt een second opinion arbeidsdeskundige aan en wie betaalt?","Werkgever, HR of werknemer. Meestal betaalt wie erom vraagt, tenzij partijen iets anders afspreken. Kosten liggen in dezelfde orde als een regulier onderzoek; vraag een offerte of kennismaking."]] },
-    { tag:"Gids", title:"Alles over arbeidsdeskundig onderzoek: de gids", slug:"arbeidsdeskundig-onderzoek-gids", read:"6 min", meta:"Gids arbeidsdeskundig onderzoek: wat het is, of het moet, timing, kosten, werknemersrechten en UWV. Links naar de diepte-artikelen. Offerte of aanmelden.", kernpunten:["Kaart van het cluster — geen homepage-pitch en geen keuzehulp online-versus-fysiek","Start bij de vraag: wat het is, of het moet, wanneer, wat het kost","Werknemers: voorbereiding, rechten, passende arbeid","Wat wringt: nadelen en second opinion; UWV: RIV en beslistermijn WIA"], faq:[["Waar begin ik in deze gids arbeidsdeskundig onderzoek?","Kies op rol en vraag. Wat het is: wat doet een arbeidsdeskundige, FML/IZP lezen, wat HR mag beslissen, belastbaarheid verouderd, wat zit er in een arbeidsdeskundig rapport, en de checklist uit recente rechtspraak. Of het moet, wanneer en wat het kost: verplicht, na 1 jaar ziekte, kosten. Werknemer: tips, gesprek voorbereiden, passende arbeid. Twijfel: nadelen, second opinion, of deskundigenoordeel versus onderzoek. UWV: RIV-toets en beslistermijn WIA 16 weken."],["Is deze gids hetzelfde als de homepage of de keuzehulp?","Nee. De homepage is het aanvraagloket. De keuzehulp gaat over online of fysiek. Deze gids cluster het onderwerp arbeidsdeskundig onderzoek en verwijst naar de unieke diepte-artikelen."],["Wat is het verschil met matchvermogen.nl?","Complementair, geen duplicaat. matchvermogen.nl is het bredere adviesmerk van het bureau. Deze gids en de kennisbank op arbeidsdeskundig.com blijven bij het onderzoek: begrijpen, vergelijken, aanvragen."],["Welk artikel lees ik als ik twijfel of het onderzoek verplicht is?","Start bij is een arbeidsdeskundig onderzoek verplicht. Timing rond de jaarsevaluatie staat in wanneer na 1 jaar ziekte. Tarief in kosten arbeidsdeskundig onderzoek."],["Hoe vraag ik daarna een onderzoek aan?","Offerte als je eerst een prijs wilt, aanmelden als het dossier klaarligt. Deze gids is de kaart; de formulieren zijn de volgende stap."]] },
+    { tag:"Gids", title:"Alles over arbeidsdeskundig onderzoek: de gids", slug:"arbeidsdeskundig-onderzoek-gids", read:"6 min", meta:"Gids arbeidsdeskundig onderzoek: wat het is, of het moet, timing, kosten, werknemersrechten en UWV. Links naar de diepte-artikelen. Offerte of aanmelden.", kernpunten:["Kaart van het cluster — geen homepage-pitch en geen keuzehulp online-versus-fysiek","Start bij de vraag: wat het is, of het moet, wanneer, wat het kost","Werknemers: voorbereiding, rechten, passende arbeid","Wat wringt: nadelen en second opinion; UWV: RIV en beslistermijn WIA"], faq:[["Waar begin ik in deze gids arbeidsdeskundig onderzoek?","Kies op rol en vraag. Wat het is: wat doet een arbeidsdeskundige, FML/IZP lezen, wat HR mag beslissen, belastbaarheid verouderd, wat zit er in een arbeidsdeskundig rapport, en de checklist uit recente rechtspraak. Of het moet, wanneer en wat het kost: verplicht, na 1 jaar ziekte, kosten. Werknemer: tips, gesprek voorbereiden, passende arbeid. Twijfel: nadelen, second opinion, of deskundigenoordeel versus onderzoek. UWV: RIV-toets en beslistermijn WIA 16 weken."],["Is deze gids hetzelfde als de homepage of de keuzehulp?","Nee. De homepage is het aanvraagloket. De keuzehulp gaat over online of fysiek. Deze gids cluster het onderwerp arbeidsdeskundig onderzoek en verwijst naar de unieke diepte-artikelen."],["Wat is het verschil met matchvermogen.nl?","Complementair, geen duplicaat. matchvermogen.nl is het bredere adviesmerk van het bureau. Deze gids en de kennisbank op arbeidsdeskundig.com blijven bij het onderzoek: begrijpen, vergelijken, aanvragen."],["Welk artikel lees ik als ik twijfel of het onderzoek verplicht is?","Start bij is een arbeidsdeskundig onderzoek verplicht. Timing rond de jaarsevaluatie staat in wanneer na 1 jaar ziekte. Tarief in kosten arbeidsdeskundig onderzoek."],["Hoe vraag ik daarna een onderzoek aan?","Offerte als je eerst een prijs wilt, aanmelden als het dossier klaarligt. Deze gids is de kaart; de formulieren zijn de volgende stap."],["Wie voert het arbeidsdeskundig onderzoek uit?","Een geregistreerd arbeidsdeskundige. De bedrijfsarts stelt de belastbaarheid vast. De arbeidsdeskundige vertaalt die naar werk. De UWV-arbeidsdeskundige bij een WIA-beoordeling is onderdeel van de UWV-procedure, niet de uitvoerder van dit onderzoek."]] },
 
     { tag:"ZZP & DGA", title:"ZZP'er en arbeidsongeschikt: is een arbeidsdeskundig onderzoek zinvol zonder werkgever?", slug:"zzp-arbeidsongeschiktheid", read:"2 min", meta:"Als zelfstandige heb je geen werkgever die een arbeidsdeskundig onderzoek moet regelen — maar dat betekent niet dat zo'n onderzoek voor jou zinloos is. Dit is wanneer het wél waarde heeft.", kernpunten:["Geen Wet Poortwachter-verplichting, maar wel relevant bij een AOV-claim of broodfonds", "Een onafhankelijke onderbouwing versterkt de positie tegenover een verzekeraar", "Ook nuttig om reëel te bepalen welk werk nog wél haalbaar is"], faq:[["Is een arbeidsdeskundig onderzoek verplicht voor zzp'ers?", "Nee, de Wet Poortwachter geldt niet voor zelfstandigen zonder personeel. Een onderzoek is dan altijd een eigen keuze, niet een wettelijke verplichting."], ["Vergoedt een arbeidsongeschiktheidsverzekering (AOV) dit onderzoek?", "Dat verschilt per verzekeraar en polis — sommige AOV's vergoeden een onafhankelijk onderzoek geheel of gedeeltelijk, vooral bij een discussie over de mate van arbeidsongeschiktheid."]] },
     { tag:"ZZP & DGA", title:"DGA en arbeidsongeschiktheid: een aparte positie binnen de sociale zekerheid", slug:"dga-arbeidsongeschiktheid", read:"2 min", meta:"Een directeur-grootaandeelhouder (DGA) valt vaak buiten de werknemersverzekeringen. Wat betekent dat voor arbeidsongeschiktheid, en welke rol kan een arbeidsdeskundige daarbij spelen?", kernpunten:["Een DGA is meestal niet verzekerd voor de WIA en Ziektewet", "Vaak alleen een eigen, particuliere AOV als vangnet", "Een arbeidsdeskundig onderzoek kan sturing geven aan verantwoorde afbouw of overdracht van taken"], faq:[["Waarom is een DGA meestal niet verzekerd voor de WIA?", "Een DGA met een meerderheidsbelang wordt fiscaal en juridisch vaak niet als 'werknemer' gezien, en valt daardoor buiten de verplichte werknemersverzekeringen."], ["Wat kan een arbeidsdeskundige voor een zieke DGA betekenen?", "Een objectieve inschatting van resterende taken en belastbaarheid, bijvoorbeeld als basis voor het overdragen van taken aan personeel of het onderbouwen van een particuliere AOV-claim."]] },
@@ -2928,6 +2949,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 <h2>Openbare tarieven, oktober 2026</h2>
 <p>Steekproef van 9 openbare tarieflijsten (oktober 2026): laagste ca. € 1.049, hoogste ca. € 1.625 excl. btw, middengebied ca. € 1.250-1.400. De lijsten gaan over een volledig arbeidsdeskundig onderzoek. Dit is geen overzicht van de hele markt en geen gemiddelde. Tarieflijsten zonder openbaar bedrag zitten er niet in. Prijzen kunnen wijzigen.</p>
 <p>Lager of hoger dan deze steekproef kan. Gebruik de bedragen niet als een landelijk gemiddelde.</p>
+<p><a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Offerte op draagkracht</a>. De staffel op deze site staat bij <a class="blog-link" href="/kennisbank/kosten-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('kosten-arbeidsdeskundig-onderzoek')">kosten arbeidsdeskundig onderzoek</a>. Twijfel je tussen online en fysiek, gebruik de <a class="blog-link" href="/keuzehulp" onclick="event.preventDefault(); setView('advies')">keuzehulp</a>.</p>
 <h3>Deskundigenoordeel UWV is een ander product</h3>
 <p>Een deskundigenoordeel bij UWV is geen goedkoop arbeidsdeskundig onderzoek. De <a href="https://wetten.overheid.nl/BWBR0032639/2015-07-01" target="_blank" rel="noopener">Beleidsregel kosten aanvraag deskundigenoordeel 2013</a> rekent € 400 als de werkgever vraagt en € 100 als de werknemer vraagt. De regeling is geldend (geraadpleegd op 12 oktober 2026). Bij een verzoek om ontbinding van de arbeidsovereenkomst in de situaties van artikel 7:671b lid 4 en 5 BW brengt UWV de werkgever niets in rekening. UWV publiceert de bedragen € 100 en € 400 ook op de pagina <a href="https://www.uwv.nl/nl/ziek/re-integratie/deskundigenoordeel" target="_blank" rel="noopener">deskundigenoordeel aanvragen</a>. Zet € 100 of € 400 dus niet naast de steekproef als de prijs van een privaat onderzoek.</p>
 
@@ -4630,6 +4652,7 @@ whk: `
 
 <h2>Offerte of kennismaking</h2>
 <p>Twijfel je of deze twijfel terecht is: toets het in 15 minuten, of vraag een offerte voor een second opinion. Dit artikel is uitleg, geen homepage.</p>
+<p>Eerst de lichtere stappen: <a class="blog-link" href="/kennisbank/oneens-met-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('oneens-met-arbeidsdeskundige')">het oneens met de arbeidsdeskundige</a>. <a class="blog-link" href="/offerte-aanvragen?dienst=second-opinion" onclick="event.preventDefault(); openOfferte('second-opinion')">Rapport laten toetsen</a>.</p>
 <p><a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vrijblijvende offerte</a> · <a class="blog-link" href="/aanmelden" onclick="event.preventDefault(); setView('aanmelden')">Onderzoek aanmelden</a> · <a href="https://calendly.com/matchvermogen/call-15-min" target="_blank" rel="noopener">Plan 15 minuten kennismaking</a></p>
 <p>Verder: <a class="blog-link" href="/kennisbank/wat-doet-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('wat-doet-arbeidsdeskundige')">wat doet een arbeidsdeskundige</a> · <a class="blog-link" href="/kennisbank/nadelen-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('nadelen-arbeidsdeskundig-onderzoek')">nadelen</a> · <a class="blog-link" href="/kennisbank/verplicht-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('verplicht-arbeidsdeskundig-onderzoek')">is het verplicht?</a> · <a class="blog-link" href="/kennisbank/kosten-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('kosten-arbeidsdeskundig-onderzoek')">kosten</a> · <a class="blog-link" href="/kennisbank/goedkoopste-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('goedkoopste-arbeidsdeskundig-onderzoek')">goedkoopste arbeidsdeskundig onderzoek</a> · <a class="blog-link" href="/kennisbank/tips-werknemer-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('tips-werknemer-arbeidsdeskundig-onderzoek')">tips werknemer</a> · <a class="blog-link" href="/kennisbank/voorbereiden-gesprek-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('voorbereiden-gesprek-arbeidsdeskundige')">gesprek voorbereiden</a> · <a class="blog-link" href="/kennisbank/deskundigenoordeel" onclick="event.preventDefault(); openArtikel('deskundigenoordeel')">deskundigenoordeel UWV</a></p>`,
 
@@ -4705,8 +4728,19 @@ whk: `
 <h2>Alles over arbeidsdeskundig onderzoek: de gids</h2>
 <p>Deze <strong>gids arbeidsdeskundig onderzoek</strong> is een kaart van het cluster — geen herhaling van de homepage en geen keuzehulp online-versus-fysiek. De diepte staat in de artikelen hieronder. Dit stuk helpt je kiezen wélk artikel je nu nodig hebt: wat het onderzoek is, of het moet, wanneer je het inzet, wat het kost, wat werknemers kunnen doen, wat wringt, en hoe het zich tot UWV verhoudt.</p>
 <p>arbeidsdeskundig.com is het loket om een onderzoek te begrijpen en aan te vragen. <a href="https://matchvermogen.nl" target="_blank" rel="noopener">matchvermogen.nl</a> is het bredere adviesmerk van hetzelfde bureau. Deze gids blijft bij het onderzoek zelf.</p>
+<nav class="gids-toc" aria-label="Inhoudsopgave">
+  <p class="eyebrow">Inhoudsopgave</p>
+  <ol>
+    <li><a href="#gids-wat-het-is">Wat het onderzoek is, en wat niet</a></li>
+    <li><a href="#gids-moet-wanneer-kosten">Moet het, wanneer, en wat kost het</a></li>
+    <li><a href="#gids-werknemer">Als je werknemer bent</a></li>
+    <li><a href="#gids-wringt">Als het wringt of je twijfelt</a></li>
+    <li><a href="#gids-uwv">Richting UWV: RIV en de WIA-wacht</a></li>
+    <li><a href="#gids-offerte">Offerte of aanmelden</a></li>
+  </ol>
+</nav>
 
-<h2>Wat het onderzoek is — en wat niet</h2>
+<h2 id="gids-wat-het-is">Wat het onderzoek is — en wat niet</h2>
 <p>Een arbeidsdeskundige beoordeelt welk werk nog past bij de belastbaarheid. Geen diagnose, geen casemanagement, geen FML. Dat onderscheid voorkomt dat het gesprek op de verkeerde stoel belandt.</p>
 <ul>
 <li><a class="blog-link" href="/kennisbank/wat-doet-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('wat-doet-arbeidsdeskundige')">Wat doet een arbeidsdeskundige (en wat niet)</a> — rol versus bedrijfsarts, verzekeringsarts en casemanager.</li>
@@ -4717,7 +4751,7 @@ whk: `
 <li><a class="blog-link" href="/kennisbank/arbeidsdeskundig-rapport-checklist" onclick="event.preventDefault(); openArtikel('arbeidsdeskundig-rapport-checklist')">Arbeidsdeskundig rapport: checklist uit recente rechtspraak</a>. Kwaliteitspoorten: aansluiting op de bedrijfsarts, documentatie bij afwijking, onderbouwing start spoor 2.</li>
 </ul>
 
-<h2>Moet het, wanneer, en wat kost het</h2>
+<h2 id="gids-moet-wanneer-kosten">Moet het, wanneer, en wat kost het</h2>
 <p>De wet eist adequate inspanning, niet in elk dossier letterlijk een rapport. UWV toetst later of de weging deugdelijk is. Timing en tarief staan los van elkaar: week 42–52 is een ijkpunt, geen startdatum. Spoor 1 hoeft niet afgerond te zijn voordat spoor 2 mag starten.</p>
 <ul>
 <li><a class="blog-link" href="/kennisbank/verplicht-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('verplicht-arbeidsdeskundig-onderzoek')">Is een arbeidsdeskundig onderzoek verplicht?</a> — wet versus UWV-praktijk, mythes, risico van overslaan.</li>
@@ -4728,7 +4762,7 @@ whk: `
 <li><a class="blog-link" href="/kennisbank/goedkoopste-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('goedkoopste-arbeidsdeskundig-onderzoek')">Goedkoopste arbeidsdeskundig onderzoek</a>: waar je op let bij de prijs, valkuilen en een offertechecklist.</li>
 </ul>
 
-<h2>Als je werknemer bent</h2>
+<h2 id="gids-werknemer">Als je werknemer bent</h2>
 <p>Het gesprek is geen verhoor. Je legt functioneel uit wat een gewone dag wel en niet lukt. Diagnose hoeft de werkgever niet te horen; inzage en zienswijze wel.</p>
 <ul>
 <li><a class="blog-link" href="/kennisbank/tips-werknemer-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('tips-werknemer-arbeidsdeskundig-onderzoek')">Tips voor werknemers</a> — voorbereiding, rechten, beperkingen zonder medische oversharing.</li>
@@ -4736,7 +4770,7 @@ whk: `
 <li><a class="blog-link" href="/kennisbank/passende-arbeid" onclick="event.preventDefault(); openArtikel('passende-arbeid')">Passende arbeid</a> — wat telt (opleiding, ervaring, belastbaarheid) en wat niet (‘leuk werk’).</li>
 </ul>
 
-<h2>Als het wringt of je twijfelt</h2>
+<h2 id="gids-wringt">Als het wringt of je twijfelt</h2>
 <p>Een rapport mag schuren. Dat is geen reden om het te herschrijven. Wringt de FML, is intern werk niet reëel, of dekt de vraagstelling het dossier niet? Eerst toelichting en zienswijze. Een second opinion is een zwaarder middel.</p>
 <ul>
 <li><a class="blog-link" href="/kennisbank/nadelen-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('nadelen-arbeidsdeskundig-onderzoek')">Nadelen van een arbeidsdeskundig onderzoek</a> — wat wringt in FML/IZP, rapportkeuzes en gesprek.</li>
@@ -4744,7 +4778,7 @@ whk: `
 <li><a class="blog-link" href="/kennisbank/deskundigenoordeel-vs-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('deskundigenoordeel-vs-arbeidsdeskundig-onderzoek')">Deskundigenoordeel vs arbeidsdeskundig onderzoek</a>. Wanneer welk instrument, wanneer beide, wanneer geen van beide.</li>
 </ul>
 
-<h2>Richting UWV: RIV en de WIA-wacht</h2>
+<h2 id="gids-uwv">Richting UWV: RIV en de WIA-wacht</h2>
 <p>Het rapport is een stuk in het re-integratieverslag, geen UWV-beslissing. Twee actuele kaders: de RIV-toets (bedrijfsarts leidend in een wetsvoorstel) en de tijdelijke beslistermijn van 16 weken ná de WIA-aanvraag. Lopen aanvraag en spoor 2 tegelijk, dan is de vraag wie wat coördineert.</p>
 <ul>
 <li><a class="blog-link" href="/kennisbank/riv-toets-bedrijfsarts-leidend" onclick="event.preventDefault(); openArtikel('riv-toets-bedrijfsarts-leidend')">RIV-toets: bedrijfsarts leidend</a> — wat het voorstel wijzigt, wat de arbeidsdeskundige nog onderbouwt.</li>
@@ -4753,7 +4787,7 @@ whk: `
 <li><a class="blog-link" href="/kennisbank/loonsanctie-voorkomen-dossierfouten" onclick="event.preventDefault(); openArtikel('loonsanctie-voorkomen-dossierfouten')">Loonsanctie voorkomen: 10 dossierfouten</a>. Wat UWV in het dossier ziet, en waar een tijdig onderzoek de gaten dicht.</li>
 </ul>
 
-<h2>Offerte of aanmelden</h2>
+<h2 id="gids-offerte">Offerte of aanmelden</h2>
 <p>Klaar om een onderzoek te plannen? Dat is de commerciële stap, niet het doel van deze gids. Offerte als je eerst een prijs wilt; aanmelden als het dossier al klaarligt.</p>
 <p><a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vrijblijvende offerte</a> · <a class="blog-link" href="/aanmelden" onclick="event.preventDefault(); setView('aanmelden')">Onderzoek aanmelden</a> · <a href="https://calendly.com/matchvermogen/call-15-min" target="_blank" rel="noopener">Plan 15 minuten kennismaking</a></p>
 <p>Verder: <a class="blog-link" href="/kennisbank/wat-doet-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('wat-doet-arbeidsdeskundige')">wat doet een arbeidsdeskundige</a> · <a class="blog-link" href="/kennisbank/fml-izp-lezen-belastbaarheid" onclick="event.preventDefault(); openArtikel('fml-izp-lezen-belastbaarheid')">FML/IZP lezen</a> · <a class="blog-link" href="/kennisbank/fml-izp-hr-beslissen-actualiseren" onclick="event.preventDefault(); openArtikel('fml-izp-hr-beslissen-actualiseren')">FML/IZP: wat mag HR beslissen</a> · <a class="blog-link" href="/kennisbank/belastbaarheid-verouderd-nieuwe-fml-izp" onclick="event.preventDefault(); openArtikel('belastbaarheid-verouderd-nieuwe-fml-izp')">belastbaarheid verouderd</a> · <a class="blog-link" href="/kennisbank/arbeidsdeskundig-rapport-voorbeeld" onclick="event.preventDefault(); openArtikel('arbeidsdeskundig-rapport-voorbeeld')">wat zit er in een rapport</a> · <a class="blog-link" href="/kennisbank/arbeidsdeskundig-rapport-checklist" onclick="event.preventDefault(); openArtikel('arbeidsdeskundig-rapport-checklist')">checklist rapport rechtspraak</a> · <a class="blog-link" href="/kennisbank/verplicht-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('verplicht-arbeidsdeskundig-onderzoek')">is het verplicht?</a> · <a class="blog-link" href="/kennisbank/arbeidsdeskundig-onderzoek-na-1-jaar-ziekte" onclick="event.preventDefault(); openArtikel('arbeidsdeskundig-onderzoek-na-1-jaar-ziekte')">timing na 1 jaar ziekte</a> · <a class="blog-link" href="/kennisbank/kosten-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('kosten-arbeidsdeskundig-onderzoek')">kosten</a> · <a class="blog-link" href="/kennisbank/tips-werknemer-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('tips-werknemer-arbeidsdeskundig-onderzoek')">tips werknemer</a> · <a class="blog-link" href="/kennisbank/voorbereiden-gesprek-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('voorbereiden-gesprek-arbeidsdeskundige')">gesprek voorbereiden</a> · <a class="blog-link" href="/kennisbank/passende-arbeid" onclick="event.preventDefault(); openArtikel('passende-arbeid')">passende arbeid</a> · <a class="blog-link" href="/kennisbank/nadelen-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('nadelen-arbeidsdeskundig-onderzoek')">nadelen</a> · <a class="blog-link" href="/kennisbank/second-opinion-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('second-opinion-arbeidsdeskundige')">second opinion</a> · <a class="blog-link" href="/kennisbank/deskundigenoordeel-vs-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('deskundigenoordeel-vs-arbeidsdeskundig-onderzoek')">deskundigenoordeel vs onderzoek</a> · <a class="blog-link" href="/kennisbank/riv-toets-bedrijfsarts-leidend" onclick="event.preventDefault(); openArtikel('riv-toets-bedrijfsarts-leidend')">RIV-toets</a> · <a class="blog-link" href="/kennisbank/beslistermijn-wia-16-weken" onclick="event.preventDefault(); openArtikel('beslistermijn-wia-16-weken')">beslistermijn WIA</a> · <a class="blog-link" href="/kennisbank/wia-aanvraag-parallel-spoor-2" onclick="event.preventDefault(); openArtikel('wia-aanvraag-parallel-spoor-2')">WIA parallel aan spoor 2</a> · <a class="blog-link" href="/kennisbank/spoor-2-zonder-spoor-1-afgerond" onclick="event.preventDefault(); openArtikel('spoor-2-zonder-spoor-1-afgerond')">spoor 2 zonder spoor 1 afgerond</a></p>`,
@@ -4949,7 +4983,8 @@ whk: `
 <p>Blijft het verschil van inzicht bestaan, dan is een deskundigenoordeel bij UWV de formele, onafhankelijke route — zowel werknemer als werkgever kan dit aanvragen. Zie <a class="blog-link" onclick="openArtikel('deskundigenoordeel')">onze uitleg over het deskundigenoordeel</a> voor hoe dat precies werkt.</p>
 <h3>Stap 4: een nieuw onderzoek of second opinion</h3>
 <p>Als zwaarste middel kan een volledig nieuw onderzoek worden aangevraagd, bijvoorbeeld bij een ander bureau. Dat is een stevige stap — lees eerst <a class="blog-link" href="/kennisbank/second-opinion-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('second-opinion-arbeidsdeskundige')">wanneer een second opinion arbeidsdeskundige wel en niet zinvol is</a> voordat je die route inslaat.</p>
-<p>Loopt jouw dossier hierop vast? <a class="blog-link" onclick="setView('offerte')">Vraag vrijblijvend advies aan</a>.</p>`,
+<p>Loopt jouw dossier hierop vast? <a class="blog-link" onclick="setView('offerte')">Vraag vrijblijvend advies aan</a>.</p>
+<p>De zwaardere route is een <a class="blog-link" href="/kennisbank/second-opinion-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('second-opinion-arbeidsdeskundige')">second opinion arbeidsdeskundige</a>. <a class="blog-link" href="/offerte-aanvragen?dienst=second-opinion" onclick="event.preventDefault(); openOfferte('second-opinion')">Rapport laten toetsen</a>.</p>`,
 
 "bedrijfsarts-onpartijdig": `
 <h2>Hoe onafhankelijk is de bedrijfsarts eigenlijk?</h2>
@@ -5007,6 +5042,10 @@ whk: `
 "voorbereiden-gesprek-arbeidsdeskundige": `
 <h2>Hoe bereid je je goed voor op het gesprek?</h2>
 <p>Een arbeidsdeskundig gesprek hoeft geen uitgebreide voorbereiding, maar een paar simpele stappen vooraf maken het gesprek prettiger én zorgen voor een vollediger rapport.</p>
+<aside class="card werknemer-aanvraagblok">
+  <h2>Werkgever nog niet gestart? Zo vraag je het aan</h2>
+  <p>Heeft je werkgever het arbeidsdeskundig onderzoek nog niet gestart, dan kun je zelf het initiatief nemen. Lees <a class="blog-link" href="/kennisbank/werknemer-zelf-aanvragen" onclick="event.preventDefault(); openArtikel('werknemer-zelf-aanvragen')">hoe je als werknemer zelf een onderzoek aanvraagt</a> en <a class="blog-link" href="/aanmelden" onclick="event.preventDefault(); setView('aanmelden')">meld je aan</a>.</p>
+</aside>
 <h3>Wat je kunt meenemen</h3>
 <p>Heb je al medische stukken die relevant zijn, zoals de FML van de bedrijfsarts, eerdere rapportages of specialistenbrieven, neem die dan mee of stuur ze vooraf door. Dat is geen verplichting: de arbeidsdeskundige haalt de benodigde basisgegevens ook zelf op bij de bedrijfsarts, maar eigen stukken kunnen het gesprek wel verdiepen. Is die FML of het IZP al een fase verder, check dan eerst of de bedrijfsarts het kader nog actueel vindt. Uitleg: <a class="blog-link" href="/kennisbank/belastbaarheid-verouderd-nieuwe-fml-izp" onclick="event.preventDefault(); openArtikel('belastbaarheid-verouderd-nieuwe-fml-izp')">wanneer je geen onderzoek start zonder nieuwe FML of IZP</a>.</p>
 <h3>Denk vooraf na over een gewone dag</h3>
@@ -5170,6 +5209,18 @@ whk: `
 <p>Verder: <a class="blog-link" href="/kennisbank/arbeidsdeskundig-onderzoek-na-1-jaar-ziekte" onclick="event.preventDefault(); openArtikel('arbeidsdeskundig-onderzoek-na-1-jaar-ziekte')">timing na 1 jaar ziekte</a> · <a class="blog-link" href="/kennisbank/kosten-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('kosten-arbeidsdeskundig-onderzoek')">kosten</a> · <a class="blog-link" href="/kennisbank/wat-doet-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('wat-doet-arbeidsdeskundige')">wat doet een arbeidsdeskundige</a> · <a class="blog-link" href="/kennisbank/poortwachter-tijdlijn" onclick="event.preventDefault(); openArtikel('poortwachter-tijdlijn')">Poortwachter-tijdlijn</a> · <a class="blog-link" href="/kennisbank/voorbereiden-gesprek-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('voorbereiden-gesprek-arbeidsdeskundige')">gesprek voorbereiden</a></p>`,
 
 "kosten-arbeidsdeskundig-onderzoek": `
+<aside class="card prijsblok" id="kosten-prijsblok">
+  <p class="eyebrow">Tarief excl. btw</p>
+  <ul>
+    <li><strong>€1.149</strong> tot 5 medewerkers, kleine stichtingen en vrijwilligersorganisaties</li>
+    <li><strong>€1.179</strong> tot 100 medewerkers</li>
+    <li><strong>€1.449</strong> groot zakelijk</li>
+    <li><strong>+€295</strong> fysiek onderzoek op locatie</li>
+    <li><strong>+€300</strong> spoed</li>
+  </ul>
+  <p style="margin:14px 0 0;"><a class="btn-primary" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Offerte binnen 24 uur</a></p>
+  <p style="margin:10px 0 0;"><a class="blog-link" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">Bereken de tijdwinst met de rekentool</a></p>
+</aside>
 <h2>Wat kost een arbeidsdeskundig onderzoek — en wat zit erin?</h2>
 <p>De <strong>kosten arbeidsdeskundig onderzoek</strong> starten in 2027 vanaf €1.149 excl. btw voor een online onderzoek. In dat tarief zitten de gesprekken, de dossieranalyse (inclusief FML/IZP) en het schriftelijke rapport. Er zit geen spoor 2-traject in, geen later vervolgonderzoek en geen second opinion. Wie vraagt <em>wat kost een arbeidsdeskundig onderzoek</em>, wil weten wat je betaalt en wat je daarvoor krijgt. Hieronder het tarief arbeidsdeskundig onderzoek 2027, wat de prijs drijft, en hoe werkgever en werknemer ernaar kijken.</p>
 <p>De werkwijze van het onderzoek zelf staat op de <a class="blog-link" href="/" onclick="event.preventDefault(); setView('home')">landingspagina arbeidsdeskundig onderzoek</a>. Dit artikel is de prijs- en procestransparantie: wat je koopt, wat niet, en hoe je een offerte of kennismaking aanvraagt.</p>
@@ -5225,6 +5276,10 @@ whk: `
 "tips-werknemer-arbeidsdeskundig-onderzoek": `
 <h2>Tips voor werknemers bij een arbeidsdeskundig onderzoek</h2>
 <p>Krijg je een uitnodiging, dan zoeken veel mensen naar <strong>tips voor werknemers bij een arbeidsdeskundig onderzoek</strong>. Dat is logisch: het klinkt formeel, je werkgever betaalt vaak, en je weet niet wat je wel en niet moet zeggen. Dit artikel is expliciet voor jou als werknemer: praktische tips over wat je voorbereidt, welke rechten je hebt, hoe je over beperkingen praat zonder medisch te overdelen, en wat de arbeidsdeskundige doet versus de bedrijfsarts. Doel: rust in het proces — geen examen, geen verkooppraatje.</p>
+<aside class="card werknemer-aanvraagblok">
+  <h2>Werkgever nog niet gestart? Zo vraag je het aan</h2>
+  <p>Heeft je werkgever het arbeidsdeskundig onderzoek nog niet gestart, dan kun je zelf het initiatief nemen. Lees <a class="blog-link" href="/kennisbank/werknemer-zelf-aanvragen" onclick="event.preventDefault(); openArtikel('werknemer-zelf-aanvragen')">hoe je als werknemer zelf een onderzoek aanvraagt</a> en <a class="blog-link" href="/aanmelden" onclick="event.preventDefault(); setView('aanmelden')">meld je aan</a>.</p>
+</aside>
 <p>De korte checklist (wat je meeneemt, wat je mag vragen) staat apart: <a class="blog-link" href="/kennisbank/voorbereiden-gesprek-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('voorbereiden-gesprek-arbeidsdeskundige')">wat je meeneemt naar het gesprek met de arbeidsdeskundige</a>. Hieronder gaat het om hoe je het traject als werknemer doorstaat — taal, rechten en verwachtingen.</p>
 
 <h2>Kalmeer het proces: wat er wél en níet gebeurt</h2>
@@ -5732,6 +5787,13 @@ whk: `
     document.getElementById('artikel-kernpunten-wrap').classList.toggle('hidden', !(post.kernpunten && post.kernpunten.length));
     document.getElementById('artikel-svg-wrap').innerHTML = artikelSVGs[slug] || '';
     document.getElementById('artikel-body').innerHTML = articleContent[slug] || '<p>Dit artikel wordt binnenkort toegevoegd.</p>';
+    const isGids = slug === 'arbeidsdeskundig-onderzoek-gids';
+    const gidsActions = document.getElementById('sticky-artikel-cta-gids');
+    const defaultActions = document.getElementById('sticky-artikel-cta-default');
+    const stickyLabel = document.getElementById('sticky-artikel-cta-label');
+    if(gidsActions) gidsActions.classList.toggle('hidden', !isGids);
+    if(defaultActions) defaultActions.classList.toggle('hidden', isGids);
+    if(stickyLabel) stickyLabel.textContent = isGids ? 'Offerte / Aanmelden' : 'Vragen over jouw situatie?';
     const faqWrap = document.getElementById('artikel-faq-wrap');
     const faqList = document.getElementById('artikel-faq-list');
     if(post.faq && post.faq.length){
@@ -6209,7 +6271,25 @@ whk: `
   }
 
   /* ================= Offertepagina (simpel) ================= */
-  const offerteData = { grootte:'', vorm:'' };
+  const offerteData = { grootte:'', vorm:'', dienst:'' };
+  const OFFERTE_DIENST_LABELS = { 'second-opinion': 'Second opinion' };
+  function applyOfferteDienstFromQuery(){
+    const raw = (new URLSearchParams(location.search).get('dienst') || '').trim().toLowerCase();
+    const label = OFFERTE_DIENST_LABELS[raw] || '';
+    offerteData.dienst = label;
+    const note = document.getElementById('of-dienst-note');
+    if(note){
+      note.classList.toggle('hidden', !label);
+      note.textContent = label ? ('Voorselectie: ' + label + '. Dit gaat mee in je aanvraag.') : '';
+    }
+  }
+  function openOfferte(dienst){
+    const next = dienst ? ('/offerte-aanvragen?dienst=' + encodeURIComponent(dienst)) : '/offerte-aanvragen';
+    if((location.pathname + location.search) !== next){
+      history.pushState({view:'offerte', dienst: dienst || ''}, '', next);
+    }
+    setView('offerte', {skipPush:true});
+  }
   document.querySelectorAll('#view-offerte .choice-row').forEach(row=>{
     const group = row.dataset.group;
     const key = group === 'of-grootte' ? 'grootte' : 'vorm';
@@ -6324,6 +6404,8 @@ whk: `
     document.getElementById('of-doc-geldig').textContent = fmtDatum(geldigTot);
     document.getElementById('of-doc-aanvrager').innerHTML = [payload.naam, payload.bedrijf, payload.email, payload.telefoon].filter(Boolean).join('<br>');
     document.getElementById('of-doc-vorm').textContent = payload.vorm === 'Fysiek' ? 'Fysiek, op locatie' : (payload.vorm === 'Online' ? 'Online' : 'Nog te bepalen');
+    const dienstEl = document.getElementById('of-doc-dienst');
+    if(dienstEl) dienstEl.textContent = payload.dienst || 'Arbeidsdeskundig onderzoek';
     document.getElementById('of-doc-grootte').textContent = OFFERTE_GROOTTE_LABELS[payload.grootte] || OFFERTE_GROOTTE_LABELS.midden;
     document.getElementById('of-doc-basis').textContent = euroFmt(basis);
     document.getElementById('of-doc-totaal').textContent = euroFmt(totaal);

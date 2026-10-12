@@ -170,4 +170,24 @@ describe('test-lead detection', () => {
         assert.equal(notifyIsSafe(`Nieuwe offerteaanvraag — ${parsed.lead.naam}`, html, parsed.lead), true);
         assert.equal(parsed.lead.dienst, 'Arbeidsdeskundig onderzoek');
     });
+
+    it('keeps the default dienst and maps a second-opinion query into the lead', () => {
+        const plain = validateOfferteLead({
+            naam: 'Jan Jansen',
+            email: 'jan@bedrijf.nl',
+            telefoon: '0629876543',
+            dienst: 'iets-anders',
+        });
+        assert.equal(plain.ok, true);
+        assert.equal(plain.lead.dienst, 'Arbeidsdeskundig onderzoek');
+
+        const second = validateOfferteLead({
+            naam: 'Jan Jansen',
+            email: 'jan@bedrijf.nl',
+            telefoon: '0629876543',
+            dienst: 'second-opinion',
+        });
+        assert.equal(second.ok, true);
+        assert.equal(second.lead.dienst, 'Second opinion');
+    });
 });

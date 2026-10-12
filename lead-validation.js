@@ -86,6 +86,17 @@ function contactErrors({ naam, email, telefoon, requireEmail, requirePhone }) {
     return errors;
 }
 
+const OFFERTE_DIENST_ALIASES = {
+    'second-opinion': 'Second opinion',
+    'second opinion': 'Second opinion',
+};
+
+function normalizeOfferteDienst(raw) {
+    const key = String(raw || '').trim().toLowerCase();
+    if (!key) return 'Arbeidsdeskundig onderzoek';
+    return OFFERTE_DIENST_ALIASES[key] || 'Arbeidsdeskundig onderzoek';
+}
+
 function pickOfferteLead(fields) {
     return {
         naam: firstString(fields, ['of-naam', 'naam']),
@@ -96,7 +107,7 @@ function pickOfferteLead(fields) {
         vorm: firstString(fields, ['of-vorm', 'vorm']),
         omschrijving: firstString(fields, ['of-omschrijving', 'omschrijving']),
         bron: firstString(fields, ['bron', 'aanvraagtype']) || 'offerte',
-        dienst: 'Arbeidsdeskundig onderzoek',
+        dienst: normalizeOfferteDienst(firstString(fields, ['dienst', 'of-dienst'])),
     };
 }
 

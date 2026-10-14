@@ -1613,3 +1613,120 @@ describe('kennisbank article: goedkoopste arbeidsdeskundig onderzoek', () => {
     });
 });
 
+const TAAL_SLUG = 'taalbeheersing-passende-functies-arbeidsdeskundige';
+const TAAL_PATH = '/kennisbank/' + TAAL_SLUG;
+const TAAL_TITLE = 'Taalbeheersing en passende functies | Arbeidsdeskundig.com';
+const TAAL_H1 = 'Matige taalbeheersing: hoe weegt de arbeidsdeskundige dit mee bij passende functies?';
+const TAAL_META = 'Matige taalbeheersing weegt mee bij passende functies. Zo legt de arbeidsdeskundige lezen, schrijven en spreken vast, ook bij functieduiding door UWV.';
+
+describe('kennisbank article: taalbeheersing en passende functies', () => {
+    it('serves 200 with one h1, schema, court facts and listings', async () => {
+        const res = await fetch(base + TAAL_PATH, GOOGLEBOT);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        const title = html.match(/<title>([^<]+)<\/title>/)[1];
+        assert.equal(title, TAAL_TITLE);
+        assert.ok(title.endsWith(' | Arbeidsdeskundig.com'));
+        assert.ok(title.length >= 50 && title.length <= 60, `title length ${title.length}`);
+
+        const desc = html.match(/<meta name="description" content="([^"]*)">/)[1];
+        assert.equal(desc, TAAL_META);
+        assert.ok(desc.length >= 140 && desc.length <= 155, `meta length ${desc.length}`);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${TAAL_PATH}">`));
+
+        const h1s = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/g) || [];
+        assert.equal(h1s.length, 1, `expected 1 <h1>, got ${h1s.length}`);
+        assert.equal((html.match(/<h1/g) || []).length, 1);
+        assert.match(h1s[0], /id="artikel-titel"/);
+        assert.match(h1s[0], /Matige taalbeheersing: hoe weegt de arbeidsdeskundige dit mee bij passende functies\?/);
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>Wat legt de arbeidsdeskundige vast over taalniveau\?<\/h2>/);
+        assert.match(body, /<h2>Hoe weegt taal mee bij passende arbeid\?<\/h2>/);
+        assert.match(body, /<h2>Hoe weegt taal mee bij functieduiding door UWV\?<\/h2>/);
+        assert.match(body, /<h2>Wat oordeelde een rechtbank op 14 september 2026\?<\/h2>/);
+        assert.match(body, /<h2>Welke vragen stel je als HR, casemanager of jurist\?<\/h2>/);
+        assert.match(body, /<h2>Waar leg je deze vraag neer\?<\/h2>/);
+        assert.match(body, /art\. 7:658a lid 4 BW/);
+        assert.match(body, /Schattingsbesluit arbeidsongeschiktheidswetten/);
+        assert.match(body, /ECLI:NL:RBGEL:2026:7022/);
+        assert.match(body, /SBC-code 315133/);
+        assert.match(body, /een rechtbank oordeelde/i);
+        assert.match(body, /eerste aanleg/);
+        assert.match(body, /geen juridisch advies/);
+        assert.match(body, /href="\/kennisbank\/passende-arbeid"/);
+        assert.match(body, /href="\/kennisbank\/casus-deskundigenoordeel-taalbarriere"/);
+        assert.match(body, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"/);
+        assert.match(body, /href="\/kennisbank\/deskundigenoordeel"/);
+        assert.match(body, /href="\/kennisbank\/second-opinion-arbeidsdeskundige"/);
+        assert.match(body, /href="\/offerte-aanvragen"/);
+        assert.doesNotMatch(body, /—/);
+        assert.doesNotMatch(body, /–/);
+        assert.doesNotMatch(body, /<h1/i);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /€/);
+        for (const name of ['Arbeidskenners', 'Mieke Zwenger', 'Comens', 'FIT Verzuimbeheer', 'Elabo', 'Arbo Werkt', 'Capability', 'Leuk Personeel', 'Amplooi']) {
+            assert.doesNotMatch(body, new RegExp(name, 'i'));
+        }
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 90).join(' ');
+        assert.match(firstWords, /Taalbeheersing weegt mee/);
+        assert.match(firstWords, /passende arbeid/i);
+
+        const blocks = [];
+        const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+        let m;
+        while ((m = re.exec(html))) blocks.push(JSON.parse(m[1]));
+        const articles = blocks.filter((b) => b['@type'] === 'Article');
+        const faqs = blocks.filter((b) => b['@type'] === 'FAQPage');
+        const crumbs = blocks.filter((b) => b['@type'] === 'BreadcrumbList');
+        assert.equal(articles.length, 1);
+        assert.equal(articles[0].headline, TAAL_H1);
+        assert.equal(articles[0].datePublished, '2026-10-13');
+        assert.equal(articles[0].dateModified, '2026-10-13');
+        assert.equal(articles[0].author.name, 'Niels Alderding');
+        assert.equal(articles[0].author.jobTitle, 'geregistreerd arbeidsdeskundige');
+        assert.equal(faqs.length, 1);
+        assert.equal(crumbs.length, 1);
+        assert.ok(faqs[0].mainEntity.length >= 3 && faqs[0].mainEntity.length <= 6);
+        assert.ok(crumbs[0].itemListElement.some((it) => it.item === 'https://www.arbeidsdeskundig.com' + TAAL_PATH));
+
+        const faqHtmlStart = html.indexOf('id="artikel-faq-list"');
+        const faqHtmlEnd = html.indexOf('Nog een vraag over jouw specifieke dossier', faqHtmlStart);
+        const faqHtml = html.slice(faqHtmlStart, faqHtmlEnd);
+        assert.match(html, /<h2[^>]*>Veelgestelde vragen<\/h2>/);
+        const visible = [...faqHtml.matchAll(/<button class="accordion-head"[^>]*>([\s\S]*?)<span class="accordion-icon">\+<\/span><\/button>\s*<div class="accordion-body"[^>]*><div class="accordion-body-inner">([\s\S]*?)<\/div>/g)];
+        assert.equal(visible.length, faqs[0].mainEntity.length);
+        faqs[0].mainEntity.forEach((q, i) => {
+            assert.equal(visible[i][1], q.name);
+            assert.equal(visible[i][2], q.acceptedAnswer.text);
+        });
+
+        const map = await fetch(base + '/sitemap.xml');
+        assert.equal(map.status, 200);
+        const xml = await map.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${TAAL_PATH}`));
+        assert.equal((xml.match(new RegExp(TAAL_SLUG, 'g')) || []).length, 1);
+
+        const llms = await fetch(base + '/llms.txt');
+        assert.equal(llms.status, 200);
+        assert.match(await llms.text(), new RegExp(`https://www\\.arbeidsdeskundig\\.com${TAAL_PATH}`));
+
+        for (const related of [
+            '/kennisbank/casus-deskundigenoordeel-taalbarriere',
+            '/kennisbank/passende-arbeid',
+            '/kennisbank/arbeidsdeskundig-onderzoek-gids',
+        ]) {
+            const rel = await fetch(base + related, GOOGLEBOT);
+            assert.equal(rel.status, 200);
+            assert.match(await rel.text(), new RegExp(`href="${TAAL_PATH}"`));
+        }
+    });
+});
+

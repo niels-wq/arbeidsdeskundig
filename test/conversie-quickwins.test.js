@@ -64,6 +64,8 @@ describe('conversie quick win: kosten', () => {
         assert.match(blok, /€1\.449/);
         assert.match(blok, /\+€295/);
         assert.match(blok, /\+€300/);
+        assert.match(body, /starten in 2027 vanaf €1\.149/);
+        assert.match(body, /<h2>Tarief arbeidsdeskundig onderzoek 2027 \(excl\. btw\)<\/h2>/);
         assertNoDash(blok, 'prijsblok');
         assert.doesNotMatch(blok, /€\s?1\.095/);
 

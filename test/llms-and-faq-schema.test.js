@@ -183,14 +183,21 @@ describe('homepage JSON-LD organization, website and logo', () => {
         assert.equal(org.logo.url, 'https://www.arbeidsdeskundig.com/logo.svg');
         assert.equal(org.image, 'https://www.arbeidsdeskundig.com/logo.svg');
         assert.equal(org.sameAs, undefined);
-        assert.deepEqual(org.aggregateRating, {
-            '@type': 'AggregateRating',
-            ratingValue: 4.9,
-            reviewCount: 21,
-            bestRating: 5,
-        });
-        assert.equal(org.review.length, 9);
-        assert.equal(org.review[0].author.name, 'Jolande van de Graaf');
+        assert.equal(org.aggregateRating, undefined);
+        assert.equal(org.review, undefined);
+        assert.equal(org.telephone, '+31850870307');
+        assert.equal(org.contactPoint, undefined);
+        for (const node of nodes) {
+            const types = [].concat(node['@type'] || []);
+            assert.equal(types.includes('AggregateRating'), false);
+            assert.equal(types.includes('Review'), false);
+            assert.equal(node.aggregateRating, undefined);
+            assert.equal(node.review, undefined);
+        }
+        assert.match(html, /id="testimonial-cards"/);
+        assert.match(html, /id="rating-score">4,9 \/ 5</);
+        assert.match(html, /Jolande van de Graaf/);
+        assert.match(html, /id="rating-count">op basis van 21\+ Google-reviews</);
 
         const site = nodes.find((n) => n['@id'] === 'https://www.arbeidsdeskundig.com/#website');
         assert.ok(site);

@@ -1730,3 +1730,126 @@ describe('kennisbank article: taalbeheersing en passende functies', () => {
     });
 });
 
+const MAATMAN_SLUG = 'maatmanloon-arbeidsdeskundige';
+const MAATMAN_PATH = '/kennisbank/' + MAATMAN_SLUG;
+const MAATMAN_TITLE = 'Maatmanloon vaststellen in de WIA | Arbeidsdeskundig.com';
+const MAATMAN_H1 = 'Maatmanloon: hoe de arbeidsdeskundige het vaststelt en waar het vaak misgaat';
+const MAATMAN_META = 'Maatmanloon in de WIA: welke looncomponenten meetellen, waar de peildatum misgaat en welke loongegevens de werkgever aanlevert om fouten te voorkomen.';
+
+describe('kennisbank article: maatmanloon', () => {
+    it('serves 200 with one h1, schema, sources and listings', async () => {
+        const res = await fetch(base + MAATMAN_PATH, GOOGLEBOT);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        const title = html.match(/<title>([^<]+)<\/title>/)[1];
+        assert.equal(title, MAATMAN_TITLE);
+        assert.ok(title.endsWith(' | Arbeidsdeskundig.com'));
+        assert.ok(title.length >= 50 && title.length <= 60, `title length ${title.length}`);
+
+        const desc = html.match(/<meta name="description" content="([^"]*)">/)[1];
+        assert.equal(desc, MAATMAN_META);
+        assert.ok(desc.length >= 140 && desc.length <= 155, `meta length ${desc.length}`);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${MAATMAN_PATH}">`));
+
+        const h1s = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/g) || [];
+        assert.equal(h1s.length, 1, `expected 1 <h1>, got ${h1s.length}`);
+        assert.equal((html.match(/<h1/g) || []).length, 1);
+        assert.match(h1s[0], /id="artikel-titel"/);
+        assert.match(h1s[0], /Maatmanloon: hoe de arbeidsdeskundige het vaststelt en waar het vaak misgaat/);
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>Wat is het maatmaninkomen in de WIA-beoordeling\?<\/h2>/);
+        assert.match(body, /<h2>Hoe stelt de arbeidsdeskundige het maatmaninkomen vast\?<\/h2>/);
+        assert.match(body, /<h2>Welke looncomponenten tellen mee\?<\/h2>/);
+        assert.match(body, /<h2>Waar gaat de vaststelling vaak mis\?<\/h2>/);
+        assert.match(body, /<h2>Wat kan de werkgever aanleveren\?<\/h2>/);
+        assert.match(body, /<h2>Wat heb je eraan bij de aanvraag of in bezwaar\?<\/h2>/);
+        assert.match(body, /Het maatmaninkomen is hetgeen gezonde personen/);
+        assert.match(body, /artikel 7a/);
+        assert.match(body, /Artikel 11a/);
+        assert.match(body, /ten hoogste 20%/);
+        assert.match(body, /ten hoogste 65%/);
+        assert.match(body, /ECLI:NL:CRVB:2025:1079/);
+        assert.match(body, /ECLI:NL:CRVB:2012:BW3706/);
+        assert.match(body, /de Centrale Raad van Beroep oordeelde/i);
+        assert.match(body, /tussenuitspraak/);
+        assert.match(body, /geen juridisch advies/);
+        assert.match(body, /geen afvinklijst/);
+        assert.match(body, /href="\/kennisbank\/loonwaardeonderzoek"/);
+        assert.match(body, /href="\/kennisbank\/bezwaar-wia"/);
+        assert.match(body, /href="\/kennisbank\/wia-aanvraag"/);
+        assert.match(body, /href="\/offerte-aanvragen"/);
+        assert.match(body, /BWBR0011478/);
+        assert.match(body, /BWBR0019057/);
+        assert.match(body, /BWBR0033471/);
+        assert.doesNotMatch(body, /—/);
+        assert.doesNotMatch(body, /–/);
+        assert.doesNotMatch(body, /<h1/i);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /€/);
+        for (const name of ['Arbeidskenners', 'Mieke Zwenger', 'Comens', 'FIT Verzuimbeheer', 'Elabo', 'Arbo Werkt', 'Capability', 'Leuk Personeel', 'Amplooi']) {
+            assert.doesNotMatch(body, new RegExp(name, 'i'));
+        }
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 90).join(' ');
+        assert.match(firstWords, /maatmanloon/i);
+        assert.match(firstWords, /maatmaninkomen/i);
+        assert.match(firstWords, /refertejaar/i);
+
+        const blocks = [];
+        const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+        let m;
+        while ((m = re.exec(html))) blocks.push(JSON.parse(m[1]));
+        const articles = blocks.filter((b) => b['@type'] === 'Article');
+        const faqs = blocks.filter((b) => b['@type'] === 'FAQPage');
+        const crumbs = blocks.filter((b) => b['@type'] === 'BreadcrumbList');
+        assert.equal(articles.length, 1);
+        assert.equal(articles[0].headline, MAATMAN_H1);
+        assert.equal(articles[0].datePublished, '2026-10-20');
+        assert.equal(articles[0].dateModified, '2026-10-20');
+        assert.equal(articles[0].author.name, 'Niels Alderding');
+        assert.equal(articles[0].author.jobTitle, 'geregistreerd arbeidsdeskundige');
+        assert.equal(faqs.length, 1);
+        assert.equal(crumbs.length, 1);
+        assert.ok(faqs[0].mainEntity.length >= 3 && faqs[0].mainEntity.length <= 6);
+        assert.ok(crumbs[0].itemListElement.some((it) => it.item === 'https://www.arbeidsdeskundig.com' + MAATMAN_PATH));
+
+        const faqHtmlStart = html.indexOf('id="artikel-faq-list"');
+        const faqHtmlEnd = html.indexOf('Nog een vraag over jouw specifieke dossier', faqHtmlStart);
+        const faqHtml = html.slice(faqHtmlStart, faqHtmlEnd);
+        assert.match(html, /<h2[^>]*>Veelgestelde vragen<\/h2>/);
+        const visible = [...faqHtml.matchAll(/<button class="accordion-head"[^>]*>([\s\S]*?)<span class="accordion-icon">\+<\/span><\/button>\s*<div class="accordion-body"[^>]*><div class="accordion-body-inner">([\s\S]*?)<\/div>/g)];
+        assert.equal(visible.length, faqs[0].mainEntity.length);
+        faqs[0].mainEntity.forEach((q, i) => {
+            assert.equal(visible[i][1], q.name);
+            assert.equal(visible[i][2], q.acceptedAnswer.text);
+        });
+
+        const map = await fetch(base + '/sitemap.xml');
+        assert.equal(map.status, 200);
+        const xml = await map.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${MAATMAN_PATH}`));
+        assert.equal((xml.match(new RegExp(MAATMAN_SLUG, 'g')) || []).length, 1);
+
+        const llms = await fetch(base + '/llms.txt');
+        assert.equal(llms.status, 200);
+        assert.match(await llms.text(), new RegExp(`https://www\\.arbeidsdeskundig\\.com${MAATMAN_PATH}`));
+
+        for (const related of [
+            '/kennisbank/loonwaardeonderzoek',
+            '/kennisbank/bezwaar-wia',
+            '/kennisbank/wia-aanvraag',
+        ]) {
+            const rel = await fetch(base + related, GOOGLEBOT);
+            assert.equal(rel.status, 200);
+            assert.match(await rel.text(), new RegExp(`href="${MAATMAN_PATH}"`));
+        }
+    });
+});
+

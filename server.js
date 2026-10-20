@@ -806,6 +806,7 @@ Sitemap: ${BASE_URL}/sitemap.xml
 // kan alleen helpen bij vindbaarheid in ChatGPT/Perplexity/Claude e.d.
 // ---------------------------------------------------------------------------
 const LLMS_FEATURED_SLUGS = [
+    'maatmanloon-arbeidsdeskundige',
     'taalbeheersing-passende-functies-arbeidsdeskundige',
     'goedkoopste-arbeidsdeskundig-onderzoek',
     'urenopbouw-stagneert-arbeidsdeskundig-onderzoek',

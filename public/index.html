@@ -183,6 +183,7 @@
   .hero-grid{display:grid; grid-template-columns:1fr; gap:32px; align-items:center;}
   @media(min-width:900px){ .hero-grid{grid-template-columns:1.1fr .9fr;} }
   .svg-frame{border-radius:4px; overflow:hidden; border:1px solid #DFE2DB; background:var(--white); display:flex; align-items:center; justify-content:center;}
+  .artikel-featured{display:block; width:100%; max-width:100%; height:auto; margin:16px 0 4px; border-radius:4px; background:var(--ink); aspect-ratio:1200 / 630;}
 
   .card{background:var(--white); border:1px solid #DFE2DB; padding:24px; border-radius:2px;}
   .grid3{display:grid; gap:24px; grid-template-columns:1fr;}
@@ -1512,6 +1513,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     </p>
     <button class="eyebrow btn-link" style="margin-top:16px; background:none; border:none; padding:0; cursor:pointer;" id="artikel-tag" onclick="filterKennisbankVanArtikel()">Ziektewet</button>
     <h1 class="route-h1" style="font-size:2.1rem; color:var(--ink); margin-top:8px;" id="artikel-titel">Titel</h1>
+    <div id="artikel-featured-slot"></div>
     <p style="margin-top:8px; font-size:.8rem; color:var(--muted2);" id="artikel-meta">Leestijd: 6 minuten · Laatst bijgewerkt: 2026</p>
     <div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
       <img src="/assets/niels-foto.png?v=2" alt="Niels Alderding" loading="lazy" style="width:28px; height:28px; border-radius:50%; object-fit:cover; flex-shrink:0;" onerror="this.style.display='none';">
@@ -5969,6 +5971,24 @@ whk: `
     setTimeout(()=>{ activeTag = tag; renderFilters(); renderPosts(); }, 0);
   }
 
+  function setArtikelFeatured(post){
+    const slot = document.getElementById('artikel-featured-slot');
+    if(!slot || !post) return;
+    let img = document.getElementById('artikel-featured');
+    if(!img){
+      img = document.createElement('img');
+      img.id = 'artikel-featured';
+      img.className = 'artikel-featured';
+      slot.appendChild(img);
+    }
+    img.src = '/assets/og/' + post.slug + '.png';
+    img.alt = 'Kennisbank: ' + post.title;
+    img.width = 1200;
+    img.height = 630;
+    img.loading = 'eager';
+    img.setAttribute('fetchpriority', 'high');
+  }
+
   function openArtikel(slug, opts){
     const post = posts.find(p=>p.slug===slug);
     if(!post) return;
@@ -5977,6 +5997,7 @@ whk: `
     if(metaDescEl && post.meta) metaDescEl.setAttribute('content', post.meta);
     document.getElementById('artikel-tag').textContent = post.tag;
     document.getElementById('artikel-titel').textContent = post.title;
+    setArtikelFeatured(post);
     document.getElementById('artikel-breadcrumb-tag').textContent = post.tag;
     document.getElementById('artikel-breadcrumb-titel').textContent = post.title;
     document.getElementById('artikel-meta').textContent = `Leestijd: ${post.read} · Laatst bijgewerkt: ${post.dateModified || '2026'}`;

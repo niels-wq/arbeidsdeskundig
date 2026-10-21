@@ -205,20 +205,81 @@ const DEFAULT_DESC = 'Arbeidsdeskundig onderzoek vanaf €1.149,-. Online of fys
 
 app.use(compression());
 app.disable('x-powered-by');
-// CSP staat uit: de frontend leunt zwaar op inline <script>/style="" (single-file
-// opzet), en een niet-grondig-geteste CSP kan de site stuk breken. De overige
-// helmet-headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy,
-// HSTS, enz.) staan wel aan — dat is winst zonder risico. Wil je later een
-// strikte CSP, dan hoort daar eerst een refactor naar externe .js/.css bij.
-// CORP staat op cross-origin: dit is een publieke marketingsite. Helmet's
-// default `same-origin` laat browsers (en sommige SEO-/fetch-tools) de
-// sitemap als geblokkeerde cross-origin resource behandelen — dat wordt
-// vaak als HTTP 500 of "couldn't fetch sitemap" gerapporteerd, terwijl
-// curl wél 200 ziet.
+// Security headers op elke response. CSP is bewust report-only: de single-file
+// frontend leunt op inline <script>, style="" en onclick, Google Fonts,
+// Calendly, en (pas na cookietoestemming) GA4/gtag plus de Meta Pixel.
+// Report-only meldt afwijkingen zonder iets te blokkeren, zodat de chat
+// (/api/chat), formulieren, og:image en sitemap niet stuk gaan. Een
+// afdwingende CSP hoort pas na een refactor naar externe .js/.css.
+// Navigatie (wa.me, Calendly, matchvermogen.nl) valt niet onder deze CSP:
+// er is geen navigate-to, dus gewone links blijven werken.
+// CORP blijft cross-origin. Helmet's default same-origin laat browsers en
+// sommige SEO-tools de sitemap en OG-beelden als geblokkeerde cross-origin
+// resource zien — vaak gemeld als HTTP 500 of "couldn't fetch sitemap",
+// terwijl curl wél 200 ziet.
+const PERMISSIONS_POLICY = 'camera=(), microphone=(), geolocation=(), payment=(), usb=()';
 app.use(helmet({
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: {
+        reportOnly: true,
+        useDefaults: true,
+        directives: {
+            'font-src': ["'self'", 'https://fonts.gstatic.com', 'data:'],
+            'frame-ancestors': ["'self'"],
+            'frame-src': ["'self'", 'https://calendly.com', 'https://assets.calendly.com'],
+            'img-src': [
+                "'self'",
+                'data:',
+                'https://matchvermogen.nl',
+                'https://*.google-analytics.com',
+                'https://*.googletagmanager.com',
+                'https://www.facebook.com',
+            ],
+            'script-src': [
+                "'self'",
+                "'unsafe-inline'",
+                'https://*.googletagmanager.com',
+                'https://*.google-analytics.com',
+                'https://connect.facebook.net',
+                'https://assets.calendly.com',
+            ],
+            // onclick="..." valt onder script-src-attr, niet onder script-src.
+            // Helmet's default is 'none'; dat zou elk inline handler rapporteren.
+            'script-src-attr': ["'unsafe-inline'"],
+            'style-src': [
+                "'self'",
+                "'unsafe-inline'",
+                'https://fonts.googleapis.com',
+                'https://assets.calendly.com',
+            ],
+            'connect-src': [
+                "'self'",
+                'https://*.google-analytics.com',
+                'https://*.analytics.google.com',
+                'https://analytics.google.com',
+                'https://*.googletagmanager.com',
+                'https://www.facebook.com',
+                'https://connect.facebook.net',
+                'https://calendly.com',
+                'https://assets.calendly.com',
+                'https://fonts.googleapis.com',
+                'https://fonts.gstatic.com',
+            ],
+        },
+    },
     crossOriginResourcePolicy: { policy: 'cross-origin' },
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    strictTransportSecurity: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: false,
+    },
+    xContentTypeOptions: true,
+    xFrameOptions: { action: 'sameorigin' },
 }));
+app.use((req, res, next) => {
+    res.setHeader('Permissions-Policy', PERMISSIONS_POLICY);
+    next();
+});
 app.use(express.json({ limit: '200kb' }));
 
 // Preview-omgevingen (bijv. de chatbot-preview op *.up.railway.app) mogen niet

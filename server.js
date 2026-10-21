@@ -259,6 +259,12 @@ app.use((req, res, next) => {
 // versie tonen. Voeg in dat geval altijd een cache-bust toe aan de verwijzing,
 // bijvoorbeeld `/assets/niels-foto.png?v=2` -> `?v=3` bij de volgende wijziging.
 const ASSETS_DIR = path.join(__dirname, 'assets');
+for (const post of posts) {
+    const ogFile = path.join(ASSETS_DIR, 'og', post.slug + '.png');
+    if (!fs.existsSync(ogFile)) {
+        console.warn('[seo] Geen featured image voor kennisbankartikel ' + post.slug + ' (' + ogFile + ')');
+    }
+}
 app.use('/assets', express.static(ASSETS_DIR, {
     maxAge: '30d',
     immutable: true,
@@ -313,6 +319,14 @@ function hydrateArtikelView(html, post, body) {
         `id="artikel-tag" onclick="filterKennisbankVanArtikel()">${escapeHtml(post.tag)}</button>`
     );
     html = html.replace('id="artikel-titel">Titel</h1>', `id="artikel-titel">${escapeHtml(post.title)}</h1>`);
+    const featuredSrc = '/assets/og/' + post.slug + '.png';
+    const featuredAlt = 'Kennisbank: ' + (post.title || '');
+    html = html.replace(
+        '<div id="artikel-featured-slot"></div>',
+        '<div id="artikel-featured-slot"><img id="artikel-featured" class="artikel-featured" src="' +
+            escapeHtml(featuredSrc) + '" alt="' + escapeHtml(featuredAlt) +
+            '" width="1200" height="630" loading="eager" fetchpriority="high"></div>'
+    );
     html = html.replace('id="artikel-breadcrumb-tag"></span>', `id="artikel-breadcrumb-tag">${escapeHtml(post.tag)}</span>`);
     html = html.replace('id="artikel-breadcrumb-titel"></span>', `id="artikel-breadcrumb-titel">${escapeHtml(post.title)}</span>`);
     const updated = post.dateModified || '2026';
@@ -461,7 +475,7 @@ function hydrateFaqView(html, faqs) {
     );
 }
 
-function renderPage(res, { title, description, canonicalPath, route, articleJsonLd, breadcrumbJsonLd, faqJsonLd, statusCode }) {
+function renderPage(res, { title, description, canonicalPath, route, articleJsonLd, breadcrumbJsonLd, faqJsonLd, ogImage, statusCode }) {
     const canonical = BASE_URL + canonicalPath;
     const safeTitle = escapeHtml(title || DEFAULT_TITLE);
     const safeDesc = escapeHtml(description || DEFAULT_DESC);
@@ -500,6 +514,15 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
     html = html.replace(/<meta property="og:url" content=".*?">/s, `<meta property="og:url" content="${canonical}">`);
     html = html.replace(/<meta name="twitter:title" content=".*?">/s, `<meta name="twitter:title" content="${safeTitle}">`);
     html = html.replace(/<meta name="twitter:description" content=".*?">/s, `<meta name="twitter:description" content="${safeDesc}">`);
+    if (ogImage) {
+        const imgUrl = escapeHtml(ogImage.url);
+        const imgAlt = escapeHtml(ogImage.alt || '');
+        html = html.replace(/<meta property="og:image" content="[^"]*">/, `<meta property="og:image" content="${imgUrl}">`);
+        html = html.replace(/<meta property="og:image:width" content="[^"]*">/, `<meta property="og:image:width" content="${ogImage.width}">`);
+        html = html.replace(/<meta property="og:image:height" content="[^"]*">/, `<meta property="og:image:height" content="${ogImage.height}">`);
+        html = html.replace(/<meta property="og:image:alt" content="[^"]*">/, `<meta property="og:image:alt" content="${imgAlt}">`);
+        html = html.replace(/<meta name="twitter:image" content="[^"]*">/, `<meta name="twitter:image" content="${imgUrl}">`);
+    }
 
     // Extra per-pagina JSON-LD (Article + BreadcrumbList + FAQPage waar de
     // vragen ook zichtbaar zijn) vóór </head> toevoegen, naast het site-brede
@@ -691,11 +714,19 @@ app.get('/kennisbank/:slug', (req, res, next) => {
     const post = posts.find((p) => p.slug === req.params.slug);
     if (!post) return next(); // -> 404 handler
 
+    const featuredUrl = BASE_URL + '/assets/og/' + post.slug + '.png';
+    const featuredAlt = 'Kennisbank: ' + post.title;
     const articleJsonLd = {
         '@context': 'https://schema.org',
         '@type': 'Article',
         headline: post.title,
         description: post.meta,
+        image: {
+            '@type': 'ImageObject',
+            url: featuredUrl,
+            width: 1200,
+            height: 630,
+        },
         articleSection: post.tag,
         keywords: post.tag + ', arbeidsdeskundig onderzoek, Wet Poortwachter',
         inLanguage: 'nl-NL',
@@ -717,6 +748,7 @@ app.get('/kennisbank/:slug', (req, res, next) => {
         description: post.meta,
         canonicalPath: '/kennisbank/' + post.slug,
         route: { view: 'artikel', slug: post.slug },
+        ogImage: { url: featuredUrl, width: 1200, height: 630, alt: featuredAlt },
         articleJsonLd,
         faqJsonLd,
         breadcrumbJsonLd: breadcrumbFor([

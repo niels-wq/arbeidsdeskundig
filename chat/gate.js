@@ -12,7 +12,7 @@ const OWN_EMAIL_RE = /@(arbeidsdeskundig\.com|matchvermogen\.nl|bestmatchbv\.nl)
 
 // Tarieven van de site (2027, excl. btw), zie /llms.txt en de offerte-PDF in server.js.
 // Geen 2027-tarieflijst voor toeslagen in de repo: fysiek en spoed blijven 295 en 300.
-const TARIFFS = { klein: 1149, midden: 1179, groot: 1449, fysiek: 295, spoed: 300 };
+const TARIFFS = { klein: 999, midden: 1179, groot: 1449, fysiek: 295, spoed: 300 };
 
 function normalizePhone(raw) {
     const s = String(raw || '').trim();

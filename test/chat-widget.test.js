@@ -124,7 +124,7 @@ describe('prijsregel en gesprek zonder API-sleutel (gescript)', () => {
         assert.equal(json.contact, true);
         assert.equal(json.lead, true);
         assert.equal(gate.hasPrice(json.reply), true);
-        assert.match(json.reply, /1\.149/);
+        assert.match(json.reply, /999/);
         assert.match(json.reply, /1\.179/);
         const mails = captured.slice(before).filter((l) => l.includes('[Resend niet geconfigureerd]'));
         assert.equal(mails.length, 1);
@@ -145,7 +145,7 @@ describe('xAI-proxy (gemockt)', () => {
         process.env.XAI_API_KEY = 'test-key-not-real';
         process.env.XAI_API_BASE = mockBase;
         mockCalls = [];
-        mockReply = { content: 'Een onderzoek kost vanaf €1.149 excl. btw.' };
+        mockReply = { content: 'Een onderzoek kost vanaf €999 excl. btw.' };
         const { json } = await chat({ session: session(), messages: convo(PRICE_Q) });
         assert.equal(mockCalls.length, 1);
         assert.equal(mockCalls[0].headers.authorization, 'Bearer test-key-not-real');
@@ -217,7 +217,7 @@ describe('beveiliging en limieten', () => {
 describe('gate en flow (unit)', () => {
     it('herkent prijzen en geen prijzen', () => {
         assert.equal(gate.hasPrice('Het kost 1.179 excl. btw'), true);
-        assert.equal(gate.hasPrice('Vanaf €1.149,-'), true);
+        assert.equal(gate.hasPrice('Vanaf €999,-'), true);
         assert.equal(gate.hasPrice('rond de twaalfhonderd'), true);
         assert.equal(gate.hasPrice('We deden al 1.500+ onderzoeken.'), false);
         assert.equal(gate.hasPrice('Rond week 42 en week 104 is dat belangrijk.'), false);

@@ -196,13 +196,13 @@ const siteFaqs = extractSiteFaqs(INDEX_HTML);
 
 // Twee vragen die daadwerkelijk in de homepage-HTML staan (niet de volledige FAQ).
 const HOME_VISIBLE_FAQ = [
-    ['Wat kost een arbeidsdeskundig onderzoek?', 'Vanaf €999,- exclusief btw. Het exacte tarief hangt af van bedrijfsgrootte. Zie de volledige FAQ voor alle tarieven.'],
+    ['Wat kost een arbeidsdeskundig onderzoek?', 'Vanaf €999,- exclusief btw, in sommige gevallen bij een vroegtijdig onderzoek. Het exacte tarief hangt af van bedrijfsgrootte. Zie de volledige FAQ voor alle tarieven.'],
     ['Kan het onderzoek ook fysiek?', 'Ja. Online is het snelst en standaard inbegrepen, maar een bezoek op locatie is altijd bespreekbaar — bijvoorbeeld als een werkplekonderzoek meerwaarde heeft.'],
 ];
 
 console.log(`[seo] ${posts.length} kennisbank-artikelen, ${personas.length} doelgroep-pagina's en ${siteFaqs.length} FAQ-vragen geladen`);
 const DEFAULT_TITLE = 'arbeidsdeskundig.com — Arbeidsdeskundig onderzoek, online én fysiek';
-const DEFAULT_DESC = 'Arbeidsdeskundig onderzoek vanaf €999,-. Online of fysiek, door heel Nederland. Specialist in WGA, Ziektewet en Wet Poortwachter.';
+const DEFAULT_DESC = 'Arbeidsdeskundig onderzoek vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek. Online of fysiek, door heel Nederland. Specialist in WGA, Ziektewet en Wet Poortwachter.';
 
 app.use(compression());
 app.disable('x-powered-by');
@@ -748,7 +748,7 @@ app.get('/over-ons', (req, res) => {
 app.get('/offerte-aanvragen', (req, res) => {
     renderPage(res, {
         title: 'Offerte aanvragen — arbeidsdeskundig.com',
-        description: 'Vraag vrijblijvend een offerte aan. Vanaf €999,-, reactie binnen 24 uur, 4,9/5. Of plan eerst 15 minuten kennismaking.',
+        description: 'Vraag vrijblijvend een offerte aan. Vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek, reactie binnen 24 uur, 4,9/5. Of plan eerst 15 minuten kennismaking.',
         canonicalPath: '/offerte-aanvragen',
         route: { view: 'offerte' },
     });
@@ -757,7 +757,7 @@ app.get('/offerte-aanvragen', (req, res) => {
 app.get('/aanmelden', (req, res) => {
     renderPage(res, {
         title: 'Aanmelden voor een arbeidsdeskundig onderzoek — arbeidsdeskundig.com',
-        description: 'Meld je aan voor een arbeidsdeskundig onderzoek. Vanaf €999,-, binnen 24 uur opgepakt. Of plan eerst 15 minuten kennismaking.',
+        description: 'Meld je aan voor een arbeidsdeskundig onderzoek. Vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek, binnen 24 uur opgepakt. Of plan eerst 15 minuten kennismaking.',
         canonicalPath: '/aanmelden',
         route: { view: 'aanmelden' },
     });
@@ -1046,7 +1046,7 @@ function buildLlmsTxt() {
 
     return `# arbeidsdeskundig.com
 
-> Arbeidsdeskundig onderzoek vanaf €999,- excl. btw. Online of fysiek, door heel Nederland. Binnen 24 uur opgepakt. UWV-proof, door geregistreerde arbeidsdeskundigen.
+> Arbeidsdeskundig onderzoek vanaf €999,- excl. btw, in sommige gevallen bij een vroegtijdig onderzoek. Online of fysiek, door heel Nederland. Binnen 24 uur opgepakt. UWV-proof, door geregistreerde arbeidsdeskundigen.
 
 arbeidsdeskundig.com is het aanvraag- en kennisplatform voor arbeidsdeskundig onderzoek: een objectieve beoordeling van wat een werknemer nog kan werken, in het kader van de Wet Poortwachter, WGA, Ziektewet en WIA. 1.500+ onderzoeken, gemiddeld 4,9/5 op Google.
 
@@ -1068,7 +1068,8 @@ arbeidsdeskundig.com is het aanvraag- en kennisplatform voor arbeidsdeskundig on
 
 ## Prijzen (2027, excl. btw)
 
-- Vanaf €999,- voor een online onderzoek (tot 5 medewerkers, kleine stichtingen of vrijwilligersorganisaties)
+- Vanaf €999,- excl. btw, in sommige gevallen bij een vroegtijdig onderzoek
+- Tot 5 medewerkers, kleine stichtingen of vrijwilligersorganisaties: €1.149,-
 - Tot 100 medewerkers: €1.179,-
 - Groot zakelijk: €1.449,-
 - Fysiek onderzoek: +€295,-; spoedonderzoek: +€300,-
@@ -1287,7 +1288,7 @@ const OFFERTE_GROOTTE_LABELS = {
     midden: 'Tot 100 medewerkers',
     groot: 'Groot zakelijk',
 };
-const OFFERTE_PRICE_TIERS = { klein: 999, midden: 1179, groot: 1449 };
+const OFFERTE_PRICE_TIERS = { klein: 1149, midden: 1179, groot: 1449 };
 
 function berekenOffertePrijs(grootte, vorm) {
     const basis = OFFERTE_PRICE_TIERS[grootte] || OFFERTE_PRICE_TIERS.midden;

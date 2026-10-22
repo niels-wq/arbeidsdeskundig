@@ -1525,6 +1525,8 @@ describe('kennisbank article: goedkoopste arbeidsdeskundig onderzoek', () => {
         assert.match(body, /draagkracht van de onderneming/);
         assert.match(body, /tussen hoog en laag/);
         assert.match(body, /vanaf € 999/);
+        assert.match(body, /in sommige gevallen bij een vroegtijdig onderzoek/);
+        assert.match(body, /€ 1\.149 excl\. btw/);
         assert.doesNotMatch(body, /<table/i);
         assert.doesNotMatch(body, /vergelijk/i);
         assert.doesNotMatch(body, /onafhankelijke gids/i);

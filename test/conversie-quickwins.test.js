@@ -59,7 +59,10 @@ describe('conversie quick win: kosten', () => {
         assert.match(blok, /Offerte binnen 24 uur/);
         assert.match(blok, /href="\/offerte-aanvragen"/);
         assert.match(blok, /href="\/rekentool"/);
-        assert.match(blok, /€999/);
+        assert.match(blok, /Vanaf €999 excl\. btw, in sommige gevallen bij een vroegtijdig onderzoek/);
+        assert.match(blok, /€1\.149/);
+        assert.match(blok, /tot 5 medewerkers/);
+        assert.doesNotMatch(blok, /€999<\/strong> tot 5/);
         assert.match(blok, /€1\.179/);
         assert.match(blok, /€1\.449/);
         assert.match(blok, /\+€295/);

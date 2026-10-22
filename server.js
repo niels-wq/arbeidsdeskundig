@@ -1624,6 +1624,15 @@ app.get('/googlea9befd16dd1488a4.html', (req, res) => {
     res.type('text/plain').send('google-site-verification: googlea9befd16dd1488a4.html');
 });
 
+// Nieuw verificatiebestand in de site-root. Letterlijk het bestand serveren:
+// 200, exacte body, geen SPA-fallback en geen extra redirect (www/https en
+// trailing slash blijven zoals de middleware hierboven ze al afhandelt).
+app.get('/googleac4843348bb6bad7.html', (req, res) => {
+    res.status(200).type('text/plain').send(
+        fs.readFileSync(path.join(__dirname, 'public', 'googleac4843348bb6bad7.html'), 'utf8')
+    );
+});
+
 app.get('/healthz', (req, res) => res.status(200).send('ok'));
 
 // ---------------------------------------------------------------------------

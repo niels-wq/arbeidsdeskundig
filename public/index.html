@@ -1553,6 +1553,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     <p class="eyebrow" style="margin-top:16px;">Voor <span id="persona-label"></span></p>
     <h1 class="route-h1" style="font-size:2.1rem; color:var(--ink); margin-top:8px;" id="persona-titel">Titel</h1>
     <p style="margin-top:14px; font-size:1rem; color:var(--muted); max-width:680px;" id="persona-intro"></p>
+    <p id="persona-tolk-link" hidden style="margin-top:14px; font-size:.95rem; color:var(--muted); max-width:680px;"></p>
 
     <div class="grid2" style="margin-top:28px; gap:16px;" id="persona-kernpunten"></div>
 
@@ -1922,6 +1923,146 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
   </div>
 </div>
 
+<div class="view" id="view-tolk" hidden>
+  <div class="wrap" style="max-width:760px; padding-top:48px; padding-bottom:64px;">
+    <p style="font-size:.76rem; color:var(--muted2);">
+      <a class="btn-link" style="font-size:.76rem;" href="/" onclick="event.preventDefault(); setView('home')">Home</a> / Arbeidsdeskundige met tolk
+    </p>
+    <p class="eyebrow" style="margin-top:16px;">Onderzoek in je eigen taal</p>
+    <h1 class="route-h1" style="font-size:2.1rem; color:var(--ink); margin-top:8px;">Arbeidsdeskundige met tolk: onderzoek in elke taal</h1>
+    <p style="margin-top:14px; font-size:1.05rem; color:var(--muted); line-height:1.7;">Spreekt een werknemer onvoldoende Nederlands, dan kan het arbeidsdeskundig onderzoek gewoon doorgaan met een tolk. Wij werken met een professionele tolk, beëdigd indien nodig, van een gerenommeerd, landelijk tolkenbureau, en bij eenvoudige onderdelen met Translate. Dat kan in alle talen, online of op locatie, door heel Nederland. De arbeidsdeskundige houdt rekening met taal en cultuur, zodat belastbaarheid en mogelijkheden goed worden begrepen en vastgelegd. In het rapport staat de naam van de tolk.</p>
+    <img class="artikel-featured" src="/images/arbeidsdeskundige-met-tolk.jpg" alt="Online gesprek met arbeidsdeskundige en tolk" width="1200" height="675" style="aspect-ratio:1200 / 675;" loading="eager" fetchpriority="high">
+
+    <div class="article-body">
+      <h2>Wat doet een tolk bij een arbeidsdeskundig onderzoek?</h2>
+      <p>Een professionele tolk, beëdigd indien nodig, vertaalt het gesprek letterlijk. De tolk is neutraal, geeft geen advies en beslist niet mee over belastbaarheid of passende arbeid. De arbeidsdeskundige blijft verantwoordelijk voor de beoordeling. In het rapport staat dat er een tolk bij was, met de naam van de tolk.</p>
+      <p>Wij regelen die tolk via een gerenommeerd, landelijk tolkenbureau. Bij korte, eenvoudige onderdelen kan Translate volstaan. Het kerngesprek doen we met een professionele tolk, beëdigd indien nodig.</p>
+
+      <h2>Tolk, Translate of familielid: wat is betrouwbaar?</h2>
+      <p>Niet elke vorm van vertalen is even geschikt voor een onderzoek. Dit is het verschil op betrouwbaarheid, privacy, geschiktheid en kosten.</p>
+      <table style="width:100%; margin-top:12px; font-size:.92rem; border-collapse:collapse; color:var(--ink);">
+        <thead>
+          <tr>
+            <th style="text-align:left; padding:8px 10px; border-bottom:2px solid #C7CCC4;"></th>
+            <th style="text-align:left; padding:8px 10px; border-bottom:2px solid #C7CCC4;">Professionele tolk, beëdigd indien nodig</th>
+            <th style="text-align:left; padding:8px 10px; border-bottom:2px solid #C7CCC4;">Translate</th>
+            <th style="text-align:left; padding:8px 10px; border-bottom:2px solid #C7CCC4;">Familielid of kind</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px 10px; border-bottom:1px solid #E4E6E1; vertical-align:top;">Betrouwbaarheid</td>
+            <td style="padding:8px 10px; border-bottom:1px solid #E4E6E1; vertical-align:top;">Letterlijk en neutraal, geen advies</td>
+            <td style="padding:8px 10px; border-bottom:1px solid #E4E6E1; vertical-align:top;">Bruikbaar bij korte, eenvoudige onderdelen</td>
+            <td style="padding:8px 10px; border-bottom:1px solid #E4E6E1; vertical-align:top;">Wisselend, niet onafhankelijk</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 10px; border-bottom:1px solid #E4E6E1; vertical-align:top;">Privacy</td>
+            <td style="padding:8px 10px; border-bottom:1px solid #E4E6E1; vertical-align:top;">Buiten het gezin en de werkgever</td>
+            <td style="padding:8px 10px; border-bottom:1px solid #E4E6E1; vertical-align:top;">Geen extra persoon die meeluistert</td>
+            <td style="padding:8px 10px; border-bottom:1px solid #E4E6E1; vertical-align:top;">Het gezin hoort het gesprek</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 10px; border-bottom:1px solid #E4E6E1; vertical-align:top;">Geschiktheid</td>
+            <td style="padding:8px 10px; border-bottom:1px solid #E4E6E1; vertical-align:top;">Het kerngesprek</td>
+            <td style="padding:8px 10px; border-bottom:1px solid #E4E6E1; vertical-align:top;">Eenvoudige onderdelen, niet het hele kerngesprek</td>
+            <td style="padding:8px 10px; border-bottom:1px solid #E4E6E1; vertical-align:top;">Niet voor het kerngesprek</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 10px; vertical-align:top;">Kosten</td>
+            <td style="padding:8px 10px; vertical-align:top;">Lage kosten</td>
+            <td style="padding:8px 10px; vertical-align:top;">Vraag een offerte aan</td>
+            <td style="padding:8px 10px; vertical-align:top;">Niet de route die wij plannen</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Een driegesprek online: hoe verloopt dat?</h2>
+      <p>Online zitten de arbeidsdeskundige, de werknemer en de tolk in hetzelfde videogesprek. De professionele tolk, beëdigd indien nodig, kan ook telefonisch aanhaken.</p>
+      <ol>
+        <li>Je geeft de taal door bij de offerte of de aanmelding.</li>
+        <li>Wij plannen een professionele tolk, beëdigd indien nodig, van een gerenommeerd, landelijk tolkenbureau.</li>
+        <li>Iedereen gebruikt één scherm, zodat niemand buiten beeld valt.</li>
+        <li>Spreek rustig, in korte zinnen, en wacht tot de vertaling klaar is.</li>
+        <li>In het rapport staat de naam van de tolk.</li>
+      </ol>
+      <p>Twijfel je of het gesprek online of op locatie past? Loop de <a class="blog-link" href="/keuzehulp" onclick="event.preventDefault(); setView('advies')">keuzehulp</a>.</p>
+
+      <h2>Taal en cultuur: waar het in de praktijk misgaat</h2>
+      <p>Zonder tolk gaat het vaak mis op punten die niets met onwil te maken hebben. Klachten worden anders benoemd. Ja-knikken betekent niet altijd dat iemand het eens is of het begrepen heeft. Schaamte houdt details tegen. Afhankelijkheid van de werkgever of van huisvesting kleurt het antwoord. En belastbaarheid uitleggen in jargon komt niet aan.</p>
+      <p>Een professionele tolk, beëdigd indien nodig, haalt die ruis uit het gesprek. Hoe dat in een dossier uitpakte, lees je in de <a class="blog-link" href="/kennisbank/casus-deskundigenoordeel-taalbarriere" onclick="event.preventDefault(); openArtikel('casus-deskundigenoordeel-taalbarriere')">casus over een taalbarrière</a>.</p>
+
+      <h2>Hoe weegt taalbeheersing mee in de beoordeling?</h2>
+      <p>De taal van het gesprek is iets anders dan de taal die de functie vraagt. De tolk maakt het gesprek zuiver. Of iemand het Nederlands beheerst dat de taken zelf vragen, weegt de arbeidsdeskundige apart. Die uitleg staat in <a class="blog-link" href="/kennisbank/taalbeheersing-passende-functies-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('taalbeheersing-passende-functies-arbeidsdeskundige')">taalbeheersing en passende functies</a>. Dit stuk herhaalt die weging niet.</p>
+
+      <h2>Wat betekent dit per rol?</h2>
+      <h3>Werknemer</h3>
+      <p>Je kunt om een tolk vragen. Wij plannen een professionele tolk, beëdigd indien nodig, in, online of op locatie. Wat je verder van het onderzoek mag verwachten, staat bij <a class="blog-link" href="/voor/werknemer" onclick="event.preventDefault(); openPersona('werknemer')">arbeidsdeskundig onderzoek voor werknemers</a>.</p>
+      <h3>HR-adviseur en casemanager</h3>
+      <p>Geef de taal door bij het plannen, zodat de tolk op tijd klaarstaat. Kosten: vraag een offerte aan. De inzet heeft lage kosten. Meer voor deze rollen: <a class="blog-link" href="/voor/hr-adviseur" onclick="event.preventDefault(); openPersona('hr-adviseur')">HR-adviseur</a> en <a class="blog-link" href="/voor/casemanager" onclick="event.preventDefault(); openPersona('casemanager')">casemanager</a>.</p>
+      <h3>Letselschadejurist</h3>
+      <p>Voor het dossier telt de zorgvuldigheid van het gesprek en de verslaglegging. In het rapport staat dat er een professionele tolk, beëdigd indien nodig, bij was, met de naam van de tolk. Zo is na te gaan wie vertaalde. De rol van de arbeidsdeskundige in letselschade staat bij <a class="blog-link" href="/voor/letselschadejurist" onclick="event.preventDefault(); openPersona('letselschadejurist')">letselschadejurist</a>.</p>
+      <h3>Directeur-eigenaar</h3>
+      <p>Je wilt dat het gesprek zorgvuldig is vastgelegd, ook als er een tolk bij is. In het rapport staat de naam van de tolk. Kosten: vraag een offerte aan. Achtergrond voor deze rol: <a class="blog-link" href="/voor/directeur-eigenaar" onclick="event.preventDefault(); openPersona('directeur-eigenaar')">directeur-eigenaar</a>.</p>
+
+      <h2>Talen waarin we werken</h2>
+      <p>Een professionele tolk, beëdigd indien nodig, kan in elke taal. Het vaakst plannen we:</p>
+      <ul>
+        <li>Pools</li>
+        <li>Roemeens</li>
+        <li>Bulgaars</li>
+        <li>Oekraïens en Russisch</li>
+        <li>Turks</li>
+        <li>Arabisch, inclusief Marokkaans-Arabisch en Tamazight</li>
+        <li>Engels</li>
+        <li>Spaans</li>
+        <li>Portugees</li>
+        <li>Italiaans</li>
+        <li>Duits</li>
+        <li>Tigrinya</li>
+        <li>Somalisch</li>
+        <li>Farsi en Dari</li>
+        <li>Papiaments</li>
+      </ul>
+      <p>en elke andere taal.</p>
+      <p>Het moederbedrijf beschrijft de aanpak voor anderstaligen op <a href="https://matchvermogen.nl/arbeidsdeskundig-onderzoek/anderstalig-onderzoek/" target="_blank" rel="noopener">anderstalig onderzoek</a>.</p>
+
+      <h2>Veelgestelde vragen</h2>
+      <div id="tolk-faq-list" style="margin-top:12px;">
+        <div class="accordion-item open">
+          <button class="accordion-head" onclick="toggleAccordion(this)">Heb ik recht op een tolk bij de arbeidsdeskundige?<span class="accordion-icon">+</span></button>
+          <div class="accordion-body" style="max-height:none;"><div class="accordion-body-inner">Bij een onderzoek in opdracht van je werkgever kun je om een tolk vragen. Wij plannen een professionele tolk, beëdigd indien nodig, in via een gerenommeerd, landelijk tolkenbureau.</div></div>
+        </div>
+        <div class="accordion-item open">
+          <button class="accordion-head" onclick="toggleAccordion(this)">Kan het gesprek online met een tolk?<span class="accordion-icon">+</span></button>
+          <div class="accordion-body" style="max-height:none;"><div class="accordion-body-inner">Ja, via video. De professionele tolk, beëdigd indien nodig, sluit aan via video of telefoon.</div></div>
+        </div>
+        <div class="accordion-item open">
+          <button class="accordion-head" onclick="toggleAccordion(this)">In welke talen kan het onderzoek?<span class="accordion-icon">+</span></button>
+          <div class="accordion-body" style="max-height:none;"><div class="accordion-body-inner">In alle talen. Het vaakst in Pools, Roemeens, Turks, Arabisch, Oekraïens en Engels.</div></div>
+        </div>
+        <div class="accordion-item open">
+          <button class="accordion-head" onclick="toggleAccordion(this)">Mag mijn kind of partner tolken?<span class="accordion-icon">+</span></button>
+          <div class="accordion-body" style="max-height:none;"><div class="accordion-body-inner">Dat raden we af voor het kerngesprek. Een professionele tolk, beëdigd indien nodig, is neutraler en beschermt je privacy.</div></div>
+        </div>
+        <div class="accordion-item open">
+          <button class="accordion-head" onclick="toggleAccordion(this)">Krijg ik het rapport in mijn eigen taal?<span class="accordion-icon">+</span></button>
+          <div class="accordion-body" style="max-height:none;"><div class="accordion-body-inner">Het rapport is in het Nederlands. In het rapport staat de naam van de tolk. Wij lichten de conclusies met de tolk toe in jouw taal.</div></div>
+        </div>
+      </div>
+      <p>Meer vragen staan bij de <a class="blog-link" href="/veelgestelde-vragen" onclick="event.preventDefault(); setView('faq')">veelgestelde vragen</a>.</p>
+
+      <h2>Vraag een onderzoek met tolk aan</h2>
+      <p>Geef bij de aanvraag de taal door. Wij plannen een professionele tolk, beëdigd indien nodig. Kosten: vraag een offerte aan. De inzet heeft lage kosten.</p>
+      <p>
+        <a class="btn-primary" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een offerte aan</a>
+        <a class="btn-ghost" href="/aanmelden" onclick="event.preventDefault(); setView('aanmelden')" style="margin-left:8px;">Direct aanmelden</a>
+      </p>
+      <p>Liever bellen? <a href="tel:0850870307">085 087 0307</a>.</p>
+    </div>
+  </div>
+</div>
+
 <footer class="site">
   <div class="footer-grid">
     <div>
@@ -1934,6 +2075,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <h4>Kennis</h4>
       <a href="/kennisbank" onclick="event.preventDefault(); setView('kennisbank')">Kennisbank</a>
       <a href="/kennisbank/arbeidsdeskundig-onderzoek-gids" onclick="event.preventDefault(); openArtikel('arbeidsdeskundig-onderzoek-gids')">Gids arbeidsdeskundig onderzoek</a>
+      <a href="/arbeidsdeskundige-met-tolk" onclick="event.preventDefault(); setView('tolk')">Arbeidsdeskundige met tolk</a>
       <a href="/veelgestelde-vragen" onclick="event.preventDefault(); setView('faq')">Veelgestelde vragen</a>
       <a href="/over-ons" onclick="event.preventDefault(); setView('over')">Over ons</a>
     </div>
@@ -2364,6 +2506,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     home: '/', calculator: '/rekentool', advies: '/keuzehulp',
     faq: '/veelgestelde-vragen', kennisbank: '/kennisbank',
     over: '/over-ons', offerte: '/offerte-aanvragen', aanmelden: '/aanmelden',
+    tolk: '/arbeidsdeskundige-met-tolk',
   };
   let _routerSync = false; // true tijdens popstate-replay, voorkomt dubbele history-entries
 
@@ -2387,6 +2530,11 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     revealCheck();
     if(view === 'aanmelden'){ setTimeout(initSignaturePad, 50); }
     if(view === 'advies'){ chooseAdviesTool(opts && opts.tool ? opts.tool : null); }
+    if(view === 'tolk'){
+      document.title = 'Arbeidsdeskundige met tolk: zo werkt het | Arbeidsdeskundig.com';
+      const metaDescEl = document.querySelector('meta[name="description"]');
+      if(metaDescEl) metaDescEl.setAttribute('content', 'Gesprek met de arbeidsdeskundige in je eigen taal? Met tolk of Translate, online of op locatie, door heel Nederland. Zo werkt het en dit zijn je rechten.');
+    }
     if(view === 'offerte') applyOfferteDienstFromQuery();
     const stickyBar = document.getElementById('sticky-artikel-cta');
     if(stickyBar){
@@ -2999,7 +3147,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 <li><strong>De bron.</strong> Wat de persoon zelf zegt, wat het dossier laat zien (cursus, werk, een examen) en wat je in het gesprek hoort. Jaren in Nederland of een diploma uit een ander land zijn geen meting van het Nederlands van nu.</li>
 <li><strong>De taaleis per taak.</strong> Een werkinstructie lezen, een kort bericht schrijven, een telefoongesprek, contact met klanten of collega's. De functieomschrijving is de maat, niet een algemeen label.</li>
 <li><strong>Een hulpmiddel of cursus, per taak.</strong> Een vertaalapp, een tolk of een inwerkperiode telt alleen als je uitlegt voor welke taken dat werkt, en voor welke niet.</li>
-<li><strong>De tolk in het onderzoek, los van de functie.</strong> Een tolk maakt het gesprek zuiver. Dat is iets anders dan de taal die het werk zelf vraagt. Zie de <a class="blog-link" href="/kennisbank/casus-deskundigenoordeel-taalbarriere" onclick="event.preventDefault(); openArtikel('casus-deskundigenoordeel-taalbarriere')">casus over een taalbarrière</a>.</li>
+<li><strong>De tolk in het onderzoek, los van de functie.</strong> Een tolk maakt het gesprek zuiver. Dat is iets anders dan de taal die het werk zelf vraagt. Zie de <a class="blog-link" href="/kennisbank/casus-deskundigenoordeel-taalbarriere" onclick="event.preventDefault(); openArtikel('casus-deskundigenoordeel-taalbarriere')">casus over een taalbarrière</a>. Hoe een gesprek met een professionele tolk, beëdigd indien nodig, verloopt, staat op <a class="blog-link" href="/arbeidsdeskundige-met-tolk" onclick="event.preventDefault(); setView('tolk')">arbeidsdeskundige met tolk</a>.</li>
 </ul>
 
 <h2>Hoe weegt taal mee bij passende arbeid?</h2>
@@ -3920,6 +4068,7 @@ whk: `
 <p>Bij eerdere gesprekken zonder professionele tolkondersteuning ontstonden misverstanden die als onwil werden geïnterpreteerd. Met een tolk erbij bleek een aanzienlijk deel van de eerdere discussie te herleiden tot onnauwkeurige vertaling van nuances, niet tot een inhoudelijk verschil van mening over de mogelijkheden zelf.</p>
 <h3>Herkenbaar patroon?</h3>
 <p>Taalbarrières worden soms verward met inhoudelijke onwil of onduidelijkheid over mogelijkheden. Onderzoek mét tolk, gevolgd door een objectief deskundigenoordeel bij aanhoudende discussie, voorkomt dat een communicatieprobleem escaleert tot een inhoudelijk geschil.</p><p>Deze casus gaat over de communicatie tijdens het onderzoek, met een tolk. Hoe taalniveau meeweegt bij de functie zelf, in het arbeidsdeskundig onderzoek en bij UWV-functieduiding, lees je in <a class="blog-link" href="/kennisbank/taalbeheersing-passende-functies-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('taalbeheersing-passende-functies-arbeidsdeskundige')">taalbeheersing en passende functies</a>.</p>
+<p>Hoe een onderzoek met een professionele tolk, beëdigd indien nodig, verloopt, lees je op <a class="blog-link" href="/arbeidsdeskundige-met-tolk" onclick="event.preventDefault(); setView('tolk')">arbeidsdeskundige met tolk</a>.</p>
 <p style="margin-top:14px;">Speelt een taalbarrière in jouw dossier een rol? <a class="blog-link" onclick="setView('offerte')">Vraag een onderzoek mét tolk aan</a>.</p>`,
 
 "fml-uitleg": `
@@ -5935,6 +6084,16 @@ whk: `
     document.getElementById('persona-label').textContent = persona.label.toLowerCase();
     document.getElementById('persona-titel').textContent = persona.title;
     document.getElementById('persona-intro').textContent = persona.intro;
+    const tolkLink = document.getElementById('persona-tolk-link');
+    if(tolkLink){
+      if(slug === 'werknemer'){
+        tolkLink.hidden = false;
+        tolkLink.innerHTML = 'Spreek je onvoldoende Nederlands? Vraag om een <a class="blog-link" href="/arbeidsdeskundige-met-tolk" onclick="event.preventDefault(); setView(\'tolk\')">professionele tolk, beëdigd indien nodig</a>.';
+      } else {
+        tolkLink.hidden = true;
+        tolkLink.innerHTML = '';
+      }
+    }
 
     document.getElementById('persona-kernpunten').innerHTML = persona.kernpunten.map(k => `
       <div class="card" style="padding:18px 20px;">
@@ -6053,6 +6212,7 @@ whk: `
     ["Wat kost een arbeidsdeskundig onderzoek?", "Vanaf €1.149,- excl. btw (online tarief): tot 5 medewerkers, kleine stichtingen of vrijwilligersorganisaties €1.149, tot 100 medewerkers €1.179, groot zakelijk €1.449. Fysiek onderzoek: €295,- extra.", "kosten-arbeidsdeskundig-onderzoek", "offerte"],
     ["Hoe lang duurt een arbeidsdeskundig onderzoek?", "Regulier: 2 tot 5 weken. Spoedonderzoek: binnen 2,5 week. Bezwaar/herbeoordeling: pro forma binnen 1 week opgepakt.", null, "aanmelden"],
     ["Kan het onderzoek volledig online?", "Ja, en dat is ook de standaard — sneller en net zo grondig als fysiek.", "online-fysiek", "advies"],
+    ["Kan het onderzoek met een tolk?", "Ja. Spreekt een werknemer onvoldoende Nederlands, dan plannen we een professionele tolk, beëdigd indien nodig, in. Het gesprek kan online of op locatie. In het rapport staat de naam van de tolk.", "/arbeidsdeskundige-met-tolk", "offerte"],
     ["Is een fysiek onderzoek ook mogelijk?", "Zeker, door heel Nederland. Als een werkplekbezoek meerwaarde heeft, plannen we dat gewoon in.", "online-fysiek", "advies"],
     ["Wat is het verschil tussen onderzoek bij WGA en Ziektewet?", "Bij WGA gaat het om het reduceren van het uitkeringspercentage en eventueel een IVA; bij de Ziektewet om het afdichten van spoor 1 en snel weer aan het werk helpen.", "ziektewet", "offerte"],
     ["Hoe zit het met een onderzoek bij uitzendkrachten of payroll?", "De verantwoordelijkheid ligt meestal bij het uitzend- of payrollbureau, niet bij de opdrachtgever/inlener.", "uitzend", "offerte"],
@@ -6079,7 +6239,12 @@ whk: `
     const body = document.createElement('div'); body.className = 'accordion-body';
     const inner = document.createElement('div'); inner.className = 'accordion-body-inner';
     const cta = FAQ_CTA[ctaKey];
-    const readLink = slug ? ` <a class="blog-link" onclick="openArtikel('${slug}')">Lees het volledige artikel →</a>` : '';
+    const tolkView = (typeof slug === 'string' && slug.charAt(0) === '/')
+      ? (Object.entries(VIEW_TO_PATH).find(([, path]) => path === slug) || ['tolk'])[0]
+      : '';
+    const readLink = tolkView
+      ? ` <a class="blog-link" href="${slug}" onclick="event.preventDefault(); setView('${tolkView}')">Lees hoe een onderzoek met tolk werkt</a>`
+      : (slug ? ` <a class="blog-link" onclick="openArtikel('${slug}')">Lees het volledige artikel →</a>` : '');
     const ctaOpts = cta && cta.tool ? `, {tool:'${cta.tool}'}` : '';
     const ctaBtn = cta ? `<div style="margin-top:12px;"><button class="btn-ghost btn-small" onclick="setView('${cta.view}'${ctaOpts})">${cta.label}</button></div>` : '';
     inner.innerHTML = `<p style="margin:0;">${a}${readLink}</p>${ctaBtn}`;

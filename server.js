@@ -176,12 +176,13 @@ function extractSiteFaqs(html) {
         const end = html.indexOf('\n  ];', start);
         const block = end === -1 ? html.slice(start) : html.slice(start, end);
         const items = [];
-        const re = /\["((?:[^"\\]|\\.)*)",\s*"((?:[^"\\]|\\.)*)"/g;
+        const re = /\["((?:[^"\\]|\\.)*)",\s*"((?:[^"\\]|\\.)*)"(?:,\s*"(\/[^"]*)")?/g;
         let m;
         while ((m = re.exec(block))) {
             items.push([
                 m[1].replace(/\\"/g, '"'),
                 m[2].replace(/\\"/g, '"'),
+                m[3] || null,
             ]);
         }
         return items;
@@ -332,6 +333,14 @@ app.use('/assets', express.static(ASSETS_DIR, {
     fallthrough: true,
 }));
 
+// Featured image van /arbeidsdeskundige-met-tolk. Alleen deze map, niet de
+// hele public/-tree: index.html krijgt per route een eigen <head>.
+app.use('/images', express.static(path.join(__dirname, 'public', 'images'), {
+    maxAge: '30d',
+    immutable: true,
+    fallthrough: true,
+}));
+
 // Zelfde SVG als de inline favicon: navy #12203A vierkant, gouden #D8A03D "A".
 app.get('/logo.svg', (req, res) => {
     res.set({
@@ -459,10 +468,17 @@ function stripSitewideFaqPage(html) {
 
 function hydratePersonaView(html, persona) {
     if (!persona) return html;
-    return html.replace(
+    html = html.replace(
         'id="persona-titel">Titel</h1>',
         `id="persona-titel">${escapeHtml(persona.title)}</h1>`
     );
+    if (persona.slug === 'werknemer') {
+        html = html.replace(
+            '<p id="persona-tolk-link" hidden style="margin-top:14px; font-size:.95rem; color:var(--muted); max-width:680px;"></p>',
+            '<p id="persona-tolk-link" style="margin-top:14px; font-size:.95rem; color:var(--muted); max-width:680px;">Spreek je onvoldoende Nederlands? Vraag om een <a class="blog-link" href="/arbeidsdeskundige-met-tolk">professionele tolk, beëdigd indien nodig</a>.</p>'
+        );
+    }
+    return html;
 }
 
 // Keep the active view's primary title (class route-h1) as the only <h1>.
@@ -524,12 +540,17 @@ function enforceSingleH1(html, view) {
 
 function hydrateFaqView(html, faqs) {
     if (!faqs || !faqs.length) return html;
-    const faqHtml = faqs.map(([q, a]) => (
-        `<div class="accordion-item">` +
-        `<button class="accordion-head" onclick="toggleAccordion(this)">${escapeHtml(q)}<span class="accordion-icon">+</span></button>` +
-        `<div class="accordion-body"><div class="accordion-body-inner">${escapeHtml(a)}</div></div>` +
-        `</div>`
-    )).join('');
+    const faqHtml = faqs.map(([q, a, link]) => {
+        const extra = (typeof link === 'string' && link.startsWith('/'))
+            ? ` <a class="blog-link" href="${escapeHtml(link)}">Lees hoe een onderzoek met tolk werkt</a>`
+            : '';
+        return (
+            `<div class="accordion-item">` +
+            `<button class="accordion-head" onclick="toggleAccordion(this)">${escapeHtml(q)}<span class="accordion-icon">+</span></button>` +
+            `<div class="accordion-body"><div class="accordion-body-inner">${escapeHtml(a)}${extra}</div></div>` +
+            `</div>`
+        );
+    }).join('');
     return html.replace(
         'id="faq-list" style="margin-top:20px;"></div>',
         `id="faq-list" style="margin-top:20px;">${faqHtml}</div>`
@@ -648,7 +669,7 @@ function sitemapUrlEl(loc, { changefreq = 'weekly', priority = '0.7' } = {}) {
 function buildSitemapXml() {
     const staticPaths = [
         '/', '/rekentool', '/keuzehulp', '/veelgestelde-vragen',
-        '/over-ons', '/offerte-aanvragen', '/aanmelden', '/kennisbank',
+        '/over-ons', '/offerte-aanvragen', '/aanmelden', '/arbeidsdeskundige-met-tolk', '/kennisbank',
     ];
     const personaList = Array.isArray(personas) ? personas : [];
     const postList = Array.isArray(posts) ? posts : [];
@@ -739,6 +760,64 @@ app.get('/aanmelden', (req, res) => {
         description: 'Meld je aan voor een arbeidsdeskundig onderzoek. Vanaf €1.149,-, binnen 24 uur opgepakt. Of plan eerst 15 minuten kennismaking.',
         canonicalPath: '/aanmelden',
         route: { view: 'aanmelden' },
+    });
+});
+
+const TOLK_PATH = '/arbeidsdeskundige-met-tolk';
+const TOLK_TITLE = 'Arbeidsdeskundige met tolk: zo werkt het | Arbeidsdeskundig.com';
+const TOLK_DESC = 'Gesprek met de arbeidsdeskundige in je eigen taal? Met tolk of Translate, online of op locatie, door heel Nederland. Zo werkt het en dit zijn je rechten.';
+const TOLK_FAQS = [
+    ['Heb ik recht op een tolk bij de arbeidsdeskundige?', 'Bij een onderzoek in opdracht van je werkgever kun je om een tolk vragen. Wij plannen een professionele tolk, beëdigd indien nodig, in via een gerenommeerd, landelijk tolkenbureau.'],
+    ['Kan het gesprek online met een tolk?', 'Ja, via video. De professionele tolk, beëdigd indien nodig, sluit aan via video of telefoon.'],
+    ['In welke talen kan het onderzoek?', 'In alle talen. Het vaakst in Pools, Roemeens, Turks, Arabisch, Oekraïens en Engels.'],
+    ['Mag mijn kind of partner tolken?', 'Dat raden we af voor het kerngesprek. Een professionele tolk, beëdigd indien nodig, is neutraler en beschermt je privacy.'],
+    ['Krijg ik het rapport in mijn eigen taal?', 'Het rapport is in het Nederlands. In het rapport staat de naam van de tolk. Wij lichten de conclusies met de tolk toe in jouw taal.'],
+];
+
+app.get(TOLK_PATH, (req, res) => {
+    const imageUrl = BASE_URL + '/images/arbeidsdeskundige-met-tolk.jpg';
+    renderPage(res, {
+        title: TOLK_TITLE,
+        description: TOLK_DESC,
+        canonicalPath: TOLK_PATH,
+        route: { view: 'tolk' },
+        ogImage: {
+            url: imageUrl,
+            width: 1200,
+            height: 675,
+            alt: 'Online gesprek met arbeidsdeskundige en tolk',
+        },
+        articleJsonLd: {
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: 'Arbeidsdeskundige met tolk: onderzoek in elke taal',
+            description: TOLK_DESC,
+            image: {
+                '@type': 'ImageObject',
+                url: imageUrl,
+                width: 1200,
+                height: 675,
+            },
+            inLanguage: 'nl-NL',
+            datePublished: '2026-10-22',
+            dateModified: '2026-10-22',
+            author: {
+                '@type': 'Person',
+                name: 'de arbeidsdeskundige',
+                jobTitle: 'geregistreerd arbeidsdeskundige',
+            },
+            publisher: {
+                '@type': 'Organization',
+                name: 'arbeidsdeskundig.com',
+                telephone: '+31850870307',
+            },
+            mainEntityOfPage: BASE_URL + TOLK_PATH,
+        },
+        faqJsonLd: faqPageJsonLd(TOLK_FAQS),
+        breadcrumbJsonLd: breadcrumbFor([
+            { name: 'Home', path: '/' },
+            { name: 'Arbeidsdeskundige met tolk', path: TOLK_PATH },
+        ]),
     });
 });
 
@@ -1010,6 +1089,7 @@ Complementair, geen concurrentie. [matchvermogen.nl](https://matchvermogen.nl) i
 - [Aanmelden](${BASE_URL}/aanmelden): onderzoek starten, binnen 24 uur opgepakt
 - [Kennisbank](${BASE_URL}/kennisbank): hub — alle artikelen per onderwerp
 - [Veelgestelde vragen](${BASE_URL}/veelgestelde-vragen): hub — tarieven en praktijkvragen
+- [Arbeidsdeskundige met tolk](${BASE_URL}/arbeidsdeskundige-met-tolk): onderzoek in je eigen taal, online of op locatie
 - [Over ons](${BASE_URL}/over-ons): Matchvermogen B.V., team en werkwijze
 
 ## Doelgroepen

@@ -180,8 +180,8 @@ function eur(n) { return '€ ' + Number(n).toLocaleString('nl-NL'); }
 
 function tierFor(mw) {
     if (!mw) return '';
-    if (mw <= 5) return 'klein';
-    if (mw <= 100) return 'midden';
+    if (mw < 10) return 'klein';
+    if (mw <= 50) return 'midden';
     return 'groot';
 }
 
@@ -189,10 +189,10 @@ function priceReply(history, thanks = true) {
     const a = analyse(history);
     const mw = a.known.mw | 0;
     const t = TARIFFS;
-    let s = (thanks ? 'Dank je! ' : '') + 'Vanaf € 999 excl. btw, in sommige gevallen bij een vroegtijdig onderzoek. De staffel voor een online onderzoek is ' + eur(t.klein) + ' (tot 5 medewerkers of een kleine stichting), ' + eur(t.midden) + ' (tot 100 medewerkers) of ' + eur(t.groot) + ' (groot zakelijk), excl. btw.';
+    let s = (thanks ? 'Dank je! ' : '') + 'Vanaf € 999 excl. btw, in sommige gevallen bij een vroegtijdig onderzoek. De staffel voor een online onderzoek is ' + eur(t.klein) + ' (MKB klein, minder dan 10, ook zzp), ' + eur(t.midden) + ' (MKB groot, 10 tot 50) of ' + eur(t.groot) + ' (meer dan 50), excl. btw.';
     const tier = tierFor(mw);
     if (tier) s += ' Met ' + mw + ' medewerkers kom je uit op ' + eur(t[tier]) + ' excl. btw.';
-    s += ' Fysiek op locatie is ' + eur(t.fysiek) + ' extra, spoed ' + eur(t.spoed) + ' extra.';
+    s += ' Onderzoek op locatie is ' + eur(t.fysiek) + ' extra, spoed of tolk ' + eur(t.spoed) + ' extra.';
     s += '\n\nWe nemen je casus altijd eerst even kort door voordat je de definitieve offerte krijgt. Plan hier een gesprek van 15 minuten: ' + CALENDLY + ' of bel ' + PHONE + '. Heb je intussen nog een vraag? Stel hem gerust.';
     return s;
 }

@@ -10,11 +10,10 @@
 const OWN_PHONES = new Set(['0850870307', '0650213593']);
 const OWN_EMAIL_RE = /@(arbeidsdeskundig\.com|matchvermogen\.nl|bestmatchbv\.nl)$/i;
 
-// Tarieven van de site (2027, excl. btw), zie /llms.txt en de offerte-PDF in server.js.
-// klein is het staffeltarief tot 5 medewerkers. De vanaf-prijs van €999 geldt
-// in sommige gevallen bij een vroegtijdig onderzoek en staat niet in deze staffel.
-// Geen 2027-tarieflijst voor toeslagen in de repo: fysiek en spoed blijven 295 en 300.
-const TARIFFS = { klein: 1149, midden: 1179, groot: 1449, fysiek: 295, spoed: 300 };
+// Tarieven 2027 uit de Matchvermogen-folder (excl. btw), zie /llms.txt.
+// klein is MKB klein, niet de vanaf-prijs. Die €999 geldt in sommige gevallen
+// bij een vroegtijdig onderzoek en staat niet in deze staffel.
+const TARIFFS = { klein: 1095, midden: 1195, groot: 1295, fysiek: 225, spoed: 195 };
 
 function normalizePhone(raw) {
     const s = String(raw || '').trim();

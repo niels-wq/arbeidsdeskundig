@@ -126,8 +126,8 @@ describe('prijsregel en gesprek zonder API-sleutel (gescript)', () => {
         assert.equal(gate.hasPrice(json.reply), true);
         assert.match(json.reply, /999/);
         assert.match(json.reply, /vroegtijdig onderzoek/);
-        assert.match(json.reply, /1\.149/);
-        assert.match(json.reply, /1\.179/);
+        assert.match(json.reply, /1\.095/);
+        assert.match(json.reply, /1\.195/);
         const mails = captured.slice(before).filter((l) => l.includes('[Resend niet geconfigureerd]'));
         assert.equal(mails.length, 1);
         assert.match(mails[0], /chatlead/i);

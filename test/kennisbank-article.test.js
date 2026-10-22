@@ -534,7 +534,9 @@ describe('kennisbank hub: gids arbeidsdeskundig onderzoek', () => {
         const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
         assert.ok(h1Match, 'SSR H1 missing');
         assert.equal(h1Match[1], 'Alles over arbeidsdeskundig onderzoek: de gids');
+
         assert.notEqual(h1Match[1], 'Arbeidsdeskundig onderzoek. Vanaf €999,-.');
+
         assert.notEqual(h1Match[1], 'Alles over arbeidsdeskundig onderzoek');
 
         const marker = 'id="artikel-body">';
@@ -554,7 +556,9 @@ describe('kennisbank hub: gids arbeidsdeskundig onderzoek', () => {
         assert.match(body, /matchvermogen\.nl/);
         assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
         assert.doesNotMatch(body, /Doe de gratis keuzehulp/);
+
         assert.doesNotMatch(body, /Vanaf €999/);
+
 
         const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 80).join(' ');
         assert.match(firstWords, /gids arbeidsdeskundig onderzoek/i);
@@ -1524,9 +1528,11 @@ describe('kennisbank article: goedkoopste arbeidsdeskundig onderzoek', () => {
         assert.match(body, new RegExp(GOEDKOOP_STEEKPROEF.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
         assert.match(body, /draagkracht van de onderneming/);
         assert.match(body, /tussen hoog en laag/);
+
         assert.match(body, /vanaf € 999/);
         assert.match(body, /in sommige gevallen bij een vroegtijdig onderzoek/);
-        assert.match(body, /€ 1\.149 excl\. btw/);
+        assert.match(body, /€ 1\.095 excl\. btw/);
+
         assert.doesNotMatch(body, /<table/i);
         assert.doesNotMatch(body, /vergelijk/i);
         assert.doesNotMatch(body, /onafhankelijke gids/i);

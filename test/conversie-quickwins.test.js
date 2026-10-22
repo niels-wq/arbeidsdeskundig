@@ -60,17 +60,16 @@ describe('conversie quick win: kosten', () => {
         assert.match(blok, /href="\/offerte-aanvragen"/);
         assert.match(blok, /href="\/rekentool"/);
         assert.match(blok, /Vanaf €999 excl\. btw, in sommige gevallen bij een vroegtijdig onderzoek/);
-        assert.match(blok, /€1\.149/);
-        assert.match(blok, /tot 5 medewerkers/);
-        assert.doesNotMatch(blok, /€999<\/strong> tot 5/);
-        assert.match(blok, /€1\.179/);
-        assert.match(blok, /€1\.449/);
-        assert.match(blok, /\+€295/);
-        assert.match(blok, /\+€300/);
+        assert.match(blok, /€ 1\.095/);
+        assert.match(blok, /MKB klein/);
+        assert.match(blok, /€ 1\.195/);
+        assert.match(blok, /€ 1\.295/);
+        assert.match(blok, /€ 225/);
+        assert.match(blok, /€ 195/);
+        assert.doesNotMatch(blok, /€1\.149/);
         assert.match(body, /starten in 2027 vanaf €999/);
         assert.match(body, /<h2>Tarief arbeidsdeskundig onderzoek 2027 \(excl\. btw\)<\/h2>/);
         assertNoDash(blok, 'prijsblok');
-        assert.doesNotMatch(blok, /€\s?1\.095/);
 
         const faqs = faqPages(html);
         assert.equal(faqs.length, 1);

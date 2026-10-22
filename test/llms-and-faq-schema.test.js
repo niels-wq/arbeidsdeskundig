@@ -56,6 +56,8 @@ describe('llms.txt', () => {
 
         assert.match(txt, /^# arbeidsdeskundig\.com/m);
         assert.match(txt, /vanaf €999/);
+        assert.match(txt, /in sommige gevallen bij een vroegtijdig onderzoek/);
+        assert.match(txt, /€1\.149,-/);
         assert.match(txt, /binnen 24 uur/i);
         assert.match(txt, /## Wat we wel doen/);
         assert.match(txt, /## Wat we niet doen/);
@@ -217,6 +219,9 @@ describe('homepage JSON-LD organization, website and logo', () => {
         assert.equal(online.priceCurrency, 'EUR');
         assert.equal(online.price, '999');
         assert.equal(fysiek.priceCurrency, 'EUR');
+        // Vloer is de vanaf-prijs plus de ongewijzigde fysieke toeslag (999 + 295).
+        // Het staffeltarief tot 5 medewerkers is €1.149; klein plus fysiek is dan
+        // 1444, maar dit Offer is de vloer, niet die staffelrij.
         assert.equal(fysiek.price, '1294');
         assert.match(org.description, /vanaf €999,-/);
     });

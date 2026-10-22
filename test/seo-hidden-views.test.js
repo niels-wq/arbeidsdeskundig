@@ -13,8 +13,10 @@ const VIEW_OPEN_RE = /<div class="(view(?: active)?)" id="(view-[^"]+)"( hidden)
 const PROBLEM_PATHS = [
     { path: '/kennisbank/wat-doet-arbeidsdeskundige', active: 'view-artikel', titleH1: /Wat doet een arbeidsdeskundige precies/ },
     { path: '/kennisbank/arbeidsdeskundig-onderzoek-gids', active: 'view-artikel', titleH1: /Alles over arbeidsdeskundig onderzoek: de gids/ },
-    { path: '/offerte-aanvragen', active: 'view-offerte', titleH1: /Vraag je offerte aan — vanaf € 1\.095/ },
-    { path: '/aanmelden', active: 'view-aanmelden', titleH1: /Meld je onderzoek aan — vanaf € 1\.095/ },
+
+    { path: '/offerte-aanvragen', active: 'view-offerte', titleH1: /Vraag je offerte aan — vanaf €999,-/ },
+    { path: '/aanmelden', active: 'view-aanmelden', titleH1: /Meld je onderzoek aan — vanaf €999,-/ },
+
 ];
 
 let server;
@@ -120,14 +122,18 @@ describe('SEO: hidden inactive views + sitemap', () => {
     it('does not gut offerte/aanmelden conversion copy', async () => {
         const offerte = await (await fetch(base + '/offerte-aanvragen')).text();
         assert.match(offerte, /<div class="view active" id="view-offerte">/);
-        assert.match(offerte, /Vraag je offerte aan — vanaf € 1\.095/);
+
+        assert.match(offerte, /Vraag je offerte aan — vanaf €999,-/);
+
         assert.match(offerte, /id="btn-of-direct"[^>]*>Offerte aanvragen</);
         assert.match(offerte, /Liever eerst kennismaken of bellen/);
         assert.match(offerte, /calendly\.com\/matchvermogen\/call-15-min/);
 
         const aanmeld = await (await fetch(base + '/aanmelden')).text();
         assert.match(aanmeld, /<div class="view active" id="view-aanmelden">/);
-        assert.match(aanmeld, /Meld je onderzoek aan — vanaf € 1\.095/);
+
+        assert.match(aanmeld, /Meld je onderzoek aan — vanaf €999,-/);
+
         assert.match(aanmeld, /id="form-step-1"/);
         assert.match(aanmeld, /id="form-step-6"/);
         assert.match(aanmeld, /Liever eerst kennismaken of bellen/);

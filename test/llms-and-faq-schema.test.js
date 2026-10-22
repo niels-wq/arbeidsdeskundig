@@ -55,7 +55,12 @@ describe('llms.txt', () => {
         const txt = await res.text();
 
         assert.match(txt, /^# arbeidsdeskundig\.com/m);
-        assert.match(txt, /vanaf € 1\.095/);
+
+        assert.match(txt, /vanaf €999/);
+        assert.match(txt, /in sommige gevallen bij een vroegtijdig onderzoek/);
+        assert.match(txt, /€ 1\.095/);
+        assert.doesNotMatch(txt, /€1\.149/);
+
         assert.match(txt, /binnen 24 uur/i);
         assert.match(txt, /## Wat we wel doen/);
         assert.match(txt, /## Wat we niet doen/);
@@ -104,9 +109,9 @@ describe('llms.txt', () => {
         assert.doesNotMatch(txt, /casus-60plus/);
         assert.doesNotMatch(txt, /### Basiskennis/);
         assert.doesNotMatch(txt, /Kennisbank, per onderwerp/);
-        // Headroom above the previous 11000 cap: one more featured comparison
-        // article. Still far below a dump of every artikel.
-        assert.ok(txt.length < 11200, `llms.txt should stay curated, got ${txt.length} chars`);
+        // Headroom above the previous 12000 cap: the 2027 folder price line
+        // lists the extra products. Still far below a dump of every artikel.
+        assert.ok(txt.length < 12500, `llms.txt should stay curated, got ${txt.length} chars`);
         const kennisbankLinks = txt.match(/\/kennisbank\/[a-z0-9-]+/g) || [];
         assert.ok(kennisbankLinks.length < 40, `too many kennisbank links: ${kennisbankLinks.length}`);
     });
@@ -138,7 +143,9 @@ describe('llms.txt', () => {
         const res = await fetch(base + '/.well-known/llms.txt');
         assert.equal(res.status, 200);
         const txt = await res.text();
-        assert.match(txt, /vanaf € 1\.095/);
+
+        assert.match(txt, /vanaf €999/);
+
         assert.match(txt, /\/aanmelden/);
     });
 });
@@ -183,14 +190,21 @@ describe('homepage JSON-LD organization, website and logo', () => {
         assert.equal(org.logo.url, 'https://www.arbeidsdeskundig.com/logo.svg');
         assert.equal(org.image, 'https://www.arbeidsdeskundig.com/logo.svg');
         assert.equal(org.sameAs, undefined);
-        assert.deepEqual(org.aggregateRating, {
-            '@type': 'AggregateRating',
-            ratingValue: 4.9,
-            reviewCount: 21,
-            bestRating: 5,
-        });
-        assert.equal(org.review.length, 9);
-        assert.equal(org.review[0].author.name, 'Jolande van de Graaf');
+        assert.equal(org.aggregateRating, undefined);
+        assert.equal(org.review, undefined);
+        assert.equal(org.telephone, '+31850870307');
+        assert.equal(org.contactPoint, undefined);
+        for (const node of nodes) {
+            const types = [].concat(node['@type'] || []);
+            assert.equal(types.includes('AggregateRating'), false);
+            assert.equal(types.includes('Review'), false);
+            assert.equal(node.aggregateRating, undefined);
+            assert.equal(node.review, undefined);
+        }
+        assert.match(html, /id="testimonial-cards"/);
+        assert.match(html, /id="rating-score">4,9 \/ 5</);
+        assert.match(html, /Jolande van de Graaf/);
+        assert.match(html, /id="rating-count">op basis van 21\+ Google-reviews</);
 
         const site = nodes.find((n) => n['@id'] === 'https://www.arbeidsdeskundig.com/#website');
         assert.ok(site);
@@ -203,6 +217,17 @@ describe('homepage JSON-LD organization, website and logo', () => {
         const blog = nodes.find((n) => n['@id'] === 'https://www.arbeidsdeskundig.com/#kennisbank');
         assert.equal(blog['@type'], 'Blog');
         assert.deepEqual(blog.publisher, { '@id': 'https://www.arbeidsdeskundig.com/#organization' });
+
+        const offers = org.makesOffer;
+        const online = offers.find((o) => o.name === 'Arbeidsdeskundig onderzoek (online)');
+        const fysiek = offers.find((o) => o.name === 'Arbeidsdeskundig onderzoek (fysiek)');
+        assert.equal(online.priceCurrency, 'EUR');
+        assert.equal(online.price, '999');
+        assert.equal(fysiek.priceCurrency, 'EUR');
+        // Vloer is de vanaf-prijs plus de locatietoeslag uit de folder (999 + 225).
+        // MKB klein plus locatie is 1095 + 225 = 1320, maar dit Offer is de vloer.
+        assert.equal(fysiek.price, '1224');
+        assert.match(org.description, /vanaf €999,-/);
     });
 });
 
@@ -279,7 +304,9 @@ describe('FAQPage structured data is page-specific', () => {
             'Wat kost een arbeidsdeskundig onderzoek?',
             'Kan het onderzoek ook fysiek?',
         ]);
-        assert.match(pages[0].mainEntity[0].acceptedAnswer.text, /vanaf € 1\.095/i);
+
+        assert.match(pages[0].mainEntity[0].acceptedAnswer.text, /€999/);
+
         assert.doesNotMatch(graphTypes(html).join(','), /FAQPage.*FAQPage/);
         assert.ok(!graphTypes(html).includes('FAQPage') || pages.length === 1);
         assert.ok(!parseLdJsonBlocks(html).some((b) => Array.isArray(b['@graph']) && b['@graph'].some((n) => n['@type'] === 'FAQPage')));
@@ -293,7 +320,9 @@ describe('FAQPage structured data is page-specific', () => {
         assert.equal(pages.length, 1);
         assert.ok(pages[0].mainEntity.length >= 14, `expected full FAQ, got ${pages[0].mainEntity.length}`);
         assert.ok(pages[0].mainEntity.some((q) => /second opinion/i.test(q.name)));
-        assert.ok(pages[0].mainEntity.some((q) => /Vanaf € 1\.095/.test(q.acceptedAnswer.text)));
+
+        assert.ok(pages[0].mainEntity.some((q) => /€999/.test(q.acceptedAnswer.text)));
+
         assert.match(html, /id="faq-list"[^>]*>[\s\S]*Wat kost een arbeidsdeskundig onderzoek\?/);
         assert.match(html, /id="faq-list"[^>]*>[\s\S]*Is een arbeidsdeskundig onderzoek verplicht\?/);
     });

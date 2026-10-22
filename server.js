@@ -20,6 +20,7 @@ const {
     validateChecklistLead,
     validateBelMeTerugLead,
 } = require('./lead-validation');
+const { createChat } = require('./chat');
 
 const app = express();
 
@@ -175,12 +176,13 @@ function extractSiteFaqs(html) {
         const end = html.indexOf('\n  ];', start);
         const block = end === -1 ? html.slice(start) : html.slice(start, end);
         const items = [];
-        const re = /\["((?:[^"\\]|\\.)*)",\s*"((?:[^"\\]|\\.)*)"/g;
+        const re = /\["((?:[^"\\]|\\.)*)",\s*"((?:[^"\\]|\\.)*)"(?:,\s*"(\/[^"]*)")?/g;
         let m;
         while ((m = re.exec(block))) {
             items.push([
                 m[1].replace(/\\"/g, '"'),
                 m[2].replace(/\\"/g, '"'),
+                m[3] || null,
             ]);
         }
         return items;
@@ -194,31 +196,104 @@ const siteFaqs = extractSiteFaqs(INDEX_HTML);
 
 // Twee vragen die daadwerkelijk in de homepage-HTML staan (niet de volledige FAQ).
 const HOME_VISIBLE_FAQ = [
-    ['Wat kost een arbeidsdeskundig onderzoek?', 'Vanaf € 1.095 exclusief btw. De staffel is een prijs naar draagkracht, naar bedrijfsgrootte. Zie de volledige FAQ voor alle tarieven.'],
+
+    ['Wat kost een arbeidsdeskundig onderzoek?', 'Vanaf €999,- exclusief btw, in sommige gevallen bij een vroegtijdig onderzoek. De staffel is een prijs naar draagkracht, naar bedrijfsgrootte. Zie de volledige FAQ voor alle tarieven.'],
+
     ['Kan het onderzoek ook fysiek?', 'Ja. Online is het snelst en standaard inbegrepen, maar een bezoek op locatie is altijd bespreekbaar — bijvoorbeeld als een werkplekonderzoek meerwaarde heeft.'],
 ];
 
 console.log(`[seo] ${posts.length} kennisbank-artikelen, ${personas.length} doelgroep-pagina's en ${siteFaqs.length} FAQ-vragen geladen`);
 const DEFAULT_TITLE = 'arbeidsdeskundig.com — Arbeidsdeskundig onderzoek, online én fysiek';
-const DEFAULT_DESC = 'Arbeidsdeskundig onderzoek vanaf € 1.095. Online of fysiek, door heel Nederland. Specialist in WGA, Ziektewet en Wet Poortwachter.';
+
+const DEFAULT_DESC = 'Arbeidsdeskundig onderzoek vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek. Online of fysiek, door heel Nederland. Specialist in WGA, Ziektewet en Wet Poortwachter.';
+
 
 app.use(compression());
 app.disable('x-powered-by');
-// CSP staat uit: de frontend leunt zwaar op inline <script>/style="" (single-file
-// opzet), en een niet-grondig-geteste CSP kan de site stuk breken. De overige
-// helmet-headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy,
-// HSTS, enz.) staan wel aan — dat is winst zonder risico. Wil je later een
-// strikte CSP, dan hoort daar eerst een refactor naar externe .js/.css bij.
-// CORP staat op cross-origin: dit is een publieke marketingsite. Helmet's
-// default `same-origin` laat browsers (en sommige SEO-/fetch-tools) de
-// sitemap als geblokkeerde cross-origin resource behandelen — dat wordt
-// vaak als HTTP 500 of "couldn't fetch sitemap" gerapporteerd, terwijl
-// curl wél 200 ziet.
+// Security headers op elke response. CSP is bewust report-only: de single-file
+// frontend leunt op inline <script>, style="" en onclick, Google Fonts,
+// Calendly, en (pas na cookietoestemming) GA4/gtag plus de Meta Pixel.
+// Report-only meldt afwijkingen zonder iets te blokkeren, zodat de chat
+// (/api/chat), formulieren, og:image en sitemap niet stuk gaan. Een
+// afdwingende CSP hoort pas na een refactor naar externe .js/.css.
+// Navigatie (wa.me, Calendly, matchvermogen.nl) valt niet onder deze CSP:
+// er is geen navigate-to, dus gewone links blijven werken.
+// CORP blijft cross-origin. Helmet's default same-origin laat browsers en
+// sommige SEO-tools de sitemap en OG-beelden als geblokkeerde cross-origin
+// resource zien — vaak gemeld als HTTP 500 of "couldn't fetch sitemap",
+// terwijl curl wél 200 ziet.
+const PERMISSIONS_POLICY = 'camera=(), microphone=(), geolocation=(), payment=(), usb=()';
 app.use(helmet({
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: {
+        reportOnly: true,
+        useDefaults: true,
+        directives: {
+            'font-src': ["'self'", 'https://fonts.gstatic.com', 'data:'],
+            'frame-ancestors': ["'self'"],
+            'frame-src': ["'self'", 'https://calendly.com', 'https://assets.calendly.com'],
+            'img-src': [
+                "'self'",
+                'data:',
+                'https://matchvermogen.nl',
+                'https://*.google-analytics.com',
+                'https://*.googletagmanager.com',
+                'https://www.facebook.com',
+            ],
+            'script-src': [
+                "'self'",
+                "'unsafe-inline'",
+                'https://*.googletagmanager.com',
+                'https://*.google-analytics.com',
+                'https://connect.facebook.net',
+                'https://assets.calendly.com',
+            ],
+            // onclick="..." valt onder script-src-attr, niet onder script-src.
+            // Helmet's default is 'none'; dat zou elk inline handler rapporteren.
+            'script-src-attr': ["'unsafe-inline'"],
+            'style-src': [
+                "'self'",
+                "'unsafe-inline'",
+                'https://fonts.googleapis.com',
+                'https://assets.calendly.com',
+            ],
+            'connect-src': [
+                "'self'",
+                'https://*.google-analytics.com',
+                'https://*.analytics.google.com',
+                'https://analytics.google.com',
+                'https://*.googletagmanager.com',
+                'https://www.facebook.com',
+                'https://connect.facebook.net',
+                'https://calendly.com',
+                'https://assets.calendly.com',
+                'https://fonts.googleapis.com',
+                'https://fonts.gstatic.com',
+            ],
+        },
+    },
     crossOriginResourcePolicy: { policy: 'cross-origin' },
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    strictTransportSecurity: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: false,
+    },
+    xContentTypeOptions: true,
+    xFrameOptions: { action: 'sameorigin' },
 }));
+app.use((req, res, next) => {
+    res.setHeader('Permissions-Policy', PERMISSIONS_POLICY);
+    next();
+});
 app.use(express.json({ limit: '200kb' }));
+
+// Preview-omgevingen (bijv. de chatbot-preview op *.up.railway.app) mogen niet
+// in Google komen: NOINDEX=true zet op elke response X-Robots-Tag: noindex.
+// Productie zet deze variabele niet, dan verandert er niets.
+app.use((req, res, next) => {
+    if (String(process.env.NOINDEX || '').toLowerCase() === 'true') res.set('X-Robots-Tag', 'noindex, nofollow');
+    next();
+});
 
 // SEO: forceer één canonieke versie van de site. Zonder dit ziet Google
 // arbeidsdeskundig.com én www.arbeidsdeskundig.com als twee aparte URL's met
@@ -250,7 +325,21 @@ app.use((req, res, next) => {
 // versie tonen. Voeg in dat geval altijd een cache-bust toe aan de verwijzing,
 // bijvoorbeeld `/assets/niels-foto.png?v=2` -> `?v=3` bij de volgende wijziging.
 const ASSETS_DIR = path.join(__dirname, 'assets');
+for (const post of posts) {
+    const ogFile = path.join(ASSETS_DIR, 'og', post.slug + '.png');
+    if (!fs.existsSync(ogFile)) {
+        console.warn('[seo] Geen featured image voor kennisbankartikel ' + post.slug + ' (' + ogFile + ')');
+    }
+}
 app.use('/assets', express.static(ASSETS_DIR, {
+    maxAge: '30d',
+    immutable: true,
+    fallthrough: true,
+}));
+
+// Featured image van /arbeidsdeskundige-met-tolk. Alleen deze map, niet de
+// hele public/-tree: index.html krijgt per route een eigen <head>.
+app.use('/images', express.static(path.join(__dirname, 'public', 'images'), {
     maxAge: '30d',
     immutable: true,
     fallthrough: true,
@@ -304,6 +393,14 @@ function hydrateArtikelView(html, post, body) {
         `id="artikel-tag" onclick="filterKennisbankVanArtikel()">${escapeHtml(post.tag)}</button>`
     );
     html = html.replace('id="artikel-titel">Titel</h1>', `id="artikel-titel">${escapeHtml(post.title)}</h1>`);
+    const featuredSrc = '/assets/og/' + post.slug + '.png';
+    const featuredAlt = 'Kennisbank: ' + (post.title || '');
+    html = html.replace(
+        '<div id="artikel-featured-slot"></div>',
+        '<div id="artikel-featured-slot"><img id="artikel-featured" class="artikel-featured" src="' +
+            escapeHtml(featuredSrc) + '" alt="' + escapeHtml(featuredAlt) +
+            '" width="1200" height="630" loading="eager" fetchpriority="high"></div>'
+    );
     html = html.replace('id="artikel-breadcrumb-tag"></span>', `id="artikel-breadcrumb-tag">${escapeHtml(post.tag)}</span>`);
     html = html.replace('id="artikel-breadcrumb-titel"></span>', `id="artikel-breadcrumb-titel">${escapeHtml(post.title)}</span>`);
     const updated = post.dateModified || '2026';
@@ -375,10 +472,17 @@ function stripSitewideFaqPage(html) {
 
 function hydratePersonaView(html, persona) {
     if (!persona) return html;
-    return html.replace(
+    html = html.replace(
         'id="persona-titel">Titel</h1>',
         `id="persona-titel">${escapeHtml(persona.title)}</h1>`
     );
+    if (persona.slug === 'werknemer') {
+        html = html.replace(
+            '<p id="persona-tolk-link" hidden style="margin-top:14px; font-size:.95rem; color:var(--muted); max-width:680px;"></p>',
+            '<p id="persona-tolk-link" style="margin-top:14px; font-size:.95rem; color:var(--muted); max-width:680px;">Spreek je onvoldoende Nederlands? Vraag om een <a class="blog-link" href="/arbeidsdeskundige-met-tolk">professionele tolk, beëdigd indien nodig</a>.</p>'
+        );
+    }
+    return html;
 }
 
 // Keep the active view's primary title (class route-h1) as the only <h1>.
@@ -440,19 +544,24 @@ function enforceSingleH1(html, view) {
 
 function hydrateFaqView(html, faqs) {
     if (!faqs || !faqs.length) return html;
-    const faqHtml = faqs.map(([q, a]) => (
-        `<div class="accordion-item">` +
-        `<button class="accordion-head" onclick="toggleAccordion(this)">${escapeHtml(q)}<span class="accordion-icon">+</span></button>` +
-        `<div class="accordion-body"><div class="accordion-body-inner">${escapeHtml(a)}</div></div>` +
-        `</div>`
-    )).join('');
+    const faqHtml = faqs.map(([q, a, link]) => {
+        const extra = (typeof link === 'string' && link.startsWith('/'))
+            ? ` <a class="blog-link" href="${escapeHtml(link)}">Lees hoe een onderzoek met tolk werkt</a>`
+            : '';
+        return (
+            `<div class="accordion-item">` +
+            `<button class="accordion-head" onclick="toggleAccordion(this)">${escapeHtml(q)}<span class="accordion-icon">+</span></button>` +
+            `<div class="accordion-body"><div class="accordion-body-inner">${escapeHtml(a)}${extra}</div></div>` +
+            `</div>`
+        );
+    }).join('');
     return html.replace(
         'id="faq-list" style="margin-top:20px;"></div>',
         `id="faq-list" style="margin-top:20px;">${faqHtml}</div>`
     );
 }
 
-function renderPage(res, { title, description, canonicalPath, route, articleJsonLd, breadcrumbJsonLd, faqJsonLd, statusCode }) {
+function renderPage(res, { title, description, canonicalPath, route, articleJsonLd, breadcrumbJsonLd, faqJsonLd, ogImage, statusCode }) {
     const canonical = BASE_URL + canonicalPath;
     const safeTitle = escapeHtml(title || DEFAULT_TITLE);
     const safeDesc = escapeHtml(description || DEFAULT_DESC);
@@ -491,6 +600,15 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
     html = html.replace(/<meta property="og:url" content=".*?">/s, `<meta property="og:url" content="${canonical}">`);
     html = html.replace(/<meta name="twitter:title" content=".*?">/s, `<meta name="twitter:title" content="${safeTitle}">`);
     html = html.replace(/<meta name="twitter:description" content=".*?">/s, `<meta name="twitter:description" content="${safeDesc}">`);
+    if (ogImage) {
+        const imgUrl = escapeHtml(ogImage.url);
+        const imgAlt = escapeHtml(ogImage.alt || '');
+        html = html.replace(/<meta property="og:image" content="[^"]*">/, `<meta property="og:image" content="${imgUrl}">`);
+        html = html.replace(/<meta property="og:image:width" content="[^"]*">/, `<meta property="og:image:width" content="${ogImage.width}">`);
+        html = html.replace(/<meta property="og:image:height" content="[^"]*">/, `<meta property="og:image:height" content="${ogImage.height}">`);
+        html = html.replace(/<meta property="og:image:alt" content="[^"]*">/, `<meta property="og:image:alt" content="${imgAlt}">`);
+        html = html.replace(/<meta name="twitter:image" content="[^"]*">/, `<meta name="twitter:image" content="${imgUrl}">`);
+    }
 
     // Extra per-pagina JSON-LD (Article + BreadcrumbList + FAQPage waar de
     // vragen ook zichtbaar zijn) vóór </head> toevoegen, naast het site-brede
@@ -512,6 +630,11 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
     html = html.replace('</head>', analyticsIdsScript + '</head>');
 
     // __ROUTE__ injecteren zodat de client meteen de juiste view rendert.
+    // Chatbot + contactknop (preview): alleen als CHAT_WIDGET_ENABLED=true. Staat de
+    // vlag uit, dan is snippet() leeg en blijft de HTML exact gelijk.
+    const chatSnippet = chat.snippet();
+    if (chatSnippet) html = html.replace('</body>', chatSnippet + '</body>');
+
     const routeScript = `<script>window.__ROUTE__ = ${JSON.stringify(route)};</script>\n`;
     html = html.replace('<script>', routeScript + '<script>');
 
@@ -550,7 +673,7 @@ function sitemapUrlEl(loc, { changefreq = 'weekly', priority = '0.7' } = {}) {
 function buildSitemapXml() {
     const staticPaths = [
         '/', '/rekentool', '/keuzehulp', '/veelgestelde-vragen',
-        '/over-ons', '/offerte-aanvragen', '/aanmelden', '/kennisbank',
+        '/over-ons', '/offerte-aanvragen', '/aanmelden', '/arbeidsdeskundige-met-tolk', '/kennisbank',
     ];
     const personaList = Array.isArray(personas) ? personas : [];
     const postList = Array.isArray(posts) ? posts : [];
@@ -629,7 +752,9 @@ app.get('/over-ons', (req, res) => {
 app.get('/offerte-aanvragen', (req, res) => {
     renderPage(res, {
         title: 'Offerte aanvragen — arbeidsdeskundig.com',
-        description: 'Vraag vrijblijvend een offerte aan. Vanaf € 1.095, reactie binnen 24 uur, 4,9/5. Of plan eerst 15 minuten kennismaking.',
+
+        description: 'Vraag vrijblijvend een offerte aan. Vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek, reactie binnen 24 uur, 4,9/5. Of plan eerst 15 minuten kennismaking.',
+
         canonicalPath: '/offerte-aanvragen',
         route: { view: 'offerte' },
     });
@@ -638,9 +763,69 @@ app.get('/offerte-aanvragen', (req, res) => {
 app.get('/aanmelden', (req, res) => {
     renderPage(res, {
         title: 'Aanmelden voor een arbeidsdeskundig onderzoek — arbeidsdeskundig.com',
-        description: 'Meld je aan voor een arbeidsdeskundig onderzoek. Vanaf € 1.095, binnen 24 uur opgepakt. Of plan eerst 15 minuten kennismaking.',
+
+        description: 'Meld je aan voor een arbeidsdeskundig onderzoek. Vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek, binnen 24 uur opgepakt. Of plan eerst 15 minuten kennismaking.',
+
         canonicalPath: '/aanmelden',
         route: { view: 'aanmelden' },
+    });
+});
+
+const TOLK_PATH = '/arbeidsdeskundige-met-tolk';
+const TOLK_TITLE = 'Arbeidsdeskundige met tolk: zo werkt het | Arbeidsdeskundig.com';
+const TOLK_DESC = 'Gesprek met de arbeidsdeskundige in je eigen taal? Met tolk of Translate, online of op locatie, door heel Nederland. Zo werkt het en dit zijn je rechten.';
+const TOLK_FAQS = [
+    ['Heb ik recht op een tolk bij de arbeidsdeskundige?', 'Bij een onderzoek in opdracht van je werkgever kun je om een tolk vragen. Wij plannen een professionele tolk, beëdigd indien nodig, in via een gerenommeerd, landelijk tolkenbureau.'],
+    ['Kan het gesprek online met een tolk?', 'Ja, via video. De professionele tolk, beëdigd indien nodig, sluit aan via video of telefoon.'],
+    ['In welke talen kan het onderzoek?', 'In alle talen. Het vaakst in Pools, Roemeens, Turks, Arabisch, Oekraïens en Engels.'],
+    ['Mag mijn kind of partner tolken?', 'Dat raden we af voor het kerngesprek. Een professionele tolk, beëdigd indien nodig, is neutraler en beschermt je privacy.'],
+    ['Krijg ik het rapport in mijn eigen taal?', 'Het rapport is in het Nederlands. In het rapport staat de naam van de tolk. Wij lichten de conclusies met de tolk toe in jouw taal.'],
+];
+
+app.get(TOLK_PATH, (req, res) => {
+    const imageUrl = BASE_URL + '/images/arbeidsdeskundige-met-tolk.jpg';
+    renderPage(res, {
+        title: TOLK_TITLE,
+        description: TOLK_DESC,
+        canonicalPath: TOLK_PATH,
+        route: { view: 'tolk' },
+        ogImage: {
+            url: imageUrl,
+            width: 1200,
+            height: 675,
+            alt: 'Online gesprek met arbeidsdeskundige en tolk',
+        },
+        articleJsonLd: {
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: 'Arbeidsdeskundige met tolk: onderzoek in elke taal',
+            description: TOLK_DESC,
+            image: {
+                '@type': 'ImageObject',
+                url: imageUrl,
+                width: 1200,
+                height: 675,
+            },
+            inLanguage: 'nl-NL',
+            datePublished: '2026-10-22',
+            dateModified: '2026-10-22',
+            author: {
+                '@type': 'Person',
+                name: 'de arbeidsdeskundige',
+                jobTitle: 'geregistreerd arbeidsdeskundige',
+            },
+            publisher: {
+                '@type': 'Organization',
+                name: 'arbeidsdeskundig.com',
+                telephone: '+31850870307',
+            },
+            mainEntityOfPage: BASE_URL + TOLK_PATH,
+        },
+        faqJsonLd: faqPageJsonLd(TOLK_FAQS),
+        breadcrumbJsonLd: breadcrumbFor([
+            { name: 'Home', path: '/' },
+            { name: 'Arbeidsdeskundige met tolk', path: TOLK_PATH },
+        ]),
     });
 });
 
@@ -677,11 +862,19 @@ app.get('/kennisbank/:slug', (req, res, next) => {
     const post = posts.find((p) => p.slug === req.params.slug);
     if (!post) return next(); // -> 404 handler
 
+    const featuredUrl = BASE_URL + '/assets/og/' + post.slug + '.png';
+    const featuredAlt = 'Kennisbank: ' + post.title;
     const articleJsonLd = {
         '@context': 'https://schema.org',
         '@type': 'Article',
         headline: post.title,
         description: post.meta,
+        image: {
+            '@type': 'ImageObject',
+            url: featuredUrl,
+            width: 1200,
+            height: 630,
+        },
         articleSection: post.tag,
         keywords: post.tag + ', arbeidsdeskundig onderzoek, Wet Poortwachter',
         inLanguage: 'nl-NL',
@@ -703,6 +896,7 @@ app.get('/kennisbank/:slug', (req, res, next) => {
         description: post.meta,
         canonicalPath: '/kennisbank/' + post.slug,
         route: { view: 'artikel', slug: post.slug },
+        ogImage: { url: featuredUrl, width: 1200, height: 630, alt: featuredAlt },
         articleJsonLd,
         faqJsonLd,
         breadcrumbJsonLd: breadcrumbFor([
@@ -792,6 +986,8 @@ Sitemap: ${BASE_URL}/sitemap.xml
 // kan alleen helpen bij vindbaarheid in ChatGPT/Perplexity/Claude e.d.
 // ---------------------------------------------------------------------------
 const LLMS_FEATURED_SLUGS = [
+    'maatmanloon-arbeidsdeskundige',
+    'taalbeheersing-passende-functies-arbeidsdeskundige',
     'goedkoopste-arbeidsdeskundig-onderzoek',
     'urenopbouw-stagneert-arbeidsdeskundig-onderzoek',
     'arbeidsdeskundig-onderzoek-gids',
@@ -858,7 +1054,9 @@ function buildLlmsTxt() {
 
     return `# arbeidsdeskundig.com
 
-> Arbeidsdeskundig onderzoek vanaf € 1.095 excl. btw. Online of fysiek, door heel Nederland. Binnen 24 uur opgepakt. UWV-proof, door geregistreerde arbeidsdeskundigen.
+
+> Arbeidsdeskundig onderzoek vanaf €999,- excl. btw, in sommige gevallen bij een vroegtijdig onderzoek. Online of fysiek, door heel Nederland. Binnen 24 uur opgepakt. UWV-proof, door geregistreerde arbeidsdeskundigen.
+
 
 arbeidsdeskundig.com is het aanvraag- en kennisplatform voor arbeidsdeskundig onderzoek: een objectieve beoordeling van wat een werknemer nog kan werken, in het kader van de Wet Poortwachter, WGA, Ziektewet en WIA. 1.500+ onderzoeken, gemiddeld 4,9/5 op Google.
 
@@ -880,7 +1078,7 @@ arbeidsdeskundig.com is het aanvraag- en kennisplatform voor arbeidsdeskundig on
 
 ## Prijzen (2027, excl. btw)
 
-Vanaf-prijs: vanaf € 1.095. De staffel is een prijs naar draagkracht, niet naar dossiercomplexiteit. MKB klein (minder dan 10, ook zzp) € 1.095, MKB groot (10 tot 50) € 1.195, meer dan 50 € 1.295. Vaste partners tot 8% korting. Locatie € 225, spoed of tolk € 195. Loonwaarde of preventief € 1.225. Pro-forma bezwaar of slagingskansconsult € 599. Bezwaar, herbeoordeling of beroep € 1.599. Hoorzitting of rechtszaak € 599. Addendum € 899. Offerte is leidend.
+Vanaf €999 excl. btw, in sommige gevallen bij een vroegtijdig onderzoek. De staffel is een prijs naar draagkracht, niet naar dossiercomplexiteit. MKB klein (minder dan 10, ook zzp) € 1.095, MKB groot (10 tot 50) € 1.195, meer dan 50 € 1.295. Vaste partners tot 8% korting. Locatie € 225, spoed of tolk € 195. Loonwaarde of preventief € 1.225. Pro-forma bezwaar of slagingskansconsult € 599. Bezwaar, herbeoordeling of beroep € 1.599. Hoorzitting of rechtszaak € 599. Addendum € 899. Offerte is leidend.
 
 ## Reactietijd
 
@@ -892,11 +1090,14 @@ Complementair, geen concurrentie. [matchvermogen.nl](https://matchvermogen.nl) i
 
 ## Belangrijkste pagina's
 
-- [Home](${BASE_URL}/): diensten, tarieven vanaf € 1.095, werkwijze
+
+- [Home](${BASE_URL}/): diensten, tarieven vanaf €999,-, werkwijze
+
 - [Offerte aanvragen](${BASE_URL}/offerte-aanvragen): vrijblijvende offerte, reactie binnen 24 uur
 - [Aanmelden](${BASE_URL}/aanmelden): onderzoek starten, binnen 24 uur opgepakt
 - [Kennisbank](${BASE_URL}/kennisbank): hub — alle artikelen per onderwerp
 - [Veelgestelde vragen](${BASE_URL}/veelgestelde-vragen): hub — tarieven en praktijkvragen
+- [Arbeidsdeskundige met tolk](${BASE_URL}/arbeidsdeskundige-met-tolk): onderzoek in je eigen taal, online of op locatie
 - [Over ons](${BASE_URL}/over-ons): Matchvermogen B.V., team en werkwijze
 
 ## Doelgroepen
@@ -1003,7 +1204,7 @@ function ignoreHoneypot(res, fields, label) {
 function offerteMailFields(lead) {
     const bronLabel = lead.bron === 'offerte-pdf'
         ? 'PDF-offerte'
-        : (lead.bron === 'offerte-contact' ? 'Contactverzoek' : 'Offerte');
+        : (lead.bron === 'offerte-contact' ? 'Contactverzoek' : (lead.bron === 'chat' ? 'Chatbot (formulier)' : 'Offerte'));
     return {
         Aanvraag: bronLabel,
         Dienst: lead.dienst || 'Arbeidsdeskundig onderzoek',
@@ -1490,10 +1691,34 @@ app.post('/api/bel-me-terug', async (req, res) => {
     res.json({ ok: true });
 });
 
+// ---------------------------------------------------------------------------
+// Chatbot + contactknop (PREVIEW, standaard UIT). Zie chat/index.js.
+// Aan met CHAT_WIDGET_ENABLED=true; xAI-sleutel alleen via XAI_API_KEY (Railway
+// variable). De kennis komt uitsluitend van deze site: llms.txt, de site-FAQ en
+// de kennisbanklijst. Leads gaan via deliverSalesLead (zelfde mailflow als
+// /api/offerte); het formulier in de chat post naar /api/offerte met bron "chat".
+// ---------------------------------------------------------------------------
+const chat = createChat({
+    getKnowledge: () => ({ llmsTxt: buildLlmsTxt(), faqs: siteFaqs, posts }),
+    deliverLead: deliverSalesLead,
+    escapeHtml,
+    fieldsToHtml,
+});
+chat.register(app);
+
 // Google Search Console eigendomsverificatie (HTML-bestandsmethode). De inhoud
 // moet exact overeenkomen met wat Google in het te downloaden bestand zet.
 app.get('/googlea9befd16dd1488a4.html', (req, res) => {
     res.type('text/plain').send('google-site-verification: googlea9befd16dd1488a4.html');
+});
+
+// Nieuw verificatiebestand in de site-root. Letterlijk het bestand serveren:
+// 200, exacte body, geen SPA-fallback en geen extra redirect (www/https en
+// trailing slash blijven zoals de middleware hierboven ze al afhandelt).
+app.get('/googleac4843348bb6bad7.html', (req, res) => {
+    res.status(200).type('text/plain').send(
+        fs.readFileSync(path.join(__dirname, 'public', 'googleac4843348bb6bad7.html'), 'utf8')
+    );
 });
 
 app.get('/healthz', (req, res) => res.status(200).send('ok'));

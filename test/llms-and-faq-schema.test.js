@@ -55,7 +55,7 @@ describe('llms.txt', () => {
         const txt = await res.text();
 
         assert.match(txt, /^# arbeidsdeskundig\.com/m);
-        assert.match(txt, /vanaf €1\.149/);
+        assert.match(txt, /vanaf €999/);
         assert.match(txt, /binnen 24 uur/i);
         assert.match(txt, /## Wat we wel doen/);
         assert.match(txt, /## Wat we niet doen/);
@@ -138,7 +138,7 @@ describe('llms.txt', () => {
         const res = await fetch(base + '/.well-known/llms.txt');
         assert.equal(res.status, 200);
         const txt = await res.text();
-        assert.match(txt, /vanaf €1\.149/);
+        assert.match(txt, /vanaf €999/);
         assert.match(txt, /\/aanmelden/);
     });
 });
@@ -210,6 +210,15 @@ describe('homepage JSON-LD organization, website and logo', () => {
         const blog = nodes.find((n) => n['@id'] === 'https://www.arbeidsdeskundig.com/#kennisbank');
         assert.equal(blog['@type'], 'Blog');
         assert.deepEqual(blog.publisher, { '@id': 'https://www.arbeidsdeskundig.com/#organization' });
+
+        const offers = org.makesOffer;
+        const online = offers.find((o) => o.name === 'Arbeidsdeskundig onderzoek (online)');
+        const fysiek = offers.find((o) => o.name === 'Arbeidsdeskundig onderzoek (fysiek)');
+        assert.equal(online.priceCurrency, 'EUR');
+        assert.equal(online.price, '999');
+        assert.equal(fysiek.priceCurrency, 'EUR');
+        assert.equal(fysiek.price, '1294');
+        assert.match(org.description, /vanaf €999,-/);
     });
 });
 
@@ -286,7 +295,7 @@ describe('FAQPage structured data is page-specific', () => {
             'Wat kost een arbeidsdeskundig onderzoek?',
             'Kan het onderzoek ook fysiek?',
         ]);
-        assert.match(pages[0].mainEntity[0].acceptedAnswer.text, /€1\.149/);
+        assert.match(pages[0].mainEntity[0].acceptedAnswer.text, /€999/);
         assert.doesNotMatch(graphTypes(html).join(','), /FAQPage.*FAQPage/);
         assert.ok(!graphTypes(html).includes('FAQPage') || pages.length === 1);
         assert.ok(!parseLdJsonBlocks(html).some((b) => Array.isArray(b['@graph']) && b['@graph'].some((n) => n['@type'] === 'FAQPage')));
@@ -300,7 +309,7 @@ describe('FAQPage structured data is page-specific', () => {
         assert.equal(pages.length, 1);
         assert.ok(pages[0].mainEntity.length >= 14, `expected full FAQ, got ${pages[0].mainEntity.length}`);
         assert.ok(pages[0].mainEntity.some((q) => /second opinion/i.test(q.name)));
-        assert.ok(pages[0].mainEntity.some((q) => /€1\.149/.test(q.acceptedAnswer.text)));
+        assert.ok(pages[0].mainEntity.some((q) => /€999/.test(q.acceptedAnswer.text)));
         assert.match(html, /id="faq-list"[^>]*>[\s\S]*Wat kost een arbeidsdeskundig onderzoek\?/);
         assert.match(html, /id="faq-list"[^>]*>[\s\S]*Is een arbeidsdeskundig onderzoek verplicht\?/);
     });

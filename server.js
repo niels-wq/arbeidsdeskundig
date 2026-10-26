@@ -196,13 +196,17 @@ const siteFaqs = extractSiteFaqs(INDEX_HTML);
 
 // Twee vragen die daadwerkelijk in de homepage-HTML staan (niet de volledige FAQ).
 const HOME_VISIBLE_FAQ = [
-    ['Wat kost een arbeidsdeskundig onderzoek?', 'Vanaf €999,- exclusief btw, in sommige gevallen bij een vroegtijdig onderzoek. Het exacte tarief hangt af van bedrijfsgrootte. Zie de volledige FAQ voor alle tarieven.'],
+
+    ['Wat kost een arbeidsdeskundig onderzoek?', 'Vanaf €999,- exclusief btw, in sommige gevallen bij een vroegtijdig onderzoek. De staffel is een prijs naar draagkracht, naar bedrijfsgrootte. Zie de volledige FAQ voor alle tarieven.'],
+
     ['Kan het onderzoek ook fysiek?', 'Ja. Online is het snelst en standaard inbegrepen, maar een bezoek op locatie is altijd bespreekbaar — bijvoorbeeld als een werkplekonderzoek meerwaarde heeft.'],
 ];
 
 console.log(`[seo] ${posts.length} kennisbank-artikelen, ${personas.length} doelgroep-pagina's en ${siteFaqs.length} FAQ-vragen geladen`);
 const DEFAULT_TITLE = 'arbeidsdeskundig.com — Arbeidsdeskundig onderzoek, online én fysiek';
+
 const DEFAULT_DESC = 'Arbeidsdeskundig onderzoek vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek. Online of fysiek, door heel Nederland. Specialist in WGA, Ziektewet en Wet Poortwachter.';
+
 
 app.use(compression());
 app.disable('x-powered-by');
@@ -754,7 +758,9 @@ app.get('/over-ons', (req, res) => {
 app.get('/offerte-aanvragen', (req, res) => {
     renderPage(res, {
         title: 'Offerte aanvragen — arbeidsdeskundig.com',
+
         description: 'Vraag vrijblijvend een offerte aan. Vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek, reactie binnen 24 uur, 4,9/5. Of plan eerst 15 minuten kennismaking.',
+
         canonicalPath: '/offerte-aanvragen',
         route: { view: 'offerte' },
     });
@@ -763,7 +769,9 @@ app.get('/offerte-aanvragen', (req, res) => {
 app.get('/aanmelden', (req, res) => {
     renderPage(res, {
         title: 'Aanmelden voor een arbeidsdeskundig onderzoek — arbeidsdeskundig.com',
+
         description: 'Meld je aan voor een arbeidsdeskundig onderzoek. Vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek, binnen 24 uur opgepakt. Of plan eerst 15 minuten kennismaking.',
+
         canonicalPath: '/aanmelden',
         route: { view: 'aanmelden' },
     });
@@ -1052,7 +1060,9 @@ function buildLlmsTxt() {
 
     return `# arbeidsdeskundig.com
 
+
 > Arbeidsdeskundig onderzoek vanaf €999,- excl. btw, in sommige gevallen bij een vroegtijdig onderzoek. Online of fysiek, door heel Nederland. Binnen 24 uur opgepakt. UWV-proof, door geregistreerde arbeidsdeskundigen.
+
 
 arbeidsdeskundig.com is het aanvraag- en kennisplatform voor arbeidsdeskundig onderzoek: een objectieve beoordeling van wat een werknemer nog kan werken, in het kader van de Wet Poortwachter, WGA, Ziektewet en WIA. 1.500+ onderzoeken, gemiddeld 4,9/5 op Google.
 
@@ -1074,12 +1084,7 @@ arbeidsdeskundig.com is het aanvraag- en kennisplatform voor arbeidsdeskundig on
 
 ## Prijzen (2027, excl. btw)
 
-- Vanaf €999,- excl. btw, in sommige gevallen bij een vroegtijdig onderzoek
-- Tot 5 medewerkers, kleine stichtingen of vrijwilligersorganisaties: €1.149,-
-- Tot 100 medewerkers: €1.179,-
-- Groot zakelijk: €1.449,-
-- Fysiek onderzoek: +€295,-; spoedonderzoek: +€300,-
-- Exact tarief volgt uit de offerte; het tarief hangt af van bedrijfsgrootte, niet van dossiercomplexiteit
+Vanaf €999 excl. btw, in sommige gevallen bij een vroegtijdig onderzoek. De staffel is een prijs naar draagkracht, niet naar dossiercomplexiteit. MKB klein (minder dan 10, ook zzp) € 1.095, MKB groot (10 tot 50) € 1.195, meer dan 50 € 1.295. Vaste partners tot 8% korting. Locatie € 225, spoed of tolk € 195. Loonwaarde of preventief € 1.225. Pro-forma bezwaar of slagingskansconsult € 599. Bezwaar, herbeoordeling of beroep € 1.599. Hoorzitting of rechtszaak € 599. Addendum € 899. Offerte is leidend.
 
 ## Reactietijd
 
@@ -1091,7 +1096,9 @@ Complementair, geen concurrentie. [matchvermogen.nl](https://matchvermogen.nl) i
 
 ## Belangrijkste pagina's
 
+
 - [Home](${BASE_URL}/): diensten, tarieven vanaf €999,-, werkwijze
+
 - [Offerte aanvragen](${BASE_URL}/offerte-aanvragen): vrijblijvende offerte, reactie binnen 24 uur
 - [Aanmelden](${BASE_URL}/aanmelden): onderzoek starten, binnen 24 uur opgepakt
 - [Kennisbank](${BASE_URL}/kennisbank): hub — alle artikelen per onderwerp
@@ -1293,15 +1300,15 @@ async function deliverSalesLead({ kind, lead, rawFields, notifySubject, notifyHt
 const PDFDocument = require('pdfkit');
 
 const OFFERTE_GROOTTE_LABELS = {
-    klein: 'Tot 5 medewerkers / stichting',
-    midden: 'Tot 100 medewerkers',
-    groot: 'Groot zakelijk',
+    klein: 'MKB klein, minder dan 10 (ook zzp)',
+    midden: 'MKB groot, 10 tot 50',
+    groot: 'Meer dan 50 medewerkers',
 };
-const OFFERTE_PRICE_TIERS = { klein: 1149, midden: 1179, groot: 1449 };
+const OFFERTE_PRICE_TIERS = { klein: 1095, midden: 1195, groot: 1295 };
 
 function berekenOffertePrijs(grootte, vorm) {
-    const basis = OFFERTE_PRICE_TIERS[grootte] || OFFERTE_PRICE_TIERS.midden;
-    const fysiekToeslag = vorm === 'Fysiek' ? 295 : 0;
+    const basis = OFFERTE_PRICE_TIERS[grootte] || OFFERTE_PRICE_TIERS.klein;
+    const fysiekToeslag = vorm === 'Fysiek' ? 225 : 0;
     return { basis, fysiekToeslag, totaal: basis + fysiekToeslag };
 }
 
@@ -1429,7 +1436,7 @@ function genereerOffertePdf(fields) {
         const rows = [
             ['Dienst', 'Arbeidsdeskundig onderzoek'],
             ['Vorm', vorm === 'Fysiek' ? 'Fysiek, op locatie' : (vorm === 'Online' ? 'Online' : 'Nog te bepalen')],
-            ['Bedrijfsgrootte', OFFERTE_GROOTTE_LABELS[grootte] || OFFERTE_GROOTTE_LABELS.midden],
+            ['Bedrijfsgrootte', OFFERTE_GROOTTE_LABELS[grootte] || OFFERTE_GROOTTE_LABELS.klein],
         ];
         rows.forEach(([k, v]) => {
             doc.fillColor(muted).fontSize(9.5).font('Helvetica').text(k, 56, y, { width: 150 });
@@ -1453,7 +1460,7 @@ function genereerOffertePdf(fields) {
         doc.fillColor(ink).fontSize(9.5).font('Helvetica').text(euro(basis), 400, y, { width: 130, align: 'right' });
         y += 18;
         if (fysiekToeslag) {
-            doc.fillColor(muted).fontSize(9.5).font('Helvetica').text('Toeslag fysiek onderzoek', 56, y);
+            doc.fillColor(muted).fontSize(9.5).font('Helvetica').text('Onderzoek op locatie', 56, y);
             doc.fillColor(ink).fontSize(9.5).font('Helvetica').text(euro(fysiekToeslag), 400, y, { width: 130, align: 'right' });
             y += 18;
         }

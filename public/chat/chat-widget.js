@@ -238,6 +238,7 @@
       + '<label>Organisatie<input type="text" name="bedrijf" autocomplete="organization"></label>'
       + '<label>E-mail<input type="email" name="email" autocomplete="email" required></label>'
       + '<label>Telefoon<input type="tel" name="telefoon" autocomplete="tel" required></label></div>'
+      + '<input type="hidden" name="form_ts" value="' + String(C.formTs || '').replace(/[^0-9a-f.]/gi, '') + '" autocomplete="off">'
       + '<p class="adc-chat__hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></p>'
       + '<label class="adc-chat__consent"><input type="checkbox" name="akkoord" required><span>Ik ga akkoord dat arbeidsdeskundig.com (Matchvermogen B.V.) mijn gegevens gebruikt om contact met mij op te nemen. Lees de <a href="' + (C.privacy || '#') + '" target="_blank" rel="noopener">privacyverklaring</a>.</span></label>'
       + '<button type="submit" class="adc-chat__lead-submit">Versturen</button><p class="adc-chat__lead-msg" role="status"></p>';
@@ -256,7 +257,7 @@
       track('chat_lead_submit', { source: 'chat_form' });
       fetch(C.lead || '/api/offerte', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin',
-        body: JSON.stringify({ naam: v('naam'), bedrijf: v('bedrijf'), email: v('email'), telefoon: v('telefoon'), website: v('website'), omschrijving: 'Via de chat op ' + location.pathname + (summary ? '. Vragen: ' + summary : ''), bron: 'chat' })
+        body: JSON.stringify({ naam: v('naam'), bedrijf: v('bedrijf'), email: v('email'), telefoon: v('telefoon'), website: v('website'), form_ts: v('form_ts'), omschrijving: 'Via de chat op ' + location.pathname + (summary ? '. Vragen: ' + summary : ''), bron: 'chat' })
       }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { return { r: r, d: d }; }); })
         .then(function (x) {
           if (x.r.ok && x.d.ok !== false) {

@@ -1,7 +1,8 @@
 'use strict';
 
-const { describe, it, before, after } = require('node:test');
+const { describe, it, before, after, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
+const { issueFormToken, resetForTests } = require('../form-spam');
 
 const captured = [];
 const origLog = console.log;
@@ -19,6 +20,10 @@ function emailLogs() {
     return captured.filter((line) => line.includes('[Resend niet geconfigureerd]'));
 }
 
+function stamped(body) {
+    return Object.assign({}, body, { form_ts: issueFormToken(Date.now() - 5000) });
+}
+
 async function post(path, body) {
     const res = await fetch(base + path, {
         method: 'POST',
@@ -29,6 +34,8 @@ async function post(path, body) {
     try { json = await res.json(); } catch (e) { json = null; }
     return { status: res.status, json };
 }
+
+beforeEach(() => resetForTests());
 
 before(async () => {
     await new Promise((resolve) => {
@@ -46,7 +53,7 @@ after(async () => {
 describe('POST /api/offerte', () => {
     it('rejects empty submissions instead of mailing onbekend', async () => {
         const beforeCount = emailLogs().length;
-        const { status, json } = await post('/api/offerte', {});
+        const { status, json } = await post('/api/offerte', stamped({}));
         assert.equal(status, 400);
         assert.equal(json.ok, false);
         assert.match(json.error, /naam|e-mail|telefoon/i);
@@ -54,22 +61,22 @@ describe('POST /api/offerte', () => {
         assert.equal(emailLogs().some((l) => /onbekend/i.test(l)), false);
     });
 
-    it('rejects a bare POST with no JSON body', async () => {
+    it('drops a bare POST with no timestamp without sending mail', async () => {
         const beforeCount = emailLogs().length;
         const res = await fetch(base + '/api/offerte', { method: 'POST' });
-        assert.equal(res.status, 400);
+        assert.equal(res.status, 200);
         const json = await res.json();
-        assert.equal(json.ok, false);
+        assert.equal(json.ok, true);
         assert.equal(emailLogs().length, beforeCount);
     });
 
     it('rejects placeholder name onbekend', async () => {
         const beforeCount = emailLogs().length;
-        const { status, json } = await post('/api/offerte', {
+        const { status, json } = await post('/api/offerte', stamped({
             naam: 'onbekend',
             email: 'jan@bedrijf.nl',
             telefoon: '0612345678',
-        });
+        }));
         assert.equal(status, 400);
         assert.equal(json.ok, false);
         assert.equal(emailLogs().length, beforeCount);
@@ -77,26 +84,26 @@ describe('POST /api/offerte', () => {
 
     it('silently accepts a honeypot fill without sending mail', async () => {
         const beforeCount = emailLogs().length;
-        const { status, json } = await post('/api/offerte', {
+        const { status, json } = await post('/api/offerte', stamped({
             naam: 'Jan Jansen',
             email: 'jan@bedrijf.nl',
             telefoon: '0612345678',
             website: 'http://spam.test',
-        });
+        }));
         assert.equal(status, 200);
         assert.equal(json.ok, true);
         assert.equal(emailLogs().length, beforeCount);
     });
 
     it('accepts a complete offerte and uses the real name in the subject', async () => {
-        const { status, json } = await post('/api/offerte', {
+        const { status, json } = await post('/api/offerte', stamped({
             'of-naam': 'Piet Pietersen',
             'of-email': 'piet@bedrijf.nl',
             'of-telefoon': '0612345678',
             grootte: 'midden',
             vorm: 'Online',
             bron: 'offerte-contact',
-        });
+        }));
         assert.equal(status, 200);
         assert.equal(json.ok, true);
         const mailed = emailLogs().filter((l) => l.includes('Piet Pietersen'));
@@ -106,11 +113,11 @@ describe('POST /api/offerte', () => {
 
     it('does not mail info@ for example.com / test payloads', async () => {
         const before = emailLogs().length;
-        const { status, json } = await post('/api/offerte', {
+        const { status, json } = await post('/api/offerte', stamped({
             naam: 'Piet Tester',
             email: 'piet.tester@example.com',
             telefoon: '0612345678',
-        });
+        }));
         assert.equal(status, 200);
         assert.equal(json.ok, true);
         const newLogs = emailLogs().slice(before);
@@ -125,11 +132,11 @@ describe('POST /api/offerte', () => {
             vorm: 'Fysiek',
             grootte: 'klein',
         };
-        const first = await post('/api/offerte', payload);
+        const first = await post('/api/offerte', stamped(payload));
         assert.equal(first.status, 200);
         const afterFirst = emailLogs().filter((l) => l.includes('Lisa Duplo') && l.includes('info@matchvermogen.nl')).length;
         assert.equal(afterFirst, 1);
-        const second = await post('/api/offerte', payload);
+        const second = await post('/api/offerte', stamped(payload));
         assert.equal(second.status, 200);
         const afterSecond = emailLogs().filter((l) => l.includes('Lisa Duplo') && l.includes('info@matchvermogen.nl')).length;
         assert.equal(afterSecond, 1);
@@ -139,18 +146,18 @@ describe('POST /api/offerte', () => {
 describe('POST /api/bel-me-terug', () => {
     it('rejects missing phone', async () => {
         const beforeCount = emailLogs().length;
-        const { status, json } = await post('/api/bel-me-terug', { naam: 'Jan Jansen' });
+        const { status, json } = await post('/api/bel-me-terug', stamped({ naam: 'Jan Jansen' }));
         assert.equal(status, 400);
         assert.equal(json.ok, false);
         assert.equal(emailLogs().length, beforeCount);
     });
 
     it('accepts name + phone', async () => {
-        const { status, json } = await post('/api/bel-me-terug', {
+        const { status, json } = await post('/api/bel-me-terug', stamped({
             'bt-naam': 'Anna Bakker',
             'bt-telefoon': '0611223344',
             'bt-moment': 'Morgen',
-        });
+        }));
         assert.equal(status, 200);
         assert.equal(json.ok, true);
         assert.ok(emailLogs().some((l) => l.includes('Anna Bakker')));
@@ -158,10 +165,10 @@ describe('POST /api/bel-me-terug', () => {
 
     it('does not mail info@ for a dummy-phone test callback', async () => {
         const before = emailLogs().length;
-        const { status, json } = await post('/api/bel-me-terug', {
+        const { status, json } = await post('/api/bel-me-terug', stamped({
             naam: 'Jan Jansen',
             telefoon: '0612345678',
-        });
+        }));
         assert.equal(status, 200);
         assert.equal(json.ok, true);
         const newLogs = emailLogs().slice(before);
@@ -171,15 +178,15 @@ describe('POST /api/bel-me-terug', () => {
 
 describe('POST /api/checklist', () => {
     it('rejects missing email', async () => {
-        const { status } = await post('/api/checklist', { 'cl-naam': 'Jan Jansen' });
+        const { status } = await post('/api/checklist', stamped({ 'cl-naam': 'Jan Jansen' }));
         assert.equal(status, 400);
     });
 
     it('accepts name + email', async () => {
-        const { status, json } = await post('/api/checklist', {
+        const { status, json } = await post('/api/checklist', stamped({
             'cl-naam': 'Chris Mol',
             'cl-email': 'chris@bedrijf.nl',
-        });
+        }));
         assert.equal(status, 200);
         assert.equal(json.ok, true);
     });
@@ -188,18 +195,18 @@ describe('POST /api/checklist', () => {
 describe('POST /api/aanmelden', () => {
     it('rejects contact-only payload without service type', async () => {
         const beforeCount = emailLogs().length;
-        const { status, json } = await post('/api/aanmelden', {
+        const { status, json } = await post('/api/aanmelden', stamped({
             'inp-aanvrager-naam': 'Sara de Vries',
             'inp-aanvrager-email': 'sara@bedrijf.nl',
             'inp-aanvrager-tel': '0850870307',
-        });
+        }));
         assert.equal(status, 400);
         assert.match(json.error, /dienstverlening/i);
         assert.equal(emailLogs().length, beforeCount);
     });
 
     it('accepts a complete aanmelding including dienst', async () => {
-        const { status, json } = await post('/api/aanmelden', {
+        const { status, json } = await post('/api/aanmelden', stamped({
             'inp-aanvrager-naam': 'Sara de Vries',
             'inp-aanvrager-email': 'sara@bedrijf.nl',
             'inp-aanvrager-tel': '0850870307',
@@ -207,7 +214,7 @@ describe('POST /api/aanmelden', () => {
             wet: 'Wet Verbetering Poortwachter',
             vorm: 'Online',
             grootte: 'midden',
-        });
+        }));
         assert.equal(status, 200);
         assert.equal(json.ok, true);
         assert.ok(emailLogs().some((l) => l.includes('Sara de Vries')));

@@ -11,7 +11,6 @@ const helmet = require('helmet');
 const path = require('path');
 const fs = require('fs');
 const {
-    isHoneypotTriggered,
     isTestLead,
     leadDedupeKey,
     notifyIsSafe,
@@ -20,6 +19,7 @@ const {
     validateChecklistLead,
     validateBelMeTerugLead,
 } = require('./lead-validation');
+const formSpam = require('./form-spam');
 const { createChat } = require('./chat');
 
 const app = express();
@@ -625,10 +625,16 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
     const analyticsIdsScript = `<script>window.__ANALYTICS_IDS__ = ${JSON.stringify({ ga4: GA4_ID, metaPixel: META_PIXEL_ID })};</script>\n`;
     html = html.replace('</head>', analyticsIdsScript + '</head>');
 
+    // Vers tijdstempel voor elk formulier op deze pagina. De client stuurt het
+    // ongewijzigd terug; de server weigert inzendingen die te snel, te oud of
+    // niet ondertekend zijn.
+    const formTs = formSpam.issueFormToken();
+    html = html.split('__FORM_TS__').join(formTs);
+
     // __ROUTE__ injecteren zodat de client meteen de juiste view rendert.
     // Chatbot + contactknop (preview): alleen als CHAT_WIDGET_ENABLED=true. Staat de
     // vlag uit, dan is snippet() leeg en blijft de HTML exact gelijk.
-    const chatSnippet = chat.snippet();
+    const chatSnippet = chat.snippet(formTs);
     if (chatSnippet) html = html.replace('</body>', chatSnippet + '</body>');
 
     const routeScript = `<script>window.__ROUTE__ = ${JSON.stringify(route)};</script>\n`;
@@ -1187,9 +1193,11 @@ function rejectLead(res, result) {
     });
 }
 
-function ignoreHoneypot(res, fields, label) {
-    if (!isHoneypotTriggered(fields)) return false;
-    console.log(`[${label}] honeypot gevuld — geen e-mail verstuurd`);
+function dropSpam(req, res, label) {
+    const fields = (req.body && typeof req.body === 'object' && !Array.isArray(req.body)) ? req.body : {};
+    const reason = formSpam.assess({ fields, ip: formSpam.clientIp(req) });
+    if (!reason) return false;
+    console.log(`[${label}] spam gedropt (${reason})`);
     res.json({ ok: true });
     return true;
 }
@@ -1218,6 +1226,7 @@ function leftoverFormFields(raw, skipKeys) {
     for (const [key, val] of Object.entries(raw)) {
         if (skip.has(key)) continue;
         if (/(^|-)(website|url|honeypot|_hp)$/i.test(key)) continue;
+        if (key === 'form_ts') continue;
         if (key.startsWith('of-doc-')) continue;
         if (val === undefined || val === null || val === '') continue;
         out[key] = val;
@@ -1483,9 +1492,9 @@ function genereerOffertePdf(fields) {
 }
 
 app.post('/api/offerte-pdf', async (req, res) => {
+    if (dropSpam(req, res, 'offerte-pdf')) return;
     console.log('[offerte-pdf] verzoek ontvangen');
     const fields = req.body || {};
-    if (ignoreHoneypot(res, fields, 'offerte-pdf')) return;
     const parsed = validateOfferteLead(fields);
     if (!parsed.ok) {
         console.log('[offerte-pdf] verplichte velden ontbreken, 400');
@@ -1547,8 +1556,8 @@ app.post('/api/offerte-pdf', async (req, res) => {
 });
 
 app.post('/api/offerte', async (req, res) => {
+    if (dropSpam(req, res, 'offerte')) return;
     const fields = req.body || {};
-    if (ignoreHoneypot(res, fields, 'offerte')) return;
     const parsed = validateOfferteLead(fields);
     if (!parsed.ok) {
         console.log('[offerte] afgewezen:', parsed.errors.join('; '));
@@ -1576,8 +1585,8 @@ app.post('/api/offerte', async (req, res) => {
 });
 
 app.post('/api/aanmelden', async (req, res) => {
+    if (dropSpam(req, res, 'aanmelden')) return;
     const fields = req.body || {};
-    if (ignoreHoneypot(res, fields, 'aanmelden')) return;
     const parsed = validateAanmeldLead(fields);
     if (!parsed.ok) {
         console.log('[aanmelden] afgewezen:', parsed.errors.join('; '));
@@ -1622,8 +1631,8 @@ app.post('/api/aanmelden', async (req, res) => {
 });
 
 app.post('/api/checklist', async (req, res) => {
+    if (dropSpam(req, res, 'checklist')) return;
     const fields = req.body || {};
-    if (ignoreHoneypot(res, fields, 'checklist')) return;
     const parsed = validateChecklistLead(fields);
     if (!parsed.ok) {
         console.log('[checklist] afgewezen:', parsed.errors.join('; '));
@@ -1651,8 +1660,8 @@ app.post('/api/checklist', async (req, res) => {
 });
 
 app.post('/api/bel-me-terug', async (req, res) => {
+    if (dropSpam(req, res, 'bel-me-terug')) return;
     const fields = req.body || {};
-    if (ignoreHoneypot(res, fields, 'bel-me-terug')) return;
     const parsed = validateBelMeTerugLead(fields);
     if (!parsed.ok) {
         console.log('[bel-me-terug] afgewezen:', parsed.errors.join('; '));

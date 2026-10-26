@@ -1018,6 +1018,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
         <label class="field"><span class="lbl">Zakelijk e-mailadres <span class="req">*</span></span><input type="email" id="of-email" autocomplete="email" aria-required="true" aria-describedby="of-email-msg"><span class="field-msg" id="of-email-msg" role="alert"></span></label>
         <label class="field"><span class="lbl">Telefoonnummer <span class="req">*</span></span><input type="tel" id="of-telefoon" autocomplete="tel" aria-required="true" aria-describedby="of-telefoon-msg" placeholder="06 of 085…"><span class="field-msg" id="of-telefoon-msg" role="alert"></span><span class="hint">Zodat we je binnen 24 uur kunnen bereiken.</span></label>
         <label class="hp-field" aria-hidden="true"><span>Website</span><input type="text" id="of-website" name="website" tabindex="-1" autocomplete="off"></label>
+        <input type="hidden" class="form-ts" name="form_ts" value="__FORM_TS__" autocomplete="off">
       </div>
       <label class="field"><span class="lbl">Hoe groot is de organisatie?</span>
         <div class="choice-row" data-group="of-grootte" role="group" aria-label="Bedrijfsgrootte">
@@ -1294,6 +1295,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
         <label class="field"><span class="lbl">Jouw e-mailadres <span class="req">*</span></span><input type="email" id="inp-aanvrager-email" autocomplete="email" aria-required="true" aria-describedby="inp-aanvrager-email-msg"><span class="field-msg" id="inp-aanvrager-email-msg" role="alert"></span></label>
         <label class="field"><span class="lbl">Jouw telefoonnummer <span class="req">*</span></span><input type="tel" id="inp-aanvrager-tel" autocomplete="tel" aria-required="true" aria-describedby="inp-aanvrager-tel-msg"><span class="field-msg" id="inp-aanvrager-tel-msg" role="alert"></span></label>
         <label class="hp-field" aria-hidden="true"><span>Website</span><input type="text" id="inp-website" name="website" tabindex="-1" autocomplete="off"></label>
+        <input type="hidden" class="form-ts" name="form_ts" value="__FORM_TS__" autocomplete="off">
       </div>
       <label class="field"><span class="lbl">Opmerkingen</span><textarea id="inp-aanvrager-opmerkingen" placeholder="Vertel hier iets over het dossier."></textarea></label>
       <div style="display:flex; gap:12px;">
@@ -2133,6 +2135,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <label class="field" style="margin-top:16px;"><span class="lbl">Naam <span class="req">*</span></span><input type="text" id="cl-naam" autocomplete="name"></label>
       <label class="field"><span class="lbl">E-mail <span class="req">*</span></span><input type="email" id="cl-email" autocomplete="email"></label>
       <label class="hp-field" aria-hidden="true"><span>Website</span><input type="text" id="cl-website" name="website" tabindex="-1" autocomplete="off"></label>
+      <input type="hidden" class="form-ts" name="form_ts" value="__FORM_TS__" autocomplete="off">
       <p id="cl-error" class="form-error hidden" role="alert"></p>
       <button type="button" class="btn-primary" style="width:100%;" onclick="submitChecklist()">Verstuur & bekijk checklist</button>
       <p style="font-size:.7rem; color:#98A0A8; margin-top:10px;">Je ontvangt ook een kopie per e-mail. We gebruiken je gegevens niet voor iets anders.</p>
@@ -2198,6 +2201,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <label class="field" style="margin-top:16px;"><span class="lbl">Naam <span class="req">*</span></span><input type="text" id="bt-naam" autocomplete="name"></label>
       <label class="field"><span class="lbl">Telefoonnummer <span class="req">*</span></span><input type="tel" id="bt-telefoon" autocomplete="tel"></label>
       <label class="hp-field" aria-hidden="true"><span>Website</span><input type="text" id="bt-website" name="website" tabindex="-1" autocomplete="off"></label>
+      <input type="hidden" class="form-ts" name="form_ts" value="__FORM_TS__" autocomplete="off">
       <label class="field"><span class="lbl">Wanneer schikt het?</span>
         <select id="bt-moment">
           <option value="Zo snel mogelijk" selected>Zo snel mogelijk</option>
@@ -2479,11 +2483,17 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       dienst: offerteData.dienst || '',
     };
   }
+  function formSpamToken(){
+    const el = document.querySelector('input.form-ts');
+    return el ? String(el.value || '') : '';
+  }
   async function submitToBackend(endpoint, fields){
+    const payload = Object.assign({}, fields || {});
+    if(!payload.form_ts) payload.form_ts = formSpamToken();
     const r = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(fields),
+      body: JSON.stringify(payload),
     });
     let data = {};
     try { data = await r.json(); } catch(e) { data = {}; }

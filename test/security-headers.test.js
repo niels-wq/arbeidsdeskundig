@@ -8,6 +8,7 @@
 const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const { app } = require('../server');
+const { issueFormToken } = require('../form-spam');
 
 const PATHS = ['/', '/kennisbank/arbeidsdeskundig-onderzoek-gids', '/sitemap.xml'];
 
@@ -133,7 +134,7 @@ describe('security response headers', () => {
             const lead = await fetch(base + '/api/offerte', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({}),
+                body: JSON.stringify({ form_ts: issueFormToken(Date.now() - 5000) }),
             });
             assert.equal(lead.status, 400);
             assert.equal(lead.headers.get('x-content-type-options'), 'nosniff');

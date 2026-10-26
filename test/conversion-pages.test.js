@@ -3,6 +3,7 @@
 const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const { app } = require('../server');
+const { issueFormToken } = require('../form-spam');
 
 let server;
 let base;
@@ -106,12 +107,13 @@ describe('conversion pages: offerte and aanmelden', () => {
     });
 
     it('empty POSTs still return 400 and never accept onbekend', async () => {
-        const emptyOfferte = await post('/api/offerte', {});
+        const token = { form_ts: issueFormToken(Date.now() - 5000) };
+        const emptyOfferte = await post('/api/offerte', token);
         assert.equal(emptyOfferte.status, 400);
         assert.equal(emptyOfferte.json.ok, false);
         assert.match(emptyOfferte.json.error, /naam|e-mail|telefoon/i);
 
-        const emptyAanmeld = await post('/api/aanmelden', {});
+        const emptyAanmeld = await post('/api/aanmelden', { form_ts: issueFormToken(Date.now() - 5000) });
         assert.equal(emptyAanmeld.status, 400);
         assert.equal(emptyAanmeld.json.ok, false);
 
@@ -119,6 +121,7 @@ describe('conversion pages: offerte and aanmelden', () => {
             naam: 'onbekend',
             email: 'jan@bedrijf.nl',
             telefoon: '0612345678',
+            form_ts: issueFormToken(Date.now() - 5000),
         });
         assert.equal(onbekend.status, 400);
         assert.equal(onbekend.json.ok, false);

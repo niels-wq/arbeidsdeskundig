@@ -23,7 +23,7 @@ const prompt = require('./prompt');
 const PUBLIC_DIR = path.join(__dirname, '..', 'public', 'chat');
 const SALT = crypto.randomBytes(16).toString('hex');
 const DAY_MS = 24 * 60 * 60 * 1000;
-const ASSET_VERSION = '1';
+const ASSET_VERSION = '2';
 
 function enabled() {
     return String(process.env.CHAT_WIDGET_ENABLED || '').toLowerCase() === 'true';
@@ -299,7 +299,7 @@ function createChat({ getKnowledge, deliverLead, escapeHtml, fieldsToHtml, fetch
         });
     }
 
-    function snippet() {
+    function snippet(formTs) {
         if (!enabled()) return '';
         const cfg = {
             api: '/api/chat/message',
@@ -312,6 +312,7 @@ function createChat({ getKnowledge, deliverLead, escapeHtml, fieldsToHtml, fetch
             privacy: flow.PRIVACY_URL,
             calendly: flow.CALENDLY,
             leadValue: 250,
+            formTs: typeof formTs === 'string' ? formTs : '',
             offset: 12,
         };
         return '<link rel="stylesheet" href="/chat/chat-widget.css?v=' + ASSET_VERSION + '">\n'

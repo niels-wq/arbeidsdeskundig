@@ -978,6 +978,7 @@ Sitemap: ${BASE_URL}/sitemap.xml
 // kan alleen helpen bij vindbaarheid in ChatGPT/Perplexity/Claude e.d.
 // ---------------------------------------------------------------------------
 const LLMS_FEATURED_SLUGS = [
+    'vrijwillige-verlenging-loondoorbetaling-arbeidsdeskundige',
     'maatmanloon-arbeidsdeskundige',
     'taalbeheersing-passende-functies-arbeidsdeskundige',
     'goedkoopste-arbeidsdeskundig-onderzoek',

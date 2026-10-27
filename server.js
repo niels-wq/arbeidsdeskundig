@@ -586,23 +586,48 @@ function hydrateFaqView(html, faqs) {
 // en BlogPosting met articleBody). Dat blijft de bron voor routing en voor
 // het artikel dat deze response wél toont. Andere artikelen gaan eruit, anders
 // kan Google de URL's niet uit elkaar houden.
+// Oudere post-regels zetten een spatie voor de komma: `"] , faq:"`.
+// Alleen op `]` direct gevolgd door `,` letten laat dan ` ,  ,` achter.
+// De client-script parseert dan niet: lege homepage-secties en dode links.
+// Haakjes binnen een string (een FAQ-antwoord met ]) tellen niet mee.
 function stripBracketField(line, key) {
     const needle = key + ':[';
     const idx = line.indexOf(needle);
     if (idx === -1) return line;
-    let depth = 0;
     let i = idx + key.length;
+    while (i < line.length && line[i] !== '[') i++;
+    if (i >= line.length) return line;
+    let depth = 0;
+    let inStr = false;
+    let escape = false;
+    let closed = false;
     for (; i < line.length; i++) {
-        if (line[i] === '[') depth++;
-        else if (line[i] === ']') {
+        const c = line[i];
+        if (inStr) {
+            if (escape) { escape = false; continue; }
+            if (c === '\\') { escape = true; continue; }
+            if (c === '"') inStr = false;
+            continue;
+        }
+        if (c === '"') { inStr = true; continue; }
+        if (c === '[') depth++;
+        else if (c === ']') {
             depth--;
-            if (depth === 0) { i++; break; }
+            if (depth === 0) { i++; closed = true; break; }
         }
     }
+    if (!closed) return line;
     let start = idx;
     let end = i;
-    if (line[end] === ',') end++;
-    else if (start > 0 && line[start - 1] === ',') start--;
+    let j = end;
+    while (j < line.length && (line[j] === ' ' || line[j] === '\t')) j++;
+    if (line[j] === ',') {
+        end = j + 1;
+    } else {
+        let k = start - 1;
+        while (k >= 0 && (line[k] === ' ' || line[k] === '\t')) k--;
+        if (line[k] === ',') start = k;
+    }
     return line.slice(0, start) + line.slice(end);
 }
 

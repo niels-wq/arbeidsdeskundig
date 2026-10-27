@@ -65,7 +65,7 @@ describe('SEO: exactly one h1 per route', () => {
             assert.equal((html.match(/<h1/g) || []).length, 1);
             assert.equal(h1Text(tags[0]), spec.h1);
             if (spec.path === '/kennisbank/kosten-arbeidsdeskundig-onderzoek') {
-                assert.match(html, /<title>Kosten arbeidsdeskundig onderzoek: tarieven en wat je krijgt \(2026\) \u2014 arbeidsdeskundig\.com<\/title>/);
+                assert.match(html, /<title>Kosten arbeidsdeskundig onderzoek 2026 \| Arbeidsdeskundig\.com<\/title>/);
                 assert.match(html, /<meta name="description" content="Kosten arbeidsdeskundig onderzoek \(2026\): vanaf €999 excl\. btw, in sommige gevallen bij een vroegtijdig onderzoek\./);
                 assert.doesNotMatch(html, /<title>[^<]*\(2027\)/);
                 assert.doesNotMatch(html, /<h1\b[^>]*>[^<]*\(2027\)/);

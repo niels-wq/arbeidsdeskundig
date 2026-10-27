@@ -201,8 +201,33 @@ const HOME_VISIBLE_FAQ = [
 ];
 
 console.log(`[seo] ${posts.length} kennisbank-artikelen, ${personas.length} doelgroep-pagina's en ${siteFaqs.length} FAQ-vragen geladen`);
-const DEFAULT_TITLE = 'arbeidsdeskundig.com — Arbeidsdeskundig onderzoek, online én fysiek';
+const TITLE_SUFFIX = ' | Arbeidsdeskundig.com';
+const DEFAULT_TITLE = 'Arbeidsdeskundig onderzoek online' + TITLE_SUFFIX;
 const DEFAULT_DESC = 'Arbeidsdeskundig onderzoek vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek. Online of fysiek, door heel Nederland. Specialist in WGA, Ziektewet en Wet Poortwachter.';
+
+// Fallback als een pagina nog geen seoTitle heeft. Bestaande seoTitle-waarden
+// (al met het juiste achtervoegsel) gaan hier niet doorheen.
+function formatPageTitle(raw) {
+    let t = String(raw || '').replace(/\s+/g, ' ').trim();
+    t = t.replace(/\s*\|\s*Arbeidsdeskundig\.com\s*$/i, '');
+    t = t.replace(/\s*[—–-]\s*arbeidsdeskundig\.com\s*$/i, '');
+    t = t.replace(/\s*[—–]\s*/g, ', ');
+    t = t.replace(/\s{2,}/g, ' ').trim();
+    const max = 65 - TITLE_SUFFIX.length;
+    if (t.length > max) {
+        let cut = t.slice(0, max);
+        const sp = cut.lastIndexOf(' ');
+        if (sp >= 18) cut = cut.slice(0, sp);
+        t = cut.replace(/[\s,:?.()\-]+$/g, '').trim();
+    }
+    if (!t) t = 'Arbeidsdeskundig onderzoek';
+    return t + TITLE_SUFFIX;
+}
+
+function pageTitle(seoTitle, fallback) {
+    if (seoTitle && !/[—–]/.test(seoTitle) && seoTitle.endsWith(TITLE_SUFFIX)) return seoTitle;
+    return formatPageTitle(seoTitle || fallback);
+}
 
 app.use(compression());
 app.disable('x-powered-by');
@@ -557,12 +582,98 @@ function hydrateFaqView(html, faqs) {
     );
 }
 
+// Eén artikel per URL. De bron-HTML bevat élk artikel (body, FAQ, kernpunten
+// en BlogPosting met articleBody). Dat blijft de bron voor routing en voor
+// het artikel dat deze response wél toont. Andere artikelen gaan eruit, anders
+// kan Google de URL's niet uit elkaar houden.
+function stripBracketField(line, key) {
+    const needle = key + ':[';
+    const idx = line.indexOf(needle);
+    if (idx === -1) return line;
+    let depth = 0;
+    let i = idx + key.length;
+    for (; i < line.length; i++) {
+        if (line[i] === '[') depth++;
+        else if (line[i] === ']') {
+            depth--;
+            if (depth === 0) { i++; break; }
+        }
+    }
+    let start = idx;
+    let end = i;
+    if (line[end] === ',') end++;
+    else if (start > 0 && line[start - 1] === ',') start--;
+    return line.slice(0, start) + line.slice(end);
+}
+
+function slimPostsForPage(html, currentSlug) {
+    const start = html.indexOf('const posts = [');
+    if (start === -1) return html;
+    const end = html.indexOf('\n  ];', start);
+    if (end === -1) return html;
+    const slim = html.slice(start, end).split('\n').map((line) => {
+        if (!line.includes('slug:"')) return line;
+        const slug = (line.match(/slug:"([^"]+)"/) || [])[1];
+        if (slug && slug === currentSlug) return line;
+        return stripBracketField(stripBracketField(line, 'kernpunten'), 'faq');
+    }).join('\n');
+    return html.slice(0, start) + slim + html.slice(end);
+}
+
+function embedCurrentArticle(html, slug) {
+    const startMarker = 'const articleContent = {';
+    const start = html.indexOf(startMarker);
+    if (start === -1) return html;
+    const end = html.indexOf('\n  const kGrid = ', start);
+    if (end === -1) return html;
+    let replacement = 'const articleContent = {};';
+    if (slug && Object.prototype.hasOwnProperty.call(articleBodies, slug)) {
+        const payload = {};
+        payload[slug] = articleBodies[slug];
+        replacement = 'const articleContent = ' + JSON.stringify(payload).replace(/</g, '\\u003c') + ';';
+    }
+    return html.slice(0, start) + replacement + html.slice(end);
+}
+
+function stripBlogPostings(html) {
+    return html.replace(
+        /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g,
+        (full, json) => {
+            try {
+                const data = JSON.parse(json);
+                if (!Array.isArray(data['@graph'])) return full;
+                data['@graph'] = data['@graph'].filter((node) => {
+                    const t = node && node['@type'];
+                    if (t === 'BlogPosting') return false;
+                    if (Array.isArray(t) && t.includes('BlogPosting')) return false;
+                    return true;
+                }).map((node) => {
+                    if (node && node['@type'] === 'Blog' && Object.prototype.hasOwnProperty.call(node, 'blogPost')) {
+                        const copy = Object.assign({}, node);
+                        delete copy.blogPost;
+                        return copy;
+                    }
+                    return node;
+                });
+                return '<script type="application/ld+json">' + JSON.stringify(data) + '</script>';
+            } catch (e) {
+                return full;
+            }
+        }
+    );
+}
+
+function isolatePageContent(html, slug) {
+    return slimPostsForPage(embedCurrentArticle(stripBlogPostings(html), slug), slug);
+}
+
 function renderPage(res, { title, description, canonicalPath, route, articleJsonLd, breadcrumbJsonLd, faqJsonLd, ogImage, statusCode }) {
     const canonical = BASE_URL + canonicalPath;
     const safeTitle = escapeHtml(title || DEFAULT_TITLE);
     const safeDesc = escapeHtml(description || DEFAULT_DESC);
 
-    let html = INDEX_HTML;
+    const currentSlug = route && route.view === 'artikel' ? route.slug : null;
+    let html = isolatePageContent(INDEX_HTML, currentSlug);
     html = activateView(html, route && route.view);
     if (route && route.view === 'artikel' && route.slug) {
         const post = posts.find((p) => p.slug === route.slug);
@@ -715,7 +826,7 @@ app.get('/', (req, res) => {
 
 app.get('/rekentool', (req, res) => {
     renderPage(res, {
-        title: 'Rekentool: bereken je tijdwinst — arbeidsdeskundig.com',
+        title: 'Rekentool: bereken je tijdwinst' + TITLE_SUFFIX,
         description: 'Bereken hoeveel tijd en geld eerder starten met een arbeidsdeskundig onderzoek oplevert in jouw situatie.',
         canonicalPath: '/rekentool',
         route: { view: 'calculator' },
@@ -724,7 +835,7 @@ app.get('/rekentool', (req, res) => {
 
 app.get('/keuzehulp', (req, res) => {
     renderPage(res, {
-        title: 'Gratis keuzehulp: online of fysiek onderzoek? — arbeidsdeskundig.com',
+        title: 'Keuzehulp: online of fysiek' + TITLE_SUFFIX,
         description: 'Beantwoord twee korte vragen en ontdek of een online of fysiek arbeidsdeskundig onderzoek het beste bij jouw situatie past.',
         canonicalPath: '/keuzehulp',
         route: { view: 'advies' },
@@ -733,7 +844,7 @@ app.get('/keuzehulp', (req, res) => {
 
 app.get('/veelgestelde-vragen', (req, res) => {
     renderPage(res, {
-        title: 'Veelgestelde vragen over arbeidsdeskundig onderzoek — arbeidsdeskundig.com',
+        title: 'Vragen over arbeidsdeskundig onderzoek' + TITLE_SUFFIX,
         description: 'Antwoord op de meest gestelde vragen over arbeidsdeskundig onderzoek: kosten, doorlooptijd, WGA, Ziektewet en meer.',
         canonicalPath: '/veelgestelde-vragen',
         route: { view: 'faq' },
@@ -744,7 +855,7 @@ app.get('/veelgestelde-vragen', (req, res) => {
 
 app.get('/over-ons', (req, res) => {
     renderPage(res, {
-        title: 'Over ons — Matchvermogen B.V. / arbeidsdeskundig.com',
+        title: 'Over ons, Matchvermogen B.V.' + TITLE_SUFFIX,
         description: 'Onderdeel van Matchvermogen B.V.: ruim 20 geregistreerde arbeidsdeskundigen en 40 re-integratiecoaches, actief door heel Nederland.',
         canonicalPath: '/over-ons',
         route: { view: 'over' },
@@ -753,7 +864,7 @@ app.get('/over-ons', (req, res) => {
 
 app.get('/offerte-aanvragen', (req, res) => {
     renderPage(res, {
-        title: 'Offerte aanvragen — arbeidsdeskundig.com',
+        title: 'Offerte aanvragen' + TITLE_SUFFIX,
         description: 'Vraag vrijblijvend een offerte aan. Vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek, reactie binnen 24 uur, 4,9/5. Of plan eerst 15 minuten kennismaking.',
         canonicalPath: '/offerte-aanvragen',
         route: { view: 'offerte' },
@@ -762,7 +873,7 @@ app.get('/offerte-aanvragen', (req, res) => {
 
 app.get('/aanmelden', (req, res) => {
     renderPage(res, {
-        title: 'Aanmelden voor een arbeidsdeskundig onderzoek — arbeidsdeskundig.com',
+        title: 'Aanmelden arbeidsdeskundig onderzoek' + TITLE_SUFFIX,
         description: 'Meld je aan voor een arbeidsdeskundig onderzoek. Vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek, binnen 24 uur opgepakt. Of plan eerst 15 minuten kennismaking.',
         canonicalPath: '/aanmelden',
         route: { view: 'aanmelden' },
@@ -829,7 +940,7 @@ app.get(TOLK_PATH, (req, res) => {
 
 app.get('/kennisbank', (req, res) => {
     renderPage(res, {
-        title: 'Kennisbank arbeidsdeskundig onderzoek — arbeidsdeskundig.com',
+        title: 'Kennisbank arbeidsdeskundig onderzoek' + TITLE_SUFFIX,
         description: 'Alles over arbeidsdeskundig onderzoek: de Wet Poortwachter, WGA, Ziektewet, WIA, WHK-premie en praktijkcasussen.',
         canonicalPath: '/kennisbank',
         route: { view: 'kennisbank' },
@@ -842,7 +953,7 @@ app.get('/voor/:slug', (req, res, next) => {
     if (!persona) return next(); // -> 404 handler
 
     renderPage(res, {
-        title: persona.title + ' — arbeidsdeskundig.com',
+        title: pageTitle(persona.seoTitle, persona.title),
         description: persona.meta,
         canonicalPath: '/voor/' + persona.slug,
         route: { view: 'persona', slug: persona.slug },
@@ -890,7 +1001,7 @@ app.get('/kennisbank/:slug', (req, res, next) => {
     const faqJsonLd = (post.faq && post.faq.length) ? faqPageJsonLd(post.faq) : null;
 
     renderPage(res, {
-        title: post.seoTitle || (post.title + ' — arbeidsdeskundig.com'),
+        title: pageTitle(post.seoTitle, post.title),
         description: post.meta,
         canonicalPath: '/kennisbank/' + post.slug,
         route: { view: 'artikel', slug: post.slug },
@@ -1736,7 +1847,7 @@ app.use((req, res) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pagina niet gevonden (404) — arbeidsdeskundig.com</title>
+<title>Pagina niet gevonden | Arbeidsdeskundig.com</title>
 <meta name="robots" content="noindex, follow">
 <style>
   body{font-family:Arial,sans-serif; background:#EDEFEA; color:#12203A; margin:0; display:flex; align-items:center; justify-content:center; min-height:100vh; text-align:center; padding:24px;}

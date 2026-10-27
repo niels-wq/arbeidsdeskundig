@@ -28,7 +28,7 @@ describe('kennisbank article: wanneer AD na 1 jaar ziekte', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>Wanneer een arbeidsdeskundig onderzoek \(na 1 jaar ziekte\)\? Timing en valkuilen — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>Arbeidsdeskundig onderzoek na 1 jaar \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="Wanneer een arbeidsdeskundig onderzoek na 1 jaar ziekte\? Week 42–52 vs eerder inzetten, valkuilen bij wachten\. Vraag een offerte of kennismaking\.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${PATH}">`));
         assert.match(html, /"@type":"Article"/);
@@ -68,7 +68,7 @@ describe('kennisbank article: is AD onderzoek verplicht', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>Is een arbeidsdeskundig onderzoek verplicht\? Wat de wet wel en niet zegt — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>Is arbeidsdeskundig onderzoek verplicht\? \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="Is een arbeidsdeskundig onderzoek verplicht\? Wet Poortwachter vs UWV-praktijk, mythes en risico van overslaan\. Vraag een offerte of kennismaking\.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${VERPLICHT_PATH}">`));
         assert.match(html, /"@type":"Article"/);
@@ -125,7 +125,7 @@ describe('kennisbank article: tips werknemer arbeidsdeskundig onderzoek', () => 
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>Tips voor werknemers bij een arbeidsdeskundig onderzoek — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>Tips werknemer: arbeidsdeskundig onderzoek \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="Tips voor werknemers bij een arbeidsdeskundig onderzoek: voorbereiding, rechten, beperkingen zonder medische oversharing. Vraag een kennismaking.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${WERKNEMER_PATH}">`));
         assert.match(html, /"@type":"Article"/);
@@ -197,7 +197,7 @@ describe('kennisbank article: nadelen arbeidsdeskundig onderzoek', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>Nadelen van een arbeidsdeskundig onderzoek \(en hoe je ze kleiner maakt\) — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>Nadelen van een arbeidsdeskundig onderzoek \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="Nadelen van een arbeidsdeskundig onderzoek: wat wringt in FML\/IZP, rapportkeuzes en het gesprek. Hoe je ze kleiner maakt. Offerte of kennismaking.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${NADELEN_PATH}">`));
         assert.match(html, /"@type":"Article"/);
@@ -276,7 +276,7 @@ describe('kennisbank article: RIV-toets bedrijfsarts leidend', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>RIV-toets: bedrijfsarts leidend — wat betekent dat voor een arbeidsdeskundig onderzoek\? — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>RIV-toets: bedrijfsarts leidend \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="RIV-toets: bedrijfsarts leidend \(wetsvoorstel 27 maart 2026\)\. Wat verandert voor het re-integratieverslag, wat AD nog onderbouwt\. Plan een onderzoek\.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${RIV_BA_PATH}">`));
         assert.match(html, /"@type":"Article"/);
@@ -357,7 +357,7 @@ describe('kennisbank article: beslistermijn WIA 16 weken', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>Beslistermijn WIA 16 weken: dossier UWV-proof terwijl je wacht — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>Beslistermijn WIA: 16 weken \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="Beslistermijn WIA 16 weken: wat de wacht na de aanvraag betekent, hoe je het dossier UWV-proof houdt, en waarom een snel AD-rapport helpt. Offerte.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${BESLISTERMIJN_PATH}">`));
         assert.match(html, /"@type":"Article"/);
@@ -438,7 +438,7 @@ describe('kennisbank article: second opinion arbeidsdeskundige', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>Second opinion arbeidsdeskundige: wanneer twijfel terecht is — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>Second opinion arbeidsdeskundige \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="Second opinion arbeidsdeskundige: wanneer twijfel terecht is, wat het wel en niet is, proces en relatie tot UWV. Vraag een offerte of kennismaking.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${SECOND_OPINION_PATH}">`));
         assert.match(html, /"@type":"Article"/);
@@ -525,7 +525,7 @@ describe('kennisbank hub: gids arbeidsdeskundig onderzoek', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>Alles over arbeidsdeskundig onderzoek: de gids — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>Gids arbeidsdeskundig onderzoek \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="Gids arbeidsdeskundig onderzoek: wat het is, of het moet, timing, kosten, werknemersrechten en UWV\. Links naar de diepte-artikelen\. Offerte of aanmelden\.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${GIDS_PATH}">`));
         assert.match(html, /"@type":"Article"/);
@@ -621,7 +621,7 @@ describe('kennisbank article: wat zit er in een arbeidsdeskundig rapport', () =>
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>Wat zit er in een arbeidsdeskundig rapport\? Sectie voor sectie, wat UWV verwacht — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>Wat staat in een arbeidsdeskundig rapport \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="Wat zit er in een arbeidsdeskundig rapport\? Sectie voor sectie, wat UWV verwacht, en wat er níet in staat \(geen diagnose\)\. Offerte of kennismaking\.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${RAPPORT_PATH}">`));
         assert.match(html, /"@type":"Article"/);
@@ -721,7 +721,7 @@ describe('kennisbank article: belastbaarheid verouderd nieuwe FML/IZP', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>Belastbaarheid verouderd: wanneer start je geen arbeidsdeskundig onderzoek zonder nieuwe FML\/IZP\? — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>Belastbaarheid verouderd: nieuwe FML \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="Belastbaarheid verouderd\? Wanneer een FML of IZP te oud is om een arbeidsdeskundig onderzoek te starten\. Wie een nieuwe vraagt\. Offerte of aanmelden\.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${VEROUDERD_PATH}">`));
         assert.match(html, /"@type":"Article"/);
@@ -815,7 +815,7 @@ describe('kennisbank article: WIA-aanvraag parallel aan spoor 2', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>WIA-aanvraag parallel aan spoor 2: wie coördineert wat\? — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>WIA-aanvraag parallel aan spoor 2 \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="WIA-aanvraag parallel aan spoor 2: wie doet wat \(werkgever, werknemer, AD, UWV, coach\), valkuilen, en hoe je het dossier bij elkaar houdt\. Offerte\.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${PARALLEL_PATH}">`));
         assert.match(html, /"@type":"Article"/);
@@ -919,7 +919,7 @@ describe('kennisbank article: spoor 2 zonder spoor 1 afgerond', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>Spoor 2 starten zonder spoor 1 afgerond: wanneer mag dat wél\? — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>Spoor 2 zonder spoor 1 afgerond \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="Spoor 2 starten zonder spoor 1 afgerond: wanneer dat mag, de mythe van eerst afsluiten, 1 jaar plus 6 weken, en welke documentatie blijft. Offerte.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${EARLY_SPOOR2_PATH}">`));
         assert.match(html, /"@type":"Article"/);
@@ -1037,7 +1037,7 @@ describe('kennisbank article: deskundigenoordeel vs arbeidsdeskundig onderzoek',
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>Deskundigenoordeel vs arbeidsdeskundig onderzoek: wanneer welk instrument\? — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>Deskundigenoordeel of eigen onderzoek \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="Deskundigenoordeel vs arbeidsdeskundig onderzoek: wanneer kies je welk instrument, wanneer beide, wanneer geen\. Voor HR en casemanagers\. Offerte of sparren\.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${VS_PATH}">`));
         assert.match(html, /"@type":"Article"/);
@@ -1112,7 +1112,7 @@ describe('kennisbank article: FML/IZP HR beslissen actualiseren', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>FML of IZP binnen: wat mag HR beslissen, en wanneer actualiseren\? — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>FML of IZP: wat mag HR beslissen\? \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="FML of IZP binnen\? Wat HR mag afleiden voor vervolgstappen, wanneer actualiseren, en wanneer je start, wacht of de bedrijfsarts vraagt\. Sparren of offerte\.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${FML_HR_PATH}">`));
         assert.match(html, /"@type":"Article"/);
@@ -1182,7 +1182,7 @@ describe('kennisbank article: arbeidsdeskundig rapport checklist rechtspraak', (
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>Arbeidsdeskundig rapport: checklist uit recente rechtspraak — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>Rapport-checklist uit rechtspraak \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="Checklist arbeidsdeskundig rapport: aansluiting op de bedrijfsarts, documenteer afwijking, onderbouw start spoor 2\. Recente rechtspraak 2026\. Offerte of aanmelden\.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${CHECKLIST_PATH}">`));
         assert.match(html, /"@type":"Article"/);
@@ -1272,7 +1272,7 @@ describe('kennisbank article: loonsanctie voorkomen dossierfouten', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>Loonsanctie voorkomen: 10 dossierfouten die UWV wél ziet — arbeidsdeskundig\.com<\/title>/);
+        assert.match(html, /<title>Loonsanctie voorkomen: dossierfouten \| Arbeidsdeskundig\.com<\/title>/);
         assert.match(html, /<meta name="description" content="Loonsanctie voorkomen: dicht de dossiergaten die UWV bij de RIV-toets ziet\. Tien fouten, en waar een tijdig onderzoek helpt\. Vraag een offerte\.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${DOSSIER_PATH}">`));
         assert.match(html, /"@type":"Article"/);

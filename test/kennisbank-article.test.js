@@ -238,6 +238,8 @@ describe('kennisbank article: nadelen arbeidsdeskundig onderzoek', () => {
         assert.match(html, /kennisbank\/wat-doet-arbeidsdeskundige/);
         assert.match(html, /\/offerte-aanvragen/);
         assert.match(html, /calendly\.com\/matchvermogen\/call-15-min/);
+        assert.match(html, /https:\/\/matchvermogen\.nl\/nadelen-van-arbeidsdeskundig-onderzoek\//);
+        assert.match(html, /houdt deze pagina een eigen hoek/);
     });
 
     it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {
@@ -1855,3 +1857,124 @@ describe('kennisbank article: maatmanloon', () => {
     });
 });
 
+
+const VVL_SLUG = 'vrijwillige-verlenging-loondoorbetaling-arbeidsdeskundige';
+const VVL_PATH = '/kennisbank/' + VVL_SLUG;
+const VVL_TITLE = 'VVL: wanneer loon langer doorbetalen | Arbeidsdeskundig.com';
+const VVL_H1 = 'Vrijwillige verlenging van de loondoorbetaling (VVL): wanneer is het zinvol en wat doet de arbeidsdeskundige?';
+const VVL_META = 'Vrijwillige verlenging van de loondoorbetaling: wanneer herstel in zicht is, hoe je het bij UWV aanvraagt en wat de arbeidsdeskundige onderbouwt.';
+
+describe('kennisbank article: vrijwillige verlenging loondoorbetaling', () => {
+    it('serves 200 with one h1, schema, sources and listings', async () => {
+        const res = await fetch(base + VVL_PATH, GOOGLEBOT);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        const title = html.match(/<title>([^<]+)<\/title>/)[1];
+        assert.equal(title, VVL_TITLE);
+        assert.ok(title.endsWith(' | Arbeidsdeskundig.com'));
+        assert.ok(title.length >= 50 && title.length <= 60, `title length ${title.length}`);
+
+        const desc = html.match(/<meta name="description" content="([^"]*)">/)[1];
+        assert.equal(desc, VVL_META);
+        assert.ok(desc.length >= 140 && desc.length <= 155, `meta length ${desc.length}`);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${VVL_PATH}">`));
+
+        const h1s = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/g) || [];
+        assert.equal(h1s.length, 1, `expected 1 <h1>, got ${h1s.length}`);
+        assert.equal((html.match(/<h1/g) || []).length, 1);
+        assert.match(h1s[0], /id="artikel-titel"/);
+        assert.match(h1s[0], /Vrijwillige verlenging van de loondoorbetaling \(VVL\)/);
+
+        const marker = 'id="artikel-body">';
+        const bodyStart = html.indexOf(marker);
+        assert.notEqual(bodyStart, -1);
+        const after = html.slice(bodyStart + marker.length);
+        const bodyEnd = after.indexOf('</div>');
+        const body = after.slice(0, bodyEnd);
+        assert.match(body, /<h2>Wanneer is een vrijwillige verlenging zinvol\?<\/h2>/);
+        assert.match(body, /<h2>Hoe vraag je de verlenging aan bij UWV\?<\/h2>/);
+        assert.match(body, /<h2>Wat doet de arbeidsdeskundige\?<\/h2>/);
+        assert.match(body, /<h2>Wat is het verschil met een loonsanctie\?<\/h2>/);
+        assert.match(body, /artikel 24/);
+        assert.match(body, /13 weken/);
+        assert.match(body, /11 weken/);
+        assert.match(body, /104 weken/);
+        assert.match(body, /maximaal een jaar/);
+        assert.match(body, /href="\/kennisbank\/loonsanctie"/);
+        assert.match(body, /href="\/offerte-aanvragen"/);
+        assert.match(body, /zes-scenarios-loondoorbetaling-bij-ziekte/);
+        assert.match(body, /uwv\.nl/);
+        assert.match(body, /rijksoverheid\.nl/);
+        assert.match(body, /geen juridisch advies/);
+        assert.match(body, /geen arbeidsdeskundig onderzoek als voorwaarde/);
+        assert.doesNotMatch(body, /—/);
+        assert.doesNotMatch(body, /–/);
+        assert.doesNotMatch(body, /<h1/i);
+        assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(body, /€/);
+        assert.doesNotMatch(body, /06[\s-]*5021/);
+        for (const name of ['Arbeidskenners', 'Mieke Zwenger', 'Comens', 'FIT Verzuimbeheer', 'Elabo', 'Arbo Werkt', 'Capability', 'Leuk Personeel', 'Amplooi']) {
+            assert.doesNotMatch(body, new RegExp(name, 'i'));
+        }
+
+        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 80).join(' ');
+        assert.match(firstWords, /vrijwillige verlenging van de loondoorbetaling/i);
+        assert.match(firstWords, /WIA-aanvraag/i);
+
+        const blocks = [];
+        const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+        let m;
+        while ((m = re.exec(html))) blocks.push(JSON.parse(m[1]));
+        const articles = blocks.filter((b) => b['@type'] === 'Article');
+        const faqs = blocks.filter((b) => b['@type'] === 'FAQPage');
+        const crumbs = blocks.filter((b) => b['@type'] === 'BreadcrumbList');
+        assert.equal(articles.length, 1);
+        assert.equal(articles[0].headline, VVL_H1);
+        assert.equal(articles[0].datePublished, '2026-10-26');
+        assert.equal(articles[0].dateModified, '2026-10-26');
+        assert.equal(articles[0].author.name, 'Niels Alderding');
+        assert.equal(articles[0].author.jobTitle, 'geregistreerd arbeidsdeskundige');
+        assert.equal(articles[0].image['@type'], 'ImageObject');
+        assert.equal(articles[0].image.width, 1200);
+        assert.equal(articles[0].image.height, 630);
+        assert.equal(faqs.length, 1);
+        assert.equal(crumbs.length, 1);
+        assert.ok(faqs[0].mainEntity.length >= 3 && faqs[0].mainEntity.length <= 6);
+        assert.ok(crumbs[0].itemListElement.some((it) => it.item === 'https://www.arbeidsdeskundig.com' + VVL_PATH));
+
+        const faqHtmlStart = html.indexOf('id="artikel-faq-list"');
+        const faqHtmlEnd = html.indexOf('Nog een vraag over jouw specifieke dossier', faqHtmlStart);
+        const faqHtml = html.slice(faqHtmlStart, faqHtmlEnd);
+        assert.match(html, /<h2[^>]*>Veelgestelde vragen<\/h2>/);
+        const visible = [...faqHtml.matchAll(/<button class="accordion-head"[^>]*>([\s\S]*?)<span class="accordion-icon">\+<\/span><\/button>\s*<div class="accordion-body"[^>]*><div class="accordion-body-inner">([\s\S]*?)<\/div>/g)];
+        assert.equal(visible.length, faqs[0].mainEntity.length);
+        faqs[0].mainEntity.forEach((q, i) => {
+            assert.equal(visible[i][1], q.name);
+            assert.equal(visible[i][2], q.acceptedAnswer.text);
+        });
+
+        const map = await fetch(base + '/sitemap.xml');
+        assert.equal(map.status, 200);
+        const xml = await map.text();
+        assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${VVL_PATH}`));
+        assert.equal((xml.match(new RegExp(VVL_SLUG, 'g')) || []).length, 1);
+
+        const llms = await fetch(base + '/llms.txt');
+        assert.equal(llms.status, 200);
+        assert.match(await llms.text(), new RegExp(`https://www\\.arbeidsdeskundig\\.com${VVL_PATH}`));
+
+        const kb = await fetch(base + '/kennisbank', GOOGLEBOT);
+        assert.equal(kb.status, 200);
+        assert.match(await kb.text(), new RegExp(VVL_SLUG));
+
+        for (const related of [
+            '/kennisbank/wia-aanvraag',
+            '/kennisbank/tweede-ziektejaar',
+        ]) {
+            const rel = await fetch(base + related, GOOGLEBOT);
+            assert.equal(rel.status, 200);
+            assert.match(await rel.text(), new RegExp(`href="${VVL_PATH}"`));
+        }
+    });
+});

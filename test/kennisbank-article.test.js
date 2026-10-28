@@ -1570,7 +1570,15 @@ describe('kennisbank article: goedkoopste arbeidsdeskundig onderzoek', () => {
         assert.equal(articles.length, 1);
         assert.equal(articles[0].headline, GOEDKOOP_H1);
         assert.equal(articles[0].datePublished, '2026-10-12');
-        assert.equal(articles[0].dateModified, '2026-10-12');
+        assert.equal(articles[0].dateModified, '2026-10-28');
+        assert.match(html, /Laatst bijgewerkt: 28 oktober 2026/);
+        assert.doesNotMatch(html, /2027/);
+        const leadH1 = html.indexOf('id="artikel-titel"');
+        const leadKort = html.indexOf('>In het kort<');
+        const leadHome = html.indexOf('id="view-home"');
+        const leadH2 = html.search(/<h2\b/);
+        assert.ok(leadH1 > 0 && leadKort > leadH1 && leadKort < leadHome, 'H1 en In het kort horen vóór de template-blokken');
+        assert.ok(leadH2 === -1 || leadH1 < leadH2, 'H1 hoort vóór template-h2s');
         assert.equal(articles[0].author.name, 'Niels Alderding');
         assert.equal(articles[0].author.jobTitle, 'geregistreerd arbeidsdeskundige');
         assert.doesNotMatch(articles[0].headline + ' ' + articles[0].description + ' ' + (articles[0].keywords || ''), /vergelijk|onafhankelijke gids/i);

@@ -66,7 +66,7 @@ describe('SEO: exactly one h1 per route', () => {
             assert.equal(h1Text(tags[0]), spec.h1);
             if (spec.path === '/kennisbank/kosten-arbeidsdeskundig-onderzoek') {
                 assert.match(html, /<title>Kosten arbeidsdeskundig onderzoek 2026 \| Arbeidsdeskundig\.com<\/title>/);
-                assert.match(html, /<meta name="description" content="Kosten arbeidsdeskundig onderzoek \(2026\): vanaf €999 excl\. btw, in sommige gevallen bij een vroegtijdig onderzoek\./);
+                assert.match(html, /<meta name="description" content="Kosten arbeidsdeskundig onderzoek \(2026\): vanaf €999 bij vaste afspraken; standaard online €1\.149 \/ €1\.179 \/ €1\.449 afhankelijk van bedrijfsgrootte; fysiek \+€295; spoed \+€300 \(excl\. btw\)\.">/);
                 assert.doesNotMatch(html, /<title>[^<]*\(2027\)/);
                 assert.doesNotMatch(html, /<h1\b[^>]*>[^<]*\(2027\)/);
             }

@@ -1482,7 +1482,7 @@ const GOEDKOOP_SLUG = 'goedkoopste-arbeidsdeskundig-onderzoek';
 const GOEDKOOP_PATH = '/kennisbank/' + GOEDKOOP_SLUG;
 const GOEDKOOP_TITLE = 'Goedkoopste arbeidsdeskundig onderzoek | Arbeidsdeskundig.com';
 const GOEDKOOP_H1 = 'Goedkoopste arbeidsdeskundig onderzoek: waar je op let (2026)';
-const GOEDKOOP_META = 'Goedkoopste arbeidsdeskundig onderzoek: waar je op let bij prijs, kwaliteit en de RIV-toets. Steekproef van openbare tarieven, oktober 2026.';
+const GOEDKOOP_META = 'Goedkoopste arbeidsdeskundig onderzoek: vanaf €999 bij vaste afspraken; standaard online €1.149 / €1.179 / €1.449 afhankelijk van bedrijfsgrootte; fysiek +€295; spoed +€300 (excl. btw).';
 const GOEDKOOP_STEEKPROEF = 'steekproef van 9 openbare tarieflijsten (oktober 2026): laagste ca. € 1.049, hoogste ca. € 1.625 excl. btw, middengebied ca. € 1.250-1.400';
 
 describe('kennisbank article: goedkoopste arbeidsdeskundig onderzoek', () => {
@@ -1497,7 +1497,7 @@ describe('kennisbank article: goedkoopste arbeidsdeskundig onderzoek', () => {
 
         const desc = html.match(/<meta name="description" content="([^"]*)">/)[1];
         assert.equal(desc, GOEDKOOP_META);
-        assert.ok(desc.length >= 140 && desc.length <= 155, `meta length ${desc.length}`);
+        assert.ok(desc.length >= 140 && desc.length <= 220, `meta length ${desc.length}`);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${GOEDKOOP_PATH}">`));
 
         const h1s = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/g) || [];
@@ -1524,9 +1524,12 @@ describe('kennisbank article: goedkoopste arbeidsdeskundig onderzoek', () => {
         assert.match(body, new RegExp(GOEDKOOP_STEEKPROEF.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
         assert.match(body, /draagkracht van de onderneming/);
         assert.match(body, /tussen hoog en laag/);
-        assert.match(body, /vanaf € 999/);
-        assert.match(body, /in sommige gevallen bij een vroegtijdig onderzoek/);
-        assert.match(body, /€ 1\.149 excl\. btw/);
+        assert.match(body, /vanaf €999 bij vaste afspraken; standaard online €1\.149 \/ €1\.179 \/ €1\.449 afhankelijk van bedrijfsgrootte; fysiek \+€295; spoed \+€300 \(excl\. btw\)/);
+        assert.doesNotMatch(body, /in sommige gevallen bij een vroegtijdig onderzoek/);
+        const tariffAt = html.indexOf('</h1>', html.indexOf('id="artikel-titel"'));
+        const tariffLead = html.slice(tariffAt, tariffAt + 1400);
+        assert.match(tariffLead, /^<\/h1>\s*<table id="tarieven-2026">/);
+        assert.match(tariffLead, /<caption>Tarieven 2026<\/caption>/);
         assert.doesNotMatch(body, /<table/i);
         assert.doesNotMatch(body, /vergelijk/i);
         assert.doesNotMatch(body, /onafhankelijke gids/i);

@@ -67,8 +67,18 @@ describe('conversie quick win: kosten', () => {
         assert.match(blok, /€1\.449/);
         assert.match(blok, /\+€295/);
         assert.match(blok, /\+€300/);
-        assert.match(body, /starten in 2027 vanaf €999/);
-        assert.match(body, /<h2>Tarief arbeidsdeskundig onderzoek 2027 \(excl\. btw\)<\/h2>/);
+        assert.match(body, /starten in 2026 vanaf €999/);
+        assert.match(body, /<h2>Tarief arbeidsdeskundig onderzoek 2026 \(excl\. btw\)<\/h2>/);
+        assert.doesNotMatch(html, /2027/);
+        assert.match(html, /Laatst bijgewerkt: 28 oktober 2026/);
+        assert.match(html, /"datePublished":"2026-09-17"/);
+        assert.match(html, /"dateModified":"2026-10-28"/);
+        const h1At = html.indexOf('id="artikel-titel"');
+        const kortAt = html.indexOf('>In het kort<');
+        const homeAt = html.indexOf('id="view-home"');
+        const h2At = html.search(/<h2\b/);
+        assert.ok(h1At > 0 && kortAt > h1At && kortAt < homeAt, 'H1 en In het kort horen vóór de template-blokken');
+        assert.ok(h2At === -1 || h1At < h2At, 'H1 hoort vóór template-h2s');
         assertNoDash(blok, 'prijsblok');
         assert.doesNotMatch(blok, /€\s?1\.095/);
 

@@ -407,6 +407,71 @@ function activateView(html, view) {
     return html;
 }
 
+// Kosten- en goedkoopste-pagina: de samenvatting hoort direct bij de H1,
+// vóór de site-brede views. Andere artikelen blijven in de bestaande volgorde.
+const COST_LEAD_SLUGS = new Set([
+    'kosten-arbeidsdeskundig-onderzoek',
+    'goedkoopste-arbeidsdeskundig-onderzoek',
+]);
+
+const DUTCH_MONTHS = [
+    'januari', 'februari', 'maart', 'april', 'mei', 'juni',
+    'juli', 'augustus', 'september', 'oktober', 'november', 'december',
+];
+
+function dutchLongDate(iso) {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
+    if (!match) return '';
+    const month = DUTCH_MONTHS[Number(match[2]) - 1];
+    if (!month) return '';
+    return `${Number(match[3])} ${month} ${match[1]}`;
+}
+
+// Sluitende </div> bij een openings-<div>, inclusief geneste divs in de FAQ.
+function extractBalancedDiv(html, start) {
+    const re = /<div\b[^>]*>|<\/div>/g;
+    re.lastIndex = start;
+    let depth = 0;
+    let m;
+    while ((m = re.exec(html))) {
+        if (m.index < start) continue;
+        if (m[0].startsWith('</')) depth--;
+        else depth++;
+        if (depth === 0) return { end: re.lastIndex, html: html.slice(start, re.lastIndex) };
+    }
+    return null;
+}
+
+function placeInHetKortAfterH1(html) {
+    const idAt = html.indexOf('id="artikel-kernpunten-wrap"');
+    if (idAt === -1) return html;
+    const start = html.lastIndexOf('<div', idAt);
+    if (start === -1) return html;
+    const block = extractBalancedDiv(html, start);
+    if (!block || /class="card hidden"/.test(block.html)) return html;
+    const without = html.slice(0, start) + html.slice(block.end);
+    const titleAt = without.indexOf('id="artikel-titel"');
+    if (titleAt === -1) return html;
+    const h1End = without.indexOf('</h1>', titleAt);
+    if (h1End === -1) return html;
+    const insertAt = h1End + '</h1>'.length;
+    return without.slice(0, insertAt) + '\n' + block.html + '\n' + without.slice(insertAt);
+}
+
+function hoistArtikelView(html) {
+    const idAt = html.indexOf('id="view-artikel"');
+    if (idAt === -1) return html;
+    const start = html.lastIndexOf('<div', idAt);
+    if (start === -1) return html;
+    const block = extractBalancedDiv(html, start);
+    if (!block) return html;
+    const without = html.slice(0, start) + html.slice(block.end);
+    const headerEnd = without.indexOf('</header>');
+    if (headerEnd === -1) return html;
+    const insertAt = headerEnd + '</header>'.length;
+    return without.slice(0, insertAt) + '\n' + block.html + '\n' + without.slice(insertAt);
+}
+
 function hydrateArtikelView(html, post, body) {
     if (!post) return html;
     html = html.replace(
@@ -424,7 +489,8 @@ function hydrateArtikelView(html, post, body) {
     );
     html = html.replace('id="artikel-breadcrumb-tag"></span>', `id="artikel-breadcrumb-tag">${escapeHtml(post.tag)}</span>`);
     html = html.replace('id="artikel-breadcrumb-titel"></span>', `id="artikel-breadcrumb-titel">${escapeHtml(post.title)}</span>`);
-    const updated = post.dateModified || '2026';
+    const updatedIso = post.dateModified || '';
+    const updated = (COST_LEAD_SLUGS.has(post.slug) && dutchLongDate(updatedIso)) || updatedIso || '2026';
     const readLabel = post.read
         ? `Leestijd: ${escapeHtml(post.read)} · Laatst bijgewerkt: ${escapeHtml(updated)}`
         : `Laatst bijgewerkt: ${escapeHtml(updated)}`;
@@ -775,6 +841,11 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
 
     const routeScript = `<script>window.__ROUTE__ = ${JSON.stringify(route)};</script>\n`;
     html = html.replace('<script>', routeScript + '<script>');
+
+    if (currentSlug && COST_LEAD_SLUGS.has(currentSlug)) {
+        html = placeInHetKortAfterH1(html);
+        html = hoistArtikelView(html);
+    }
 
     res.status(statusCode || 200).set('Content-Type', 'text/html; charset=utf-8').send(html);
 }

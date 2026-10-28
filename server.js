@@ -458,6 +458,30 @@ function placeInHetKortAfterH1(html) {
     return without.slice(0, insertAt) + '\n' + block.html + '\n' + without.slice(insertAt);
 }
 
+const TARIFF_TABLE_2026 = `<table id="tarieven-2026">
+<caption>Tarieven 2026</caption>
+<thead>
+<tr><th scope="col">Onderdeel</th><th scope="col">Tarief excl. btw</th></tr>
+</thead>
+<tbody>
+<tr><th scope="row">Vanaf, bij vaste afspraken</th><td>€999</td></tr>
+<tr><th scope="row">Standaard online, tot 5 medewerkers, kleine stichtingen en vrijwilligersorganisaties</th><td>€1.149</td></tr>
+<tr><th scope="row">Standaard online, tot 100 medewerkers</th><td>€1.179</td></tr>
+<tr><th scope="row">Standaard online, groot zakelijk</th><td>€1.449</td></tr>
+<tr><th scope="row">Fysiek</th><td>+€295</td></tr>
+<tr><th scope="row">Spoed</th><td>+€300</td></tr>
+</tbody>
+</table>`;
+
+function insertTariffTableAfterH1(html) {
+    const titleAt = html.indexOf('id="artikel-titel"');
+    if (titleAt === -1) return html;
+    const h1End = html.indexOf('</h1>', titleAt);
+    if (h1End === -1) return html;
+    const insertAt = h1End + '</h1>'.length;
+    return html.slice(0, insertAt) + '\n' + TARIFF_TABLE_2026 + '\n' + html.slice(insertAt);
+}
+
 function hoistArtikelView(html) {
     const idAt = html.indexOf('id="view-artikel"');
     if (idAt === -1) return html;
@@ -844,6 +868,7 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
 
     if (currentSlug && COST_LEAD_SLUGS.has(currentSlug)) {
         html = placeInHetKortAfterH1(html);
+        html = insertTariffTableAfterH1(html);
         html = hoistArtikelView(html);
     }
 

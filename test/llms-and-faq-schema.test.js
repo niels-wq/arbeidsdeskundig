@@ -106,9 +106,9 @@ describe('llms.txt', () => {
         assert.doesNotMatch(txt, /casus-60plus/);
         assert.doesNotMatch(txt, /### Basiskennis/);
         assert.doesNotMatch(txt, /Kennisbank, per onderwerp/);
-        // Headroom above the previous 11600 cap: one featured article on
-        // maatmanloon. Still far below a dump of every artikel.
-        assert.ok(txt.length < 12000, `llms.txt should stay curated, got ${txt.length} chars`);
+        // Headroom above the previous 12000 cap: the kosten-meta now states
+        // the full 2026 tariff sentence. Still far below a dump of every artikel.
+        assert.ok(txt.length < 12500, `llms.txt should stay curated, got ${txt.length} chars`);
         const kennisbankLinks = txt.match(/\/kennisbank\/[a-z0-9-]+/g) || [];
         assert.ok(kennisbankLinks.length < 40, `too many kennisbank links: ${kennisbankLinks.length}`);
     });

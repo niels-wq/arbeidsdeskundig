@@ -126,7 +126,7 @@ describe('UX top-3: cookie banner, homepage scan, kennisbank listing', () => {
         assert.equal(offerte.status, 200);
         assert.match(offerte.html, /<body class="conv-page conv-offerte">/);
         const offerteView = sliceView(offerte.html, 'view-offerte');
-        assert.match(offerteView, /<h1[^>]*>Vraag je offerte aan — vanaf €999,-<\/h1>/);
+        assert.match(offerteView, /<h1[^>]*>Vraag je offerte aan: vanaf €999,-<\/h1>/);
         assert.match(offerteView, /id="btn-of-direct"[^>]*>Offerte aanvragen</);
         assert.match(offerteView, /Liever eerst kennismaken of bellen/);
         assert.match(offerteView, /calendly\.com\/matchvermogen\/call-15-min/);
@@ -135,7 +135,7 @@ describe('UX top-3: cookie banner, homepage scan, kennisbank listing', () => {
         assert.equal(aanmeld.status, 200);
         assert.match(aanmeld.html, /<body class="conv-page conv-aanmelden">/);
         const aanmeldView = sliceView(aanmeld.html, 'view-aanmelden');
-        assert.match(aanmeldView, /<h1[^>]*>Meld je onderzoek aan — vanaf €999,-<\/h1>/);
+        assert.match(aanmeldView, /<h1[^>]*>Meld je onderzoek aan: vanaf €999,-<\/h1>/);
         assert.match(aanmeldView, /id="form-step-1"/);
         assert.match(aanmeldView, /id="form-step-6"/);
         assert.match(aanmeldView, /Liever eerst kennismaken of bellen/);

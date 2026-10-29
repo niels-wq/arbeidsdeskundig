@@ -144,7 +144,7 @@ describe('SEO: one article per URL', () => {
             assert.equal(html.includes(WERKNEMER_BODY), false);
             assert.match(html, /seoTitle:"[^"]+\| Arbeidsdeskundig\.com"/);
             assert.match(html, /slug:"voorbereiden-gesprek-arbeidsdeskundige"/);
-            assert.match(html, /title:"Wat neem je mee, en wat vraag je aan de arbeidsdeskundige\?"/);
+            assert.match(html, /title:"Gesprek met de arbeidsdeskundige voorbereiden: wat neem je mee en wat vraag je\?"/);
             assert.ok(html.length < 750000, `${path} still too large: ${html.length}`);
         }
     });

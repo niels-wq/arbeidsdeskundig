@@ -80,7 +80,7 @@ describe('primary nav crawlability', () => {
         const sticky = html.slice(stickyStart, stickyEnd);
         assert.match(
             sticky,
-            /<a class="btn-primary" href="\/offerte-aanvragen"[^>]*>\s*Direct offerte &(?:amp;)? planning — reactie binnen 24 uur\s*<\/a>/
+            /<a class="btn-primary" href="\/offerte-aanvragen"[^>]*>\s*Direct offerte &(?:amp;)? planning: reactie binnen 24 uur\s*<\/a>/
         );
     });
 });

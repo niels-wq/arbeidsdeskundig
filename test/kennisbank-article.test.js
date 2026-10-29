@@ -284,7 +284,7 @@ describe('kennisbank article: RIV-toets bedrijfsarts leidend', () => {
 
         const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
         assert.ok(h1Match, 'SSR H1 missing');
-        assert.equal(h1Match[1], 'RIV-toets: bedrijfsarts leidend — wat betekent dat voor een arbeidsdeskundig onderzoek?');
+        assert.equal(h1Match[1], 'RIV-toets: bedrijfsarts leidend, wat betekent dat voor een arbeidsdeskundig onderzoek?');
 
         const marker = 'id="artikel-body">';
         const bodyStart = html.indexOf(marker);
@@ -292,7 +292,7 @@ describe('kennisbank article: RIV-toets bedrijfsarts leidend', () => {
         const after = html.slice(bodyStart + marker.length);
         const bodyEnd = after.indexOf('</div>');
         const body = after.slice(0, bodyEnd);
-        assert.match(body, /<h2>RIV-toets: bedrijfsarts leidend — wat betekent dat voor een arbeidsdeskundig onderzoek\?<\/h2>/);
+        assert.match(body, /<h2>RIV-toets: bedrijfsarts leidend, wat betekent dat voor een arbeidsdeskundig onderzoek\?<\/h2>/);
         assert.match(body, /RIV-toets/);
         assert.match(body, /bedrijfsarts leidend/);
         assert.match(body, /wetsvoorstel/);
@@ -546,7 +546,7 @@ describe('kennisbank hub: gids arbeidsdeskundig onderzoek', () => {
         assert.match(body, /<h2>Alles over arbeidsdeskundig onderzoek: de gids<\/h2>/);
         assert.match(body, /gids arbeidsdeskundig onderzoek/);
         assert.match(body, /kaart van het cluster/);
-        assert.match(body, /Wat het onderzoek is — en wat niet/);
+        assert.match(body, /Wat het onderzoek is, en wat niet/);
         assert.match(body, /Moet het, wanneer, en wat kost het/);
         assert.match(body, /Als je werknemer bent/);
         assert.match(body, /Als het wringt of je twijfelt/);
@@ -641,11 +641,11 @@ describe('kennisbank article: wat zit er in een arbeidsdeskundig rapport', () =>
         assert.match(body, /<h2>Wat zit er in een arbeidsdeskundig rapport\? Sectie voor sectie, wat UWV verwacht<\/h2>/);
         assert.match(body, /wat zit er in een arbeidsdeskundig rapport/i);
         assert.match(body, /zonder echte cliëntgegevens/);
-        assert.match(body, /Sectie 1 — Vraagstelling/);
-        assert.match(body, /Sectie 2 — Geraadpleegde bronnen/);
-        assert.match(body, /Sectie 3 — Analyse/);
-        assert.match(body, /Sectie 4 — Conclusie/);
-        assert.match(body, /Sectie 5 — Advies/);
+        assert.match(body, /Sectie 1: Vraagstelling/);
+        assert.match(body, /Sectie 2: Geraadpleegde bronnen/);
+        assert.match(body, /Sectie 3: Analyse/);
+        assert.match(body, /Sectie 4: Conclusie/);
+        assert.match(body, /Sectie 5: Advies/);
         assert.match(body, /Wat UWV verwacht te zien/);
         assert.match(body, /Wat er níet in het rapport staat/);
         assert.match(body, /Geen diagnose/);

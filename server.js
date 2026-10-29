@@ -197,7 +197,7 @@ const siteFaqs = extractSiteFaqs(INDEX_HTML);
 // Twee vragen die daadwerkelijk in de homepage-HTML staan (niet de volledige FAQ).
 const HOME_VISIBLE_FAQ = [
     ['Wat kost een arbeidsdeskundig onderzoek?', 'Vanaf €999,- exclusief btw, in sommige gevallen bij een vroegtijdig onderzoek. Het exacte tarief hangt af van bedrijfsgrootte. Zie de volledige FAQ voor alle tarieven.'],
-    ['Kan het onderzoek ook fysiek?', 'Ja. Online is het snelst en standaard inbegrepen, maar een bezoek op locatie is altijd bespreekbaar — bijvoorbeeld als een werkplekonderzoek meerwaarde heeft.'],
+    ['Kan het onderzoek ook fysiek?', 'Ja. Online is het snelst en standaard inbegrepen, maar een bezoek op locatie is altijd bespreekbaar, bijvoorbeeld als een werkplekonderzoek meerwaarde heeft.'],
 ];
 
 console.log(`[seo] ${posts.length} kennisbank-artikelen, ${personas.length} doelgroep-pagina's en ${siteFaqs.length} FAQ-vragen geladen`);
@@ -1302,7 +1302,7 @@ arbeidsdeskundig.com is het aanvraag- en kennisplatform voor arbeidsdeskundig on
 - Geen casemanagement of Poortwachter-procesbewaking
 - Geen UWV-uitkeringsbeslissing (WIA/WGA/IVA)
 - Geen ontslagadvies
-- Geen concurrent van matchvermogen.nl — zie hieronder
+- Geen concurrent van matchvermogen.nl: zie hieronder
 
 ## Prijzen (2027, excl. btw)
 
@@ -1326,8 +1326,8 @@ Complementair, geen concurrentie. [matchvermogen.nl](https://matchvermogen.nl) i
 - [Home](${BASE_URL}/): diensten, tarieven vanaf €999,-, werkwijze
 - [Offerte aanvragen](${BASE_URL}/offerte-aanvragen): vrijblijvende offerte, reactie binnen 24 uur
 - [Aanmelden](${BASE_URL}/aanmelden): onderzoek starten, binnen 24 uur opgepakt
-- [Kennisbank](${BASE_URL}/kennisbank): hub — alle artikelen per onderwerp
-- [Veelgestelde vragen](${BASE_URL}/veelgestelde-vragen): hub — tarieven en praktijkvragen
+- [Kennisbank](${BASE_URL}/kennisbank): alle artikelen per onderwerp
+- [Veelgestelde vragen](${BASE_URL}/veelgestelde-vragen): tarieven en praktijkvragen
 - [Arbeidsdeskundige met tolk](${BASE_URL}/arbeidsdeskundige-met-tolk): onderzoek in je eigen taal, online of op locatie
 - [Over ons](${BASE_URL}/over-ons): Matchvermogen B.V., team en werkwijze
 
@@ -1348,7 +1348,7 @@ ${featured}
 
 ${extraRoutes}
 
-De volledige index staat op ${BASE_URL}/kennisbank en in ${BASE_URL}/sitemap.xml — niet hier herhaald, om dunne duplicaten te voorkomen.
+De volledige index staat op ${BASE_URL}/kennisbank en in ${BASE_URL}/sitemap.xml: niet hier herhaald, om dunne duplicaten te voorkomen.
 `;
 }
 
@@ -1980,7 +1980,7 @@ app.use((req, res) => {
 </head>
 <body>
   <div class="box">
-    <h1>404 — Pagina niet gevonden</h1>
+    <h1>404: Pagina niet gevonden</h1>
     <p>De pagina <code>${escapeHtml(req.path)}</code> bestaat niet (meer). Mogelijk is de link verouderd of is er een typefout gemaakt.</p>
     <a href="/">Terug naar de homepage</a>
   </div>

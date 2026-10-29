@@ -63,7 +63,7 @@ describe('conversion pages: offerte and aanmelden', () => {
         assert.match(html, /<div class="view active" id="view-offerte">/);
 
         const view = sliceView(html, 'view-offerte');
-        assert.match(view, /<h1[^>]*>Vraag je offerte aan — vanaf €999,-<\/h1>/);
+        assert.match(view, /<h1[^>]*>Vraag je offerte aan: vanaf €999,-<\/h1>/);
         assert.match(view, /Vanaf €999,-/);
         assert.match(view, /Binnen 24 uur/);
         assert.match(view, /4,9\/5/);
@@ -90,7 +90,7 @@ describe('conversion pages: offerte and aanmelden', () => {
         assert.match(html, /<div class="view active" id="view-aanmelden">/);
 
         const view = sliceView(html, 'view-aanmelden');
-        assert.match(view, /<h1[^>]*>Meld je onderzoek aan — vanaf €999,-<\/h1>/);
+        assert.match(view, /<h1[^>]*>Meld je onderzoek aan: vanaf €999,-<\/h1>/);
         assert.match(view, /Vanaf €999,-/);
         assert.match(view, /Binnen 24 uur/);
         assert.match(view, /4,9\/5/);

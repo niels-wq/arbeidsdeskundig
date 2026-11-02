@@ -64,7 +64,7 @@ describe('conversion pages: offerte and aanmelden', () => {
 
         const view = sliceView(html, 'view-offerte');
         assert.match(view, /<h1[^>]*>Vraag je offerte aan: vanaf €999,-<\/h1>/);
-        assert.match(view, /Vanaf €999,-/);
+        assert.match(view, /<b>Vanaf €999<\/b> bij vaste afspraken, excl\. btw/);
         assert.match(view, /Binnen 24 uur/);
         assert.match(view, /4,9\/5/);
         assert.match(view, /id="btn-of-direct"[^>]*>Offerte aanvragen</);

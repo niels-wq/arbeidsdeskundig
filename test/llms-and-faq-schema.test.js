@@ -275,7 +275,9 @@ describe('static logo and assets', () => {
         const res = await fetch(base + '/');
         const html = await res.text();
         const start = html.indexOf('id="view-home"');
-        const end = html.indexOf('id="view-', start + 10);
+        const footer = html.indexOf('<footer', start);
+        const nextView = html.indexOf('id="view-', start + 10);
+        const end = nextView === -1 ? footer : Math.min(nextView, footer);
         assert.ok(start !== -1 && end > start);
         const srcs = [...html.slice(start, end).matchAll(/<img\b[^>]*\bsrc="([^"]+)"/g)].map((m) => m[1]);
         assert.ok(srcs.length >= 1, 'homepage should have at least one image');

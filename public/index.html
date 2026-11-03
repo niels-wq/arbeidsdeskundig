@@ -505,8 +505,8 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
         <h1 class="hero-title route-h1">Arbeidsdeskundig onderzoek. Vanaf €999,-.</h1>
         <p class="hero-sub">Binnen 24 uur opgepakt. Standaard online voor maximale snelheid. Een fysiek bezoek op locatie is altijd bespreekbaar. Het voelt soms als een aftikkertje voor de Wet Poortwachter, en dat tempo respecteren we. Maar we zorgen er wel voor dat het een waardevol onderzoek blijft: we denken graag verder met je mee waar dat kansen oplevert.</p>
         <div class="hero-actions">
-          <button class="btn-primary" onclick="setView('offerte')">Direct offerte & planning</button>
-          <button class="btn-ghost" onclick="setView('calculator')">Bereken je tijdwinst</button>
+          <a class="btn-primary" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Direct offerte & planning</a>
+          <a class="btn-ghost" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">Bereken je tijdwinst</a>
         </div>
         <p class="trust-line">1.500+ onderzoeken uitgevoerd · gemiddeld 4,9/5 op Google · vertrouwd door BAM, Sligro, Hornbach, Buurtzorg, Takeaway, Royal Cosun, ING en 100+ andere organisaties</p>
         <button onclick="openCalendlyPopup()" style="margin-top:14px; display:inline-flex; align-items:center; gap:10px; background:none; border:none; padding:0; cursor:pointer; text-align:left;">
@@ -568,7 +568,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
   <section class="wrap">
     <div class="grid3">
       <div class="card reveal"><h3>Online of fysiek</h3><p style="color:var(--muted); font-size:.9rem; margin-top:8px;">Standaard online voor maximale snelheid en een AVG-proof dashboard. Liever een bezoek op locatie, door heel Nederland? Ook dat plannen we, zonder gedoe.</p></div>
-      <div class="card reveal"><h3>Vanaf een heldere prijs</h3><p style="color:var(--muted); font-size:.9rem; margin-top:8px;">Vanaf €999,- exclusief btw, in sommige gevallen bij een vroegtijdig onderzoek. Het exacte tarief hangt af van bedrijfsgrootte, <button class="btn-link" onclick="setView('faq')">bekijk alle tarieven</button>.</p></div>
+      <div class="card reveal"><h3>Vanaf een heldere prijs</h3><p style="color:var(--muted); font-size:.9rem; margin-top:8px;">Vanaf €999,- exclusief btw, in sommige gevallen bij een vroegtijdig onderzoek. Het exacte tarief hangt af van bedrijfsgrootte, <a class="btn-link" href="/veelgestelde-vragen" onclick="event.preventDefault(); setView('faq')">bekijk alle tarieven</a>.</p></div>
       <div class="card reveal"><h3>Razendsnelle opvolging</h3><p style="color:var(--muted); font-size:.9rem; margin-top:8px;">Binnen 24 uur contact na aanmelding. Geen wekenlange wachtlijst zoals bij veel bureaus.</p></div>
     </div>
   </section>
@@ -684,7 +684,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     </div>
     <div class="card reveal" style="margin-top:20px; padding:20px 24px; display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between;">
       <p style="font-size:.9rem; color:var(--muted); margin:0; max-width:520px;">Twijfel je welke vorm bij jouw situatie past? Kies je online en blijkt tijdens het onderzoek dat een locatiebezoek toch nodig is, dan gaan we, indien nodig, alsnog vrijblijvend naar locatie.</p>
-      <button class="btn-ghost" onclick="setView('advies', {tool:'keuzehulp'})">Doe de gratis keuzehulp</button>
+      <a class="btn-ghost" href="/keuzehulp?tool=keuzehulp" onclick="event.preventDefault(); setView('advies', {tool:'keuzehulp'})">Doe de gratis keuzehulp</a>
     </div>
   </section>
 
@@ -697,7 +697,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
         <div class="card reveal" style="border-top:4px solid var(--teal);"><h3>Loondoorbetaling / Poortwachter</h3><p style="color:var(--muted); font-size:.9rem; margin-top:8px;">Regulier onderzoek binnen de Wet Poortwachter, of vervroegd ingezet, ruim vóór het 1e ziektejaar, voor meer ruimte om tijdig bij te sturen.</p></div>
       </div>
       <p style="margin-top:24px; font-size:.9rem; color:var(--muted); max-width:700px;">Uitzendkracht, payroll of vast contract: de verantwoordelijkheid voor het onderzoek verschilt per situatie. Eigenrisicodrager voor de WGA of de Ziektewet? Wij kennen de premiesystematiek en denken daarin mee.</p>
-      <button class="btn-ghost" style="margin-top:18px;" onclick="setView('faq')">Bekijk alle veelgestelde vragen</button>
+      <a class="btn-ghost" style="margin-top:18px;" href="/veelgestelde-vragen" onclick="event.preventDefault(); setView('faq')">Bekijk alle veelgestelde vragen</a>
     </div>
   </section>
 
@@ -727,7 +727,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <div class="stat reveal"><div class="num mono">1 jaar</div><div class="lbl">loon bij een loonsanctie</div></div>
       <div class="stat reveal"><div class="num mono">104 wk</div><div class="lbl">grens Wet Poortwachter</div></div>
     </div>
-    <button class="btn-ghost" style="margin-top:28px;" onclick="setView('calculator')">Bereken jouw tijdwinst</button>
+    <a class="btn-ghost" style="margin-top:28px;" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">Bereken jouw tijdwinst</a>
   </section>
 
   <section class="panel">
@@ -741,7 +741,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
         <div class="card reveal"><blockquote>&ldquo;Verliep prima, snel, soepel en voor een redelijke prijs.&rdquo;</blockquote><p class="quote-author mono">Carric Fergus</p></div>
         <div class="card reveal"><blockquote>&ldquo;Professioneel, duidelijk en snelle respons.&rdquo;</blockquote><p class="quote-author mono">Dredging & Contracting Rotterdam BV</p></div>
       </div>
-      <p style="margin-top:24px; font-size:.9rem; color:var(--muted); max-width:520px;">Ruim 20 geregistreerde arbeidsdeskundigen en 40 re-integratiecoaches bij ons dochterbedrijf. <button onclick="setView('over')" class="btn-link">Maak kennis met het team →</button></p>
+      <p style="margin-top:24px; font-size:.9rem; color:var(--muted); max-width:520px;">Ruim 20 geregistreerde arbeidsdeskundigen en 40 re-integratiecoaches bij ons dochterbedrijf. <a href="/over-ons" onclick="event.preventDefault(); setView('over')" class="btn-link">Maak kennis met het team →</a></p>
     </div>
   </section>
 
@@ -753,8 +753,8 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
           <h2 style="margin-top:8px;">Spoor 2: naadloos geregeld via Best Match Re-integratie</h2>
           <p style="margin-top:14px; max-width:520px;">Een arbeidsdeskundig onderzoek brengt vaak aan het licht dat spoor 2 de beste weg vooruit is. Je vraagt dit gewoon <strong>meteen mee aan bij je aanmelding</strong> met 40 coaches door heel Nederland, en een warme overdracht van het dossier zodat werkgever en werknemer niet opnieuw hun verhaal hoeven te doen.</p>
           <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
-            <button class="btn-primary" onclick="setView('offerte')">Direct offerte</button>
-            <button class="btn-ghost on-dark" onclick="setView('over')">Meer over Best Match Re-integratie</button>
+            <a class="btn-primary" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Direct offerte</a>
+            <a class="btn-ghost on-dark" href="/over-ons" onclick="event.preventDefault(); setView('over')">Meer over Best Match Re-integratie</a>
           </div>
         </div>
         <div class="svg-frame reveal" style="aspect-ratio:4/3; background:#1B2C4C; border-color:#28406B;">
@@ -779,7 +779,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <h3 style="margin-top:6px; font-size:1.2rem;">Waarom dit onderzoek ook je premie raakt</h3>
       <p style="margin-top:10px; font-size:.9rem; color:var(--muted); max-width:680px;">Je gedifferentieerde WHK-premie (WGA en Ziektewet) wordt bepaald door instroom van (ex-)medewerkers in de WGA of Ziektewet, met een terugkijkperiode van twee jaar (T-2). Een tijdig arbeidsdeskundig onderzoek is precies het instrument waarmee je onterechte of vermijdbare instroom kunt voorkomen, en dus je premie jarenlang kunt drukken. Andersom geldt: hoe hoger je huidige premie, hoe groter de kans dat een tijdig onderzoek dat had kunnen voorkomen.</p>
       <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:16px;">
-        <button class="btn-ghost" onclick="setView('calculator')">Bereken het effect van vroeg starten</button>
+        <a class="btn-ghost" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">Bereken het effect van vroeg starten</a>
         <button class="btn-link" onclick="openArtikel('whk')">Lees hoe de WHK-premie werkt</button>
       </div>
     </div>
@@ -798,14 +798,14 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     <div style="margin-top:24px;">
       <div class="accordion-item">
         <button class="accordion-head" onclick="toggleAccordion(this)">Wat kost een arbeidsdeskundig onderzoek?<span class="accordion-icon">+</span></button>
-        <div class="accordion-body"><div class="accordion-body-inner">Vanaf €999,- exclusief btw, in sommige gevallen bij een vroegtijdig onderzoek. Het exacte tarief hangt af van bedrijfsgrootte. Zie de <button class="btn-link" onclick="setView('faq')">volledige FAQ</button> voor alle tarieven.</div></div>
+        <div class="accordion-body"><div class="accordion-body-inner">Vanaf €999,- exclusief btw, in sommige gevallen bij een vroegtijdig onderzoek. Het exacte tarief hangt af van bedrijfsgrootte. Zie de <a class="btn-link" href="/veelgestelde-vragen" onclick="event.preventDefault(); setView('faq')">volledige FAQ</a> voor alle tarieven.</div></div>
       </div>
       <div class="accordion-item">
         <button class="accordion-head" onclick="toggleAccordion(this)">Kan het onderzoek ook fysiek?<span class="accordion-icon">+</span></button>
         <div class="accordion-body"><div class="accordion-body-inner">Ja. Online is het snelst en standaard inbegrepen, maar een bezoek op locatie is altijd bespreekbaar, bijvoorbeeld als een werkplekonderzoek meerwaarde heeft.</div></div>
       </div>
     </div>
-    <button class="btn-ghost" style="margin-top:8px;" onclick="setView('faq')">Bekijk alle vragen →</button>
+    <a class="btn-ghost" style="margin-top:8px;" href="/veelgestelde-vragen" onclick="event.preventDefault(); setView('faq')">Bekijk alle vragen →</a>
   </section>
 
   <section class="wrap" style="margin-top:56px;">
@@ -970,7 +970,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       </div>
 
       <div>
-        <button class="btn-primary" style="margin-top:20px; display:block;" onclick="setView('offerte')">Zet dit voordeel om in actie: vraag nu een onderzoek aan</button>
+        <a class="btn-primary" style="margin-top:20px; display:block;" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Zet dit voordeel om in actie: vraag nu een onderzoek aan</a>
       </div>
     </div>
 
@@ -979,7 +979,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <h3 id="advies-titel" style="font-size:1.15rem; margin-top:8px; color:var(--ink);">Regulier onderzoek, gericht op spoor 1</h3>
       <p id="advies-tekst" style="margin-top:8px; font-size:.9rem; color:var(--muted);">Op basis van de ingevulde situatie.</p>
       <div id="advies-extra" style="margin-top:12px; display:flex; flex-wrap:wrap; gap:8px;"></div>
-      <button class="btn-primary" style="margin-top:16px;" onclick="setView('offerte')">Start deze aanpak</button>
+      <a class="btn-primary" style="margin-top:16px;" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Start deze aanpak</a>
     </div>
 
     <div class="card" style="margin-top:24px; padding:28px;">
@@ -1037,7 +1037,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
           <button type="button" class="choice" data-value="Fysiek">Fysiek, op locatie</button>
           <button type="button" class="choice" data-value="Weet niet">Weet ik nog niet</button>
         </div>
-        <span class="hint">Twijfel je? <button type="button" class="btn-link" onclick="setView('advies', {tool:'keuzehulp'})">Doe de keuzehulp</button> of kies “weet ik nog niet”.</span>
+        <span class="hint">Twijfel je? <a type="button" class="btn-link" href="/keuzehulp?tool=keuzehulp" onclick="event.preventDefault(); setView('advies', {tool:'keuzehulp'})">Doe de keuzehulp</a> of kies “weet ik nog niet”.</span>
       </label>
       <label class="field" style="margin-top:8px;"><span class="lbl">Korte omschrijving van de situatie</span><textarea id="of-omschrijving" placeholder="Optioneel: bijvoorbeeld: week 42, WIA in zicht, of twijfel over spoor 1."></textarea></label>
 
@@ -1149,14 +1149,14 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       </div>
 
       <div id="of-fysiek-twijfel-knop" class="hidden no-print" style="margin-top:16px; padding:16px 20px; background:#FCF6E9; border:1px dashed var(--amber); border-radius:2px; text-align:center;">
-        <button class="btn-link" style="font-size:.87rem;" onclick="setView('fysiek-tarief')">Twijfelt u over het tarief bij fysiek onderzoek? Klik dan hier →</button>
+        <a class="btn-link" style="font-size:.87rem;" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('fysiek-tarief')">Twijfelt u over het tarief bij fysiek onderzoek? Klik dan hier →</a>
       </div>
 
       <div class="no-print" style="margin-top:20px; text-align:center;">
         <p style="font-size:.87rem; color:var(--muted);">Weet je het al zeker?</p>
         <button class="btn-ghost" style="margin-top:10px;" onclick="document.getElementById('offerte-pdf-result').classList.add('hidden'); gaNaarAanmelden();">Ik wil me nu direct aanmelden →</button>
         <br>
-        <button class="btn-link" style="margin-top:16px;" onclick="setView('home')">Terug naar home</button>
+        <a class="btn-link" style="margin-top:16px;" href="/" onclick="event.preventDefault(); setView('home')">Terug naar home</a>
       </div>
     </div>
 
@@ -1164,7 +1164,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <p class="eyebrow">Verzoek ontvangen</p>
       <h2 style="font-size:1.2rem; margin-top:8px; color:var(--ink);" id="of-contact-titel">Bedankt. We nemen binnen 24 uur contact met je op.</h2>
       <p style="margin-top:10px; font-size:.9rem; color:var(--muted);">Geen verplichtingen. We denken graag eerst met je mee over wat het beste past, ook als dat betekent dat een onderzoek (nu nog) niet nodig is.</p>
-      <button class="btn-ghost" style="margin-top:16px;" onclick="setView('home')">Terug naar home</button>
+      <a class="btn-ghost" style="margin-top:16px;" href="/" onclick="event.preventDefault(); setView('home')">Terug naar home</a>
     </div>
   </div>
 </div>
@@ -1186,7 +1186,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <a href="https://calendly.com/matchvermogen/call-15-min" target="_blank" rel="noopener" class="btn-ghost" style="text-decoration:none;">Plan een gratis 15 minuten call →</a>
     </div>
 
-    <button class="btn-link" style="margin-top:28px;" onclick="setView('offerte')">← Terug naar de offertepagina</button>
+    <a class="btn-link" style="margin-top:28px;" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">← Terug naar de offertepagina</a>
   </div>
 </div>
 
@@ -1485,7 +1485,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       </div>
       <p style="font-size:.78rem; color:var(--muted2); margin-top:12px;">Fysiek onderzoek: <strong>+€295,-</strong> bovenop het online tarief (ongeacht bedrijfsgrootte).</p>
     </div>
-    <p style="margin-top:20px; font-size:.9rem; color:var(--muted); max-width:600px;">Staat je vraag er niet bij? Bekijk de <button onclick="setView('kennisbank')" class="btn-link">volledige kennisbank</button> of vraag het rechtstreeks aan een arbeidsdeskundige.</p>
+    <p style="margin-top:20px; font-size:.9rem; color:var(--muted); max-width:600px;">Staat je vraag er niet bij? Bekijk de <a href="/kennisbank" onclick="event.preventDefault(); setView('kennisbank')" class="btn-link">volledige kennisbank</a> of vraag het rechtstreeks aan een arbeidsdeskundige.</p>
     <div id="faq-list" style="margin-top:20px;"></div>
   </div>
 </div>
@@ -1515,7 +1515,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 <div class="view" id="view-artikel" hidden>
   <div class="wrap" style="max-width:720px; padding-top:48px; padding-bottom:64px;">
     <p style="font-size:.76rem; color:var(--muted2);">
-      <button class="btn-link" style="font-size:.76rem;" onclick="setView('kennisbank')">Kennisbank</button> / <span id="artikel-breadcrumb-tag"></span> / <span id="artikel-breadcrumb-titel"></span>
+      <a class="btn-link" style="font-size:.76rem;" href="/kennisbank" onclick="event.preventDefault(); setView('kennisbank')">Kennisbank</a> / <span id="artikel-breadcrumb-tag"></span> / <span id="artikel-breadcrumb-titel"></span>
     </p>
     <button class="eyebrow btn-link" style="margin-top:16px; background:none; border:none; padding:0; cursor:pointer;" id="artikel-tag" onclick="filterKennisbankVanArtikel()">Ziektewet</button>
     <h1 class="route-h1" style="font-size:2.1rem; color:var(--ink); margin-top:8px;" id="artikel-titel">Titel</h1>
@@ -1537,7 +1537,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <div id="artikel-faq-list" style="margin-top:12px;"></div>
       <div class="card" style="margin-top:16px; padding:16px 20px; display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between;">
         <p style="margin:0; font-size:.87rem; color:var(--muted);">Nog een vraag over jouw specifieke dossier?</p>
-        <button class="btn-ghost btn-small" onclick="setView('offerte')">Vraag vrijblijvend advies →</button>
+        <a class="btn-ghost btn-small" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag vrijblijvend advies →</a>
       </div>
     </div>
     <div style="margin-top:36px;">
@@ -1546,7 +1546,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     </div>
     <div class="card" style="margin-top:32px;">
       <p style="font-size:.9rem; margin:0;"><strong>Twijfel je of dit voor jouw situatie geldt?</strong> Vraag vrijblijvend een offerte aan: reactie binnen 24 uur.</p>
-      <button class="btn-primary" style="margin-top:12px;" onclick="setView('offerte')">Direct offerte & planning</button>
+      <a class="btn-primary" style="margin-top:12px;" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Direct offerte & planning</a>
     </div>
   </div>
 </div>
@@ -1554,7 +1554,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 <div class="view" id="view-persona" hidden>
   <div class="wrap" style="max-width:760px; padding-top:48px; padding-bottom:64px;">
     <p style="font-size:.76rem; color:var(--muted2);">
-      <button class="btn-link" style="font-size:.76rem;" onclick="setView('home')">Home</button> / <span id="persona-breadcrumb"></span>
+      <a class="btn-link" style="font-size:.76rem;" href="/" onclick="event.preventDefault(); setView('home')">Home</a> / <span id="persona-breadcrumb"></span>
     </p>
     <p class="eyebrow" style="margin-top:16px;">Voor <span id="persona-label"></span></p>
     <h1 class="route-h1" style="font-size:2.1rem; color:var(--ink); margin-top:8px;" id="persona-titel">Titel</h1>
@@ -1575,7 +1575,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 
     <div class="card" style="margin-top:32px;">
       <p style="font-size:.9rem; margin:0;"><strong>Herken je je in deze situatie?</strong> Vraag vrijblijvend een offerte aan: reactie binnen 24 uur.</p>
-      <button class="btn-primary" style="margin-top:12px;" onclick="setView('offerte')">Direct offerte & planning</button>
+      <a class="btn-primary" style="margin-top:12px;" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Direct offerte & planning</a>
     </div>
   </div>
 </div>
@@ -1589,7 +1589,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <h1 class="route-h1" style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Waar wil je hulp bij?</h1>
       <p style="margin-top:10px; font-size:.92rem; color:var(--muted); max-width:640px;">Vijf gratis tools, elk gericht op een andere vraag binnen de Wet Poortwachter. Kies hieronder, je kunt altijd nog wisselen.</p>
       <div class="grid3 advies-choice-grid" style="margin-top:28px; gap:20px;">
-        <button class="advies-choice-card" onclick="setView('calculator')">
+        <a class="advies-choice-card" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">
           <span class="advies-choice-icon" style="background:#FCF6E9;">
             <svg viewBox="0 0 48 48" width="30" height="30"><circle cx="16" cy="16" r="7" fill="none" stroke="#D8A03D" stroke-width="2.5"/><path d="M25 25 l10 10" stroke="#D8A03D" stroke-width="2.5" stroke-linecap="round"/><path d="M13 16 l2 2 4 -4.5" stroke="#12203A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span>
@@ -1597,7 +1597,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
           <h2 style="font-size:1.1rem; margin-top:12px; color:var(--ink);">Bereken je tijdwinst</h2>
           <p style="margin-top:8px; font-size:.85rem; color:var(--muted);">Wat levert nu starten op ten opzichte van wachten tot het gebruikelijke moment?</p>
           <span class="advies-choice-cta">Open de rekentool <span class="arrow">→</span></span>
-        </button>
+        </a>
         <button class="advies-choice-card" onclick="chooseAdviesTool('keuzehulp')">
           <span class="advies-choice-icon" style="background:#E9F1EE;">
             <svg viewBox="0 0 48 48" width="30" height="30"><rect x="8" y="10" width="26" height="18" rx="2" fill="none" stroke="#1F6F5C" stroke-width="2.5"/><line x1="8" y1="24" x2="34" y2="24" stroke="#1F6F5C" stroke-width="2.5"/><path d="M18 34 h8" stroke="#1F6F5C" stroke-width="2.5" stroke-linecap="round"/><circle cx="38" cy="14" r="7" fill="#D8A03D"/><path d="M35 14 l2 2 4 -4.5" stroke="#12203A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1674,7 +1674,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
           <strong>Onze belofte:</strong> kies je online en blijkt tijdens het onderzoek dat een locatiebezoek toch nodig is, dan gaan we, indien nodig, alsnog vrijblijvend naar locatie. Je zit dus nooit vast aan een verkeerde keuze vooraf.
         </div>
         <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:16px;">
-          <button class="btn-primary" onclick="setView('offerte')">Ga verder naar de offerte</button>
+          <a class="btn-primary" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Ga verder naar de offerte</a>
           <button class="btn-ghost" onclick="openChecklistModal()">Ontvang ook de gratis checklist</button>
         </div>
         <p style="margin-top:14px; font-size:.82rem;"><a class="blog-link" id="kh-faq-link" onclick="">Gerelateerde vraag →</a></p>
@@ -1702,7 +1702,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 
     <div class="card reveal" id="ad-cta-wia" style="margin-top:20px; padding:18px 22px; border-left:4px solid var(--amber); display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between;">
       <p style="margin:0; font-size:.88rem; color:var(--ink); max-width:560px;"><strong>Vlak vóór de WIA-aanvraag</strong> een arbeidsdeskundige inzetten helpt om tot een objectieve, UWV-proof beoordeling te komen, juist wanneer de wachttijd van 104 weken bijna afloopt en er nog weinig ruimte is voor discussie achteraf.</p>
-      <button class="btn-ghost btn-small" onclick="setView('offerte')">Vraag een onderzoek aan →</button>
+      <a class="btn-ghost btn-small" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onderzoek aan →</a>
     </div>
 
     <div class="grid2" style="margin-top:24px;">
@@ -1770,7 +1770,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
           <p class="eyebrow" style="color:var(--muted2); margin:0;" id="ad-output-cta-eyebrow">Aanbevolen vervolgstap</p>
           <p style="margin-top:6px; font-size:.9rem; color:var(--ink); max-width:560px;" id="ad-output-cta-tekst"></p>
         </div>
-        <button class="btn-primary" id="ad-output-cta-btn" style="white-space:nowrap;" onclick="setView('offerte')">Vraag dit onderzoek aan →</button>
+        <a class="btn-primary" id="ad-output-cta-btn" style="white-space:nowrap;" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag dit onderzoek aan →</a>
       </div>
     </div>
     </div>
@@ -1793,7 +1793,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
             <p class="eyebrow" style="color:var(--muted2); margin:0;" id="pw-cta-eyebrow">Aanbevolen vervolgstap</p>
             <p style="margin-top:6px; font-size:.9rem; color:var(--ink); max-width:560px;" id="pw-cta-tekst"></p>
           </div>
-          <button class="btn-primary" style="white-space:nowrap;" onclick="setView('offerte')">Vraag een onderzoek aan →</button>
+          <a class="btn-primary" style="white-space:nowrap;" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onderzoek aan →</a>
         </div>
       </div>
     </div>
@@ -1854,7 +1854,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
         </div>
         <div class="card reveal" style="margin-top:16px; padding:20px 24px; border-left:4px solid var(--amber); display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between;">
           <p style="margin:0; font-size:.9rem; color:var(--ink); max-width:560px;" id="rs-cta-tekst">Vraag vrijblijvend advies aan over jouw specifieke dossier.</p>
-          <button class="btn-primary" style="white-space:nowrap;" onclick="setView('offerte')">Vraag advies aan →</button>
+          <a class="btn-primary" style="white-space:nowrap;" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag advies aan →</a>
         </div>
       </div>
     </div>
@@ -1924,7 +1924,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
         <p class="eyebrow">Kennismaking?</p>
         <p style="margin-top:8px; font-size:.9rem; color:var(--muted);">Losplaats 16d, 5404 NJ Uden · 085 087 0307 · info@arbeidsdeskundig.com · KVK 85849618</p>
       </div>
-      <button class="btn-primary" onclick="setView('offerte')">Direct offerte & planning</button>
+      <a class="btn-primary" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Direct offerte & planning</a>
     </div>
   </div>
 </div>
@@ -2076,6 +2076,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <a href="/" onclick="event.preventDefault(); setView('home')">Home</a>
       <a href="/rekentool" onclick="event.preventDefault(); setView('calculator')">Rekentool</a>
       <a href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Offerte</a>
+      <a href="/aanmelden" onclick="event.preventDefault(); setView('aanmelden')">Aanmelden</a>
     </div>
     <div>
       <h4>Kennis</h4>
@@ -2178,7 +2179,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 
       <div class="checklist-anim-item" style="animation-delay:.5s; margin-top:18px; padding-top:16px; border-top:1px dashed var(--rule); display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-ghost btn-small" onclick="printChecklist()">🖨️ Print checklist</button>
-        <button class="btn-ghost btn-small" onclick="closeChecklistModal(); setView('advies', {tool:'keuzehulp'});">Twijfel je online/fysiek? Doe de keuzehulp</button>
+        <a class="btn-ghost btn-small" href="/keuzehulp?tool=keuzehulp" onclick="event.preventDefault(); closeChecklistModal(); setView('advies', {tool:'keuzehulp'});">Twijfel je online/fysiek? Doe de keuzehulp</a>
       </div>
 
       <div class="checklist-anim-item card" style="animation-delay:.6s; margin-top:14px; padding:16px 18px; background:var(--panel);">
@@ -2189,7 +2190,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
         </div>
       </div>
 
-      <button class="btn-primary" style="margin-top:16px; width:100%;" onclick="closeChecklistModal(); setView('offerte');">Direct een onderzoek aanvragen</button>
+      <a class="btn-primary" style="margin-top:16px; width:100%;" href="/offerte-aanvragen" onclick="event.preventDefault(); closeChecklistModal(); setView('offerte');">Direct een onderzoek aanvragen</a>
     </div>
   </div>
 </div>
@@ -2231,7 +2232,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
   <span id="sticky-artikel-cta-label" style="font-size:.84rem; max-width:60%;">Vragen over jouw situatie?</span>
   <div style="display:flex; gap:10px; flex-shrink:0; align-items:center;">
     <div id="sticky-artikel-cta-default">
-      <button class="btn-ghost btn-small on-dark" onclick="setView('offerte')">Offerte aanvragen</button>
+      <a class="btn-ghost btn-small on-dark" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Offerte aanvragen</a>
     </div>
     <div id="sticky-artikel-cta-gids" class="hidden" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
       <span>Offerte / Aanmelden</span>
@@ -2524,14 +2525,31 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
   };
   let _routerSync = false; // true tijdens popstate-replay, voorkomt dubbele history-entries
 
+  function assignView(view, opts){
+    let path = VIEW_TO_PATH[view] || '';
+    if(view === 'fysiek-tarief') path = '/offerte-aanvragen';
+    if(!path) return false;
+    const params = new URLSearchParams();
+    if(opts && opts.tool) params.set('tool', opts.tool);
+    const qs = params.toString();
+    const hash = opts && opts.hash ? '#' + String(opts.hash).replace(/^#/, '') : '';
+    const target = path + (qs ? '?' + qs : '') + hash;
+    if(location.pathname + location.search + location.hash !== target) window.location.assign(target);
+    return true;
+  }
+
   function setView(view, opts){
+    const target = document.getElementById('view-'+view);
+    if(!target){
+      assignView(view, opts);
+      return;
+    }
     document.querySelectorAll('.view').forEach(v=>{
       v.classList.remove('active');
       v.setAttribute('hidden','');
     });
-    const next = document.getElementById('view-'+view);
-    next.classList.add('active');
-    next.removeAttribute('hidden');
+    target.classList.add('active');
+    target.removeAttribute('hidden');
     document.querySelectorAll('#navDesktop a, #navMobile a').forEach(b=>{
       b.classList.toggle('active', b.dataset.key === view);
     });
@@ -2543,7 +2561,10 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     window.scrollTo({top:0, behavior:'instant'});
     revealCheck();
     if(view === 'aanmelden'){ setTimeout(initSignaturePad, 50); }
-    if(view === 'advies'){ chooseAdviesTool(opts && opts.tool ? opts.tool : null); }
+    if(view === 'advies'){
+      const tool = (opts && opts.tool) || new URLSearchParams(location.search).get('tool') || null;
+      chooseAdviesTool(tool);
+    }
     if(view === 'tolk'){
       document.title = 'Arbeidsdeskundige met tolk: zo werkt het | Arbeidsdeskundig.com';
       const metaDescEl = document.querySelector('meta[name="description"]');
@@ -2602,7 +2623,11 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
   function goHomeSection(id, ev){
     if(ev) ev.preventDefault();
     const home = document.getElementById('view-home');
-    const alreadyHome = home && home.classList.contains('active');
+    if(!home){
+      window.location.assign('/#' + id);
+      return;
+    }
+    const alreadyHome = home.classList.contains('active');
     if(!alreadyHome) setView('home');
     if(history.replaceState) history.replaceState({view:'home'}, '', '/#' + id);
     scrollToHomeSection(id, {smooth: alreadyHome});
@@ -2655,7 +2680,9 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 
   const logos = ["BAM Nederland","Royal Flora Holland","Sligro","Hornbach","Buurtzorg","Takeaway","Smurfit Kappa","UBS","Treant","Van der Valk","Gemeente Delft","Leger des Heils","Royal Cosun","ING"];
   const tape = document.getElementById('logoTape');
-  [...logos, ...logos].forEach(l=>{ const s = document.createElement('span'); s.textContent = l; tape.appendChild(s); });
+  if(tape){
+    [...logos, ...logos].forEach(l=>{ const s = document.createElement('span'); s.textContent = l; tape.appendChild(s); });
+  }
 
   /* Team avatars (SVG, geen foto's) */
   const teamMembers = [
@@ -2678,6 +2705,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     return `<svg viewBox="0 0 88 88" width="100%" height="100%"><circle cx="44" cy="44" r="44" fill="${color}"/><circle cx="44" cy="35" r="14" fill="#EDEFEA"/><path d="M18 78 C 18 58, 70 58, 70 78 Z" fill="#EDEFEA"/></svg>`;
   }
   const teamGroupsEl = document.getElementById('team-groups');
+  if(teamGroupsEl){
   const teamGroepen = [...new Set(teamMembers.map(t => t.groep))];
   teamGroepen.forEach((groep, i) => {
     const heading = document.createElement('p');
@@ -2700,6 +2728,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     });
     teamGroupsEl.appendChild(grid);
   });
+  }
 
   const revealEls = () => document.querySelectorAll('.reveal:not(.visible)');
   const io = new IntersectionObserver((entries)=>{
@@ -3345,14 +3374,14 @@ ziektewet: `
 </ul>
 <h3>Hoe wij dit anders aanpakken</h3>
 <p>Bij Ziektewet-dossiers werken we met een vaste checklist die precies aansluit op wat UWV toetst: contactmomenten met de ex-werkgever, een concrete functieanalyse, en, waar relevant, een vroege doorverwijzing naar spoor 2. Dat voorkomt dat het dossier na indiening alsnog terug moet voor aanvulling.</p>
-<p>Wil je weten wat dit voor jouw dossier betekent? <a class="blog-link" onclick="setView('offerte')">Vraag een offerte aan</a> of lees verder over <a class="blog-link" onclick="openArtikel('erd')">eigenrisicodragerschap voor de Ziektewet</a>.</p>
+<p>Wil je weten wat dit voor jouw dossier betekent? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een offerte aan</a> of lees verder over <a class="blog-link" onclick="openArtikel('erd')">eigenrisicodragerschap voor de Ziektewet</a>.</p>
 <h3>Wat is een "vangnetter"?</h3>
 <p>UWV gebruikt de term vangnetter voor iemand die ziek wordt zonder (langer) een werkgever te hebben die het loon doorbetaalt, bijvoorbeeld een uitzendkracht na afloop van het contract. Voor vangnetters loopt de uitkering via de Ziektewet in plaats van via loondoorbetaling, maar de re-integratieverplichtingen blijven grotendeels gelijk aan een regulier traject.</p>
 <h3>Ziektewet en de no-risk polis</h3>
 <p>Bij herplaatsing van een vangnetter met een doelgroep-status kan de <a class="blog-link" onclick="openArtikel('no-risk-polis')">no-risk polis</a> een nieuwe werkgever over de streep trekken: het ziekterisico bij een nieuwe uitval ligt dan niet volledig bij die werkgever.</p>
 <h3>Praktische tip voor (voormalig) werkgevers</h3>
 <p>Ook als het dienstverband al is beëindigd, loont het om als voormalig werkgever proactief mee te werken aan het Ziektewet-onderzoek: een snelle, volledige informatieverstrekking over eerdere functies voorkomt vertraging in het hele traject, voor alle betrokken partijen.</p>
-<p>Speelt dit in een van jouw dossiers? <a class="blog-link" onclick="setView('offerte')">Vraag een Ziektewet-onderzoek aan</a>.</p>`,
+<p>Speelt dit in een van jouw dossiers? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een Ziektewet-onderzoek aan</a>.</p>`,
 
 loonsanctie: `
 <h2>Wat is een loonsanctie precies?</h2>
@@ -3372,14 +3401,14 @@ loonsanctie: `
 <li>Er is geen recente, onafhankelijke onderbouwing richting UWV</li>
 <li>Duurzaamheid van de arbeidsongeschiktheid is nog niet eerder beoordeeld</li>
 </ul>
-<p>Gebruik onze <a class="blog-link" onclick="setView('calculator')">rekentool</a> om te zien hoeveel tijdwinst vroeg starten in jouw situatie oplevert.</p>
+<p>Gebruik onze <a class="blog-link" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">rekentool</a> om te zien hoeveel tijdwinst vroeg starten in jouw situatie oplevert.</p>
 <h3>Kan een loonsanctie worden bekort?</h3>
 <p>Ja. Toont een werkgever tijdens de sanctieperiode alsnog aan dat de re-integratie-inspanningen op orde zijn, dan kan UWV de loonsanctie bekorten: doorgaans tot 6 weken na de melding dat het verzuim is hersteld. Een actueel, gedegen arbeidsdeskundig onderzoek is vaak precies wat nodig is om deze bekorting te onderbouwen.</p>
 <h3>Bezwaar tegen een opgelegde loonsanctie</h3>
 <p>Ook tegen een loonsanctie zelf staat bezwaar open, binnen 6 weken na het besluit. Zie <a class="blog-link" onclick="openArtikel('bezwaar-wia')">onze uitleg over bezwaar maken tegen een WIA-beslissing</a> voor de procedure: deze is voor een loonsanctie vergelijkbaar.</p>
 <h3>Loonsanctie voorkomen versus bekorten: het verschil in aanpak</h3>
 <p>Voorkomen vraagt om tijdige actie vóór de WIA-aanvraag; bekorten vraagt om alsnog, achteraf, een compleet en overtuigend beeld neer te zetten. In beide gevallen is de kern hetzelfde: aantonen dat serieus is gekeken naar wat iemand nog wél kan.</p>
-<p>Zit je middenin een loonsanctieperiode? <a class="blog-link" onclick="setView('offerte')">Vraag een onderzoek aan gericht op bekorting</a>.</p>`,
+<p>Zit je middenin een loonsanctieperiode? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onderzoek aan gericht op bekorting</a>.</p>`,
 
 uitzend: `
 <h2>Verantwoordelijkheid bij uitzend en payroll</h2>
@@ -3394,14 +3423,14 @@ uitzend: `
 <p>Bij payrolling is er meestal wél sprake van een vast dienstverband met het payrollbedrijf, maar wordt het werk feitelijk bij de opdrachtgever verricht, vergelijkbaar met de inlener-constructie bij uitzendkrachten. Bij detachering ligt de nadruk vaak op een langduriger, specialistische inzet, met weer eigen afspraken over wie welke re-integratieverplichtingen draagt. Elk van deze constructies vraagt om dezelfde vraag: wie is de formele werkgever, en wie de feitelijke werkplek?</p>
 <h3>Praktische tip bij aanmelding</h3>
 <p>Heb je twijfel over wie in jouw situatie de formele werkgever is? Vul bij aanmelding in wat je zeker weet, en laat het veld voor de inlener desnoods op "niet van toepassing" staan, onze arbeidsdeskundige helpt dit bij de intake verder uit te zoeken.</p>
-<p>Meer weten over jouw specifieke situatie? <a class="blog-link" onclick="setView('offerte')">Vraag vrijblijvend een offerte aan</a>.</p>
+<p>Meer weten over jouw specifieke situatie? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag vrijblijvend een offerte aan</a>.</p>
 <h3>Wat bij faillissement van het uitzendbureau?</h3>
 <p>Gaat het uitzendbureau tijdens het traject failliet, dan kan de re-integratieverplichting via het UWV worden overgenomen, vergelijkbaar met de regeling bij een faillissement van een reguliere werkgever. Documentatie van het lopende traject, inclusief het arbeidsdeskundig rapport, is dan essentieel om de overgang soepel te laten verlopen.</p>
 <h3>Praktische tip: leg de contractketen vooraf vast</h3>
 <p>Bij langere uitzendrelaties met wisselende inleners is het verstandig om de contractketen (fase, opdrachtgever, periodes) overzichtelijk te documenteren vóórdat een onderzoek nodig is. Dat bespaart tijd bij de start van het traject en voorkomt discussie over wie waarvoor verantwoordelijk is.</p>
 <h3>Payrolling: een aparte variant</h3>
 <p>Bij payrolling ligt de arbeidsrechtelijke verantwoordelijkheid net iets anders dan bij regulier uitzenden, met eigen cao-afspraken. Ook hier geldt: de formele werkgever (het payrollbedrijf) blijft verantwoordelijk voor re-integratie, ook al werkt de medewerker feitelijk bij de opdrachtgever.</p>
-<p>Speelt dit in jouw organisatie? <a class="blog-link" onclick="setView('offerte')">Vraag een onderzoek aan</a> we vragen de contractketen standaard scherp uit.</p>`,
+<p>Speelt dit in jouw organisatie? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onderzoek aan</a> we vragen de contractketen standaard scherp uit.</p>`,
 
 erd: `
 <h2>ERD WGA versus ERD Ziektewet</h2>
@@ -3425,7 +3454,7 @@ erd: `
 <p>ERD kan financieel voordelig zijn voor werkgevers met een beperkte, goed voorspelbare instroom en een actief, kwalitatief re-integratiebeleid, de besparing op premie weegt dan op tegen het zelf dragen van het risico. Bij een minder voorspelbare of grotere instroom is de publieke, collectieve verzekering vaak juist veiliger.</p>
 <h3>De rol van arbeidsdeskundig onderzoek bij beide keuzes</h3>
 <p>Ongeacht de keuze voor ERD of publieke verzekering, blijft een tijdig en gedegen arbeidsdeskundig onderzoek de kern van het beperken van risico's, bij ERD werkt dit direct door in de eigen kosten, bij de publieke premie via de <a class="blog-link" onclick="openArtikel('whk')">WHK-systematiek</a>.</p>
-<p>Overweeg je een overstap naar eigenrisicodragerschap? <a class="blog-link" onclick="setView('offerte')">Wij denken hier graag in mee</a>.</p>`,
+<p>Overweeg je een overstap naar eigenrisicodragerschap? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Wij denken hier graag in mee</a>.</p>`,
 
 vervroegd: `
 <h2>Het principe: eerder starten = eerder klaar</h2>
@@ -3442,14 +3471,14 @@ vervroegd: `
 <p>Dit is niet alleen praktijkervaring: onderzoek van het Arbeidsdeskundig Kennis Centrum, uitgevoerd samen met het Impact Centre Erasmus, wijst op een gemiddelde stijging in loonwaarde van bijna 32% bij vroegtijdige inzet van arbeidsdeskundigen. CEREO werkt bovendien mee aan lopend onderzoek naar de zogeheten VIA-hypothese (Vervroegde Inzet Arbeidsdeskundige): dat vroege inzet verzuim verkort en spoor 2-trajecten vaker voorkomt of gerichter maakt.</p>
 <h3>Ook bij de Ziektewet telt tijd mee</h3>
 <p>Een veelgemaakte misvatting is dat de Wet Poortwachter-termijnen niet gelden bij Ziektewet-dossiers. Dat klopt niet: ook hier loopt de klok door, en werkt vroege inzet net zo hard door in kortere doorlooptijd en minder financieel risico.</p>
-<p>Gebruik onze <a class="blog-link" onclick="setView('calculator')">rekentool</a> om dit voor jouw situatie concreet te maken: inclusief het effect van dossiercomplexiteit en de kans dat spoor 2 nodig is.</p>
+<p>Gebruik onze <a class="blog-link" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">rekentool</a> om dit voor jouw situatie concreet te maken: inclusief het effect van dossiercomplexiteit en de kans dat spoor 2 nodig is.</p>
 <h3>Een concreet voorbeeld in weken</h3>
 <p>Start je een onderzoek in week 20 in plaats van te wachten tot de gebruikelijke jaarsevaluatie rond week 47, dan win je grofweg 27 weken speelruimte, ruim een half jaar extra om, indien nodig, een volledig Spoor 2-traject te doorlopen binnen de 104-wekengrens. Wacht je tot week 70 (tweede ziektejaar), dan is dat venster al grotendeels gesloten.</p>
 <h3>Waarom dit verschil niet lineair is</h3>
 <p>De waarde van vroeg starten neemt niet gelijkmatig af naarmate de tijd verstrijkt, richting de 104-wekengrens versnelt het effect juist, omdat elke week die verloren gaat steeds moeilijker in te halen is binnen een steeds korter wordend resterend venster.</p>
 <h3>Bereken het voor jouw dossier</h3>
-<p>Onze <a class="blog-link" onclick="setView('calculator')">rekentool</a> zet dit om naar een concrete inschatting in weken én euro's, op basis van de fase waarin jouw dossier zich op dit moment bevindt.</p>
-<p>Twijfel je of nu het juiste moment is? <a class="blog-link" onclick="setView('offerte')">Vraag vrijblijvend advies aan</a>.</p>`,
+<p>Onze <a class="blog-link" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">rekentool</a> zet dit om naar een concrete inschatting in weken én euro's, op basis van de fase waarin jouw dossier zich op dit moment bevindt.</p>
+<p>Twijfel je of nu het juiste moment is? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag vrijblijvend advies aan</a>.</p>`,
 
 jaarsevaluatie: `
 <h2>Het omslagpunt in de Wet Poortwachter</h2>
@@ -3463,14 +3492,14 @@ jaarsevaluatie: `
 <p>Als de jaarsevaluatie uitwijst dat spoor 2 nodig is, moet dat traject nog van de grond komen, met nog maar iets meer dan een jaar te gaan tot de WIA-aanvraag. Bij complexe dossiers, drukte bij re-integratiecoaches, of onverwachte vertraging in het proces, kan dat precies te krap blijken. Dat risico is met vroege inzet grotendeels te vermijden.</p>
 <h3>De jaarsevaluatie is geen wet van Meden en Perzen</h3>
 <p>De jaarsevaluatie is een gebruikelijk moment, geen wettelijke ondergrens voor wanneer een arbeidsdeskundig onderzoek mág. Werkgevers die hier vroeger op inspelen, geven zichzelf simpelweg meer opties.</p>
-<p>Bekijk in onze <a class="blog-link" onclick="setView('calculator')">rekentool</a> hoeveel tijdwinst dat in jouw situatie oplevert.</p>
+<p>Bekijk in onze <a class="blog-link" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">rekentool</a> hoeveel tijdwinst dat in jouw situatie oplevert.</p>
 <h3>Wie is er bij de eerstejaars-evaluatie betrokken?</h3>
 <p>In de regel nemen werkgever en werknemer deel, vaak samen met de casemanager of bedrijfsarts. Is er al een arbeidsdeskundig onderzoek uitgevoerd, dan vormen de conclusies daaruit een directe basis voor het gesprek.</p>
 <h3>Wat wordt er precies vastgelegd?</h3>
 <p>De uitkomst van de eerstejaars-evaluatie wordt toegevoegd aan het Plan van Aanpak: een terugblik op de afgelopen periode, een actuele inschatting van de mogelijkheden, en concrete vervolgstappen richting het tweede ziektejaar. Dit document maakt straks onderdeel uit van het re-integratieverslag bij de WIA-aanvraag.</p>
 <h3>Is er ook een tweede evaluatiemoment?</h3>
 <p>Naast de eerstejaars-evaluatie wordt de voortgang in het tweede jaar doorgaans opnieuw geëvalueerd, vaak informeler, in aanloop naar de <a class="blog-link" onclick="openArtikel('wia-aanvraag')">voorbereiding van de WIA-aanvraag</a> rond week 91.</p>
-<p>Nadert de eerstejaars-evaluatie in jouw dossier? <a class="blog-link" onclick="setView('calculator')">Bereken wat eerder starten nu nog oplevert</a>. Of lees als HR/casemanager <a class="blog-link" href="/kennisbank/arbeidsdeskundig-onderzoek-na-1-jaar-ziekte" onclick="event.preventDefault(); openArtikel('arbeidsdeskundig-onderzoek-na-1-jaar-ziekte')">wanneer je het arbeidsdeskundig onderzoek inzet (na 1 jaar ziekte) en welke valkuilen daarbij horen</a>.</p>`,
+<p>Nadert de eerstejaars-evaluatie in jouw dossier? <a class="blog-link" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">Bereken wat eerder starten nu nog oplevert</a>. Of lees als HR/casemanager <a class="blog-link" href="/kennisbank/arbeidsdeskundig-onderzoek-na-1-jaar-ziekte" onclick="event.preventDefault(); openArtikel('arbeidsdeskundig-onderzoek-na-1-jaar-ziekte')">wanneer je het arbeidsdeskundig onderzoek inzet (na 1 jaar ziekte) en welke valkuilen daarbij horen</a>.</p>`,
 
 investering: `
 <h2>Investering versus opbrengst</h2>
@@ -3483,14 +3512,14 @@ investering: `
 <p>Een spoedonderzoek kost €300,- meer dan het reguliere tarief, en fysiek €295,- meer dan online. Vergeleken met wat een loonsanctie of gemiste tijdwinst kan kosten, zijn dat relatief kleine bedragen, en soms juist de investering die het verschil maakt tussen op tijd klaar zijn en net niet.</p>
 <h3>Wat zit er wél en niet in het tarief?</h3>
 <p>In het tarief zit het volledige onderzoek: gesprekken met werkgever en werknemer, analyse van het dossier, en een UWV-proof rapportage met concreet advies. Reiskosten bij een fysiek onderzoek zijn met de vaste meerprijs van €295,- al verrekend, zodat je vooraf precies weet waar je aan toe bent.</p>
-<p>Bekijk het voor jouw situatie met onze <a class="blog-link" onclick="setView('calculator')">rekentool</a>.</p>
+<p>Bekijk het voor jouw situatie met onze <a class="blog-link" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">rekentool</a>.</p>
 <h3>Wat zit er wel en niet in het tarief?</h3>
 <p>In het genoemde tarief zitten het volledige onderzoek, het gesprek met werkgever en werknemer, de analyse en de schriftelijke rapportage inbegrepen. Een eventueel vervolgonderzoek, bijvoorbeeld een herbeoordeling na verloop van tijd, wordt apart geoffreerd, afhankelijk van de omvang.</p>
 <h3>Betaling en facturatie</h3>
 <p>Facturatie verloopt na afronding van het onderzoek, met een standaard betaaltermijn. Bij grotere, terugkerende opdrachtgevers zijn ook andere afspraken bespreekbaar, vraag dit gerust na bij de offerteaanvraag.</p>
 <h3>Wat als het onderzoek meer tijd vergt dan verwacht?</h3>
 <p>Blijkt tijdens het onderzoek dat de situatie complexer is dan vooraf ingeschat, bijvoorbeeld doordat een fysiek bezoek alsnog nodig blijkt, dan bespreken we dit altijd vooraf, zodat er nooit onverwachte kosten bijkomen zonder jouw akkoord.</p>
-<p>Wil je een offerte op maat? <a class="blog-link" onclick="setView('offerte')">Vraag deze vrijblijvend aan</a>. Zoek je vooral hoe de prijs is opgebouwd en hoe je die weegt tegen Poortwachter- en WHK-risico? Lees <a class="blog-link" onclick="openArtikel('kosten-arbeidsdeskundig-onderzoek')">kosten arbeidsdeskundig onderzoek: tarief, prijsdrijvers en risico</a>.</p>`,
+<p>Wil je een offerte op maat? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag deze vrijblijvend aan</a>. Zoek je vooral hoe de prijs is opgebouwd en hoe je die weegt tegen Poortwachter- en WHK-risico? Lees <a class="blog-link" onclick="openArtikel('kosten-arbeidsdeskundig-onderzoek')">kosten arbeidsdeskundig onderzoek: tarief, prijsdrijvers en risico</a>.</p>`,
 
 spoor2: `
 <h2>Spoor 2 als logisch vervolg</h2>
@@ -3504,14 +3533,14 @@ spoor2: `
 <p>Spoor 2 draait om het vinden van passend werk bij een andere werkgever, met begeleiding van een re-integratiecoach: van het opstellen van een concreet zoekprofiel tot sollicitatiebegeleiding en, waar nodig, scholing. Hoe eerder dit traject start, hoe meer tijd er is om dit zorgvuldig te doen in plaats van gehaast.</p>
 <h3>Spoor 2 is geen erkenning van falen</h3>
 <p>Spoor 2 wordt nog weleens gezien als "het is niet gelukt", terwijl het in de praktijk vaak juist de meest kansrijke en eerlijke route is, zowel voor werkgever als werknemer. Een goed onderbouwd advies helpt om dat gesprek zonder ongemak te voeren.</p>
-<p>Meer weten over de aanpak van spoor 2? Lees verder op de <button class="btn-link" onclick="setView('over')">Over ons-pagina</button>, of <a class="blog-link" onclick="setView('offerte')">start met een arbeidsdeskundig onderzoek</a> en vraag Spoor 2 direct mee aan.</p>
+<p>Meer weten over de aanpak van spoor 2? Lees verder op de <a class="btn-link" href="/over-ons" onclick="event.preventDefault(); setView('over')">Over ons-pagina</a>, of <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">start met een arbeidsdeskundig onderzoek</a> en vraag Spoor 2 direct mee aan.</p>
 <h3>Hoe lang duurt een Spoor 2-traject gemiddeld?</h3>
 <p>Reken op 6 tot 12 maanden, afhankelijk van de arbeidsmarktkansen, de mate van scholing die nodig is, en de intensiteit van begeleiding. Hoe eerder gestart wordt, hoe meer ruimte er is om dit traject rustig en zorgvuldig te doorlopen binnen de wettelijke termijnen.</p>
 <h3>Wat bepaalt of Spoor 2 slaagt?</h3>
 <p>Een realistisch, goed onderbouwd beeld van de mogelijkheden, direct afkomstig uit het arbeidsdeskundig onderzoek, is de belangrijkste succesfactor. Een traject dat start met een te optimistisch of te vaag beeld van wat iemand kan, verliest kostbare tijd aan bijstelling onderweg.</p>
 <h3>Wat als Spoor 2 niet tot een plaatsing leidt?</h3>
 <p>Lukt het niet om vóór het einde van de wachttijd een nieuwe werkgever te vinden, dan verschuift de aandacht naar een zorgvuldige onderbouwing richting de WIA-aanvraag: aantoonbaar maken dát serieus en volledig is gezocht, ook zonder concreet resultaat. Dat blijft relevant voor de RIV-toets, ook zonder plaatsing.</p>
-<p>Wil je Spoor 2 direct meeaanvragen bij je arbeidsdeskundig onderzoek? <a class="blog-link" onclick="setView('offerte')">Vink dit mee aan in het aanmeldformulier</a>. Lopen WIA-aanvraag en spoor 2 tegelijk, zie <a class="blog-link" href="/kennisbank/wia-aanvraag-parallel-spoor-2" onclick="event.preventDefault(); openArtikel('wia-aanvraag-parallel-spoor-2')">wie coördineert wat</a>. Twijfel je of spoor 1 eerst afgerond moet zijn: <a class="blog-link" href="/kennisbank/spoor-2-zonder-spoor-1-afgerond" onclick="event.preventDefault(); openArtikel('spoor-2-zonder-spoor-1-afgerond')">wanneer je spoor 2 wél eerder mag starten</a>.</p>`,
+<p>Wil je Spoor 2 direct meeaanvragen bij je arbeidsdeskundig onderzoek? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vink dit mee aan in het aanmeldformulier</a>. Lopen WIA-aanvraag en spoor 2 tegelijk, zie <a class="blog-link" href="/kennisbank/wia-aanvraag-parallel-spoor-2" onclick="event.preventDefault(); openArtikel('wia-aanvraag-parallel-spoor-2')">wie coördineert wat</a>. Twijfel je of spoor 1 eerst afgerond moet zijn: <a class="blog-link" href="/kennisbank/spoor-2-zonder-spoor-1-afgerond" onclick="event.preventDefault(); openArtikel('spoor-2-zonder-spoor-1-afgerond')">wanneer je spoor 2 wél eerder mag starten</a>.</p>`,
 
 "online-fysiek": `
 <h2>Online of fysiek: wat is het verschil in de praktijk?</h2>
@@ -3525,12 +3554,12 @@ spoor2: `
 <h3>Door heel Nederland</h3>
 <p>Beide vormen bieden we door heel Nederland aan. Bij aanmelding geef je aan welke vorm je voorkeur heeft; wij plannen vervolgens in overleg met alle betrokkenen.</p>
 <h3>De hybride tussenweg</h3>
-<p>In de praktijk hoeft de keuze niet definitief te zijn. Start je online en blijkt tijdens het onderzoek dat een locatiebezoek toch waardevol is, dan schakelen we, net als bij onze <a class="blog-link" onclick="setView('advies', {tool:'keuzehulp'})">gratis keuzehulp</a> alsnog vrijblijvend door naar fysiek. Zo loop je nooit het risico vast te zitten aan een verkeerde keuze vooraf.</p>
+<p>In de praktijk hoeft de keuze niet definitief te zijn. Start je online en blijkt tijdens het onderzoek dat een locatiebezoek toch waardevol is, dan schakelen we, net als bij onze <a class="blog-link" href="/keuzehulp?tool=keuzehulp" onclick="event.preventDefault(); setView('advies', {tool:'keuzehulp'})">gratis keuzehulp</a> alsnog vrijblijvend door naar fysiek. Zo loop je nooit het risico vast te zitten aan een verkeerde keuze vooraf.</p>
 <h3>Hoe vaak is fysiek daadwerkelijk nodig?</h3>
 <p>Op basis van onze eigen dossiers is online in circa 80% van de gevallen toereikend, met name bij overwegend administratieve of goed te beschrijven functies. Fysiek blijkt vooral onmisbaar bij wisselende werkplekken, complexe fysieke belasting, of wanneer de opdrachtgever de omstandigheden zelf niet objectief kan inventariseren.</p>
 <h3>Wat merkt de werknemer van het verschil?</h3>
 <p>Voor de werknemer is het gesprek zelf vergelijkbaar qua diepgang en duur, ongeacht de vorm. Het belangrijkste verschil zit in de mogelijkheid om tijdens een fysiek bezoek daadwerkelijk de werkplek en werkomstandigheden te observeren, in plaats van deze mondeling te bespreken.</p>
-<p>Twijfel je welke vorm bij jouw situatie past? <a class="blog-link" onclick="setView('advies', {tool:'keuzehulp'})">Doe de gratis keuzehulp</a>.</p>`,
+<p>Twijfel je welke vorm bij jouw situatie past? <a class="blog-link" href="/keuzehulp?tool=keuzehulp" onclick="event.preventDefault(); setView('advies', {tool:'keuzehulp'})">Doe de gratis keuzehulp</a>.</p>`,
 
 whk: `
 <h2>De WHK-premie kort uitgelegd</h2>
@@ -3547,7 +3576,7 @@ whk: `
 <p>Stel: een middelgrote werkgever heeft twee jaar geleden één WGA-instroom gehad. Die ene instroom werkt, via de T-2-systematiek, dit jaar en de komende jaren door in een hogere premie, vaak in de orde van enkele duizenden euro's extra loonkosten per jaar, afhankelijk van de loonsom van de organisatie. Eén vermeden instroom kan dus een aanzienlijk, jarenlang effect hebben.</p>
 <h3>Premie beïnvloeden: wat werkt wél?</h3>
 <p>Naast het beperken van nieuwe instroom, telt ook het verlagen van het uitkeringspercentage van bestaande WGA-dossiers mee in de schadelast. Een <a class="blog-link" onclick="openArtikel('loonsanctie')">WGA-onderzoek gericht op het uitkeringspercentage</a> is dus niet alleen relevant voor de individuele werknemer, maar ook direct voor de premie.</p>
-<p>Wil je inzicht in de opbouw van jouw WHK-premie? <a class="blog-link" onclick="setView('offerte')">Neem contact op</a>.</p>`,
+<p>Wil je inzicht in de opbouw van jouw WHK-premie? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Neem contact op</a>.</p>`,
 
 "casus-wga": `
 <p style="font-size:.8rem; color:var(--muted2); font-style:italic; margin-top:-8px;">Namen en details in deze casus zijn gefingeerd en samengesteld uit vergelijkbare situaties binnen onze 1.500+ uitgevoerde onderzoeken, ter bescherming van de privacy van betrokkenen.</p>
@@ -3559,7 +3588,7 @@ whk: `
 <p>Op basis van het rapport kon de werkgever bij UWV een herbeoordeling aanvragen. Het uitkeringspercentage werd na deze herbeoordeling verlaagd, wat direct doorwerkte in een lagere WGA-lastendruk voor de eigenrisicodrager. Minstens zo belangrijk: Peter kreeg concreet zicht op passend werk, in plaats van in onzekerheid te blijven zitten.</p>
 <h2>Wat we hiervan meenemen</h2>
 <p>Deze casus laat goed zien dat een WGA-onderzoek niet draait om het bevestigen van beperkingen, maar om het scherp maken van mogelijkheden. Een verouderde inschatting van de verdiencapaciteit kan jarenlang onnodig doorwerken in het uitkeringspercentage, en dus in de lasten voor een eigenrisicodrager, totdat iemand het opnieuw, grondig, laat onderzoeken.</p>
-<p>Herken je deze situatie? <a class="blog-link" onclick="setView('offerte')">Vraag een WGA-onderzoek aan</a> of lees meer over <a class="blog-link" onclick="openArtikel('loonsanctie')">wat een WGA-onderzoek precies inhoudt</a>.</p>
+<p>Herken je deze situatie? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een WGA-onderzoek aan</a> of lees meer over <a class="blog-link" onclick="openArtikel('loonsanctie')">wat een WGA-onderzoek precies inhoudt</a>.</p>
 <h3>Wat als dit dossier niet was herbeoordeeld?</h3>
 <p>Zonder het initiatief van de werkgever was het uitkeringspercentage vermoedelijk nog jaren ongewijzigd gebleven, herbeoordelingen gebeuren immers niet automatisch. Dat onderstreept een breder patroon: de bewijslast om een verouderde WGA-inschatting te laten herzien, ligt in de praktijk bij de werkgever of werknemer zelf, niet bij UWV.</p>
 <h3>Herkenbaar patroon?</h3>
@@ -3575,7 +3604,7 @@ whk: `
 <p>Spoor 1 werd binnen twee weken aantoonbaar afgedicht, wat de ZW-beoordeling door UWV vlot liet verlopen. Op basis van het advies werd Melissa vervolgens doorverwezen naar Best Match Re-integratie voor spoor 2, waar ze binnen enkele maanden een nieuwe baan vond, aanzienlijk sneller dan het gemiddelde traject.</p>
 <h2>Wat we hiervan meenemen</h2>
 <p>Deze casus toont precies waarom we bij Ziektewet altijd twee doelen tegelijk nastreven. Door spoor 1 en spoor 2 parallel op te pakken, in plaats van na elkaar, ging er geen tijd verloren tussen "spoor 1 is afgedicht" en "spoor 2 kan beginnen".</p>
-<p>Zit je in een vergelijkbare situatie? Lees meer over <a class="blog-link" onclick="openArtikel('ziektewet')">arbeidsdeskundig onderzoek bij de Ziektewet</a> of <a class="blog-link" onclick="setView('offerte')">vraag direct een onderzoek aan</a>.</p>
+<p>Zit je in een vergelijkbare situatie? Lees meer over <a class="blog-link" onclick="openArtikel('ziektewet')">arbeidsdeskundig onderzoek bij de Ziektewet</a> of <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">vraag direct een onderzoek aan</a>.</p>
 <h3>Tijdlijn van dit dossier</h3>
 <p>Ziekmelding in week 1, arbeidsdeskundig onderzoek gestart in week 2, spoor 1 aantoonbaar afgedicht in week 4, en directe doorverwijzing naar spoor 2 in dezelfde week, in plaats van pas na een formeel oordeel over spoor 1 af te wachten. Die overlap tussen beide sporen scheelde uiteindelijk naar schatting 6 tot 8 weken ten opzichte van een sequentiële aanpak.</p>
 <h3>Herkenbaar patroon?</h3>
@@ -3591,7 +3620,7 @@ whk: `
 <p>Het volledige spoor 2-traject werd ruim binnen de 104-wekengrens afgerond, met een aantoonbaar zorgvuldige onderbouwing richting UWV. Daarmee werd het risico op een loonsanctie, al gauw een jaar extra loondoorbetaling, weggenomen. De werkgever gaf aan achteraf verrast te zijn hoeveel rust de vroege duidelijkheid gaf, ook aan de medewerker zelf.</p>
 <h2>Wat we hiervan meenemen</h2>
 <p>Deze casus is een schoolvoorbeeld van "eerder starten = eerder klaar": de 27 weken voorsprong werden niet opgepot, maar volledig benut om spoor 2 zonder tijdsdruk te doorlopen, precies het verschil tussen comfortabel op tijd zijn en op het randje balanceren.</p>
-<p>Bereken zelf hoeveel tijdwinst vroeg starten in jouw situatie oplevert met onze <a class="blog-link" onclick="setView('calculator')">rekentool</a>.</p>
+<p>Bereken zelf hoeveel tijdwinst vroeg starten in jouw situatie oplevert met onze <a class="blog-link" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">rekentool</a>.</p>
 <h3>Wat als de werkgever wél had gewacht tot de jaarsevaluatie?</h3>
 <p>Reken het na: bij starten in week 47 (de gebruikelijke jaarsevaluatie) had Spoor 2 nog moeten beginnen met precies de tijd die het gemiddeld kost om zorgvuldig te doorlopen, zonder enige marge voor vertraging. Elke onverwachte hobbel (wachttijd bij een coach, een aanvullend medisch onderzoek) had dan direct het risico op een loonsanctie dichterbij gebracht. De 27 weken voorsprong was dus niet alleen comfortabel, maar functioneel: het bood ruimte voor tegenslag.</p>
 <h3>Herkenbaar patroon?</h3>
@@ -3607,7 +3636,7 @@ whk: `
 <p>Binnen een week na aanmelding was er volledige duidelijkheid over de verantwoordelijkheden, en kon het arbeidsdeskundig onderzoek zonder verdere vertraging van start. Dit voorkwam verdere onnodige vertraging in een dossier dat al maanden had stilgestaan door de onduidelijkheid tussen de partijen.</p>
 <h2>Wat we hiervan meenemen</h2>
 <p>Deze casus laat zien dat vertraging niet altijd inhoudelijk is, soms zit het 'm puur in onduidelijke rolverdeling. Door dit gestructureerd uit te vragen bij aanmelding, voorkomen we dat dossiers vastlopen nog vóórdat het onderzoek is begonnen.</p>
-<p>Lees meer over <a class="blog-link" onclick="openArtikel('uitzend')">verantwoordelijkheid bij uitzend en payroll</a> of <a class="blog-link" onclick="setView('offerte')">meld je situatie aan</a>.</p>
+<p>Lees meer over <a class="blog-link" onclick="openArtikel('uitzend')">verantwoordelijkheid bij uitzend en payroll</a> of <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">meld je situatie aan</a>.</p>
 <h3>Wat deze casus typeert</h3>
 <p>Vergelijkbare dossiers lopen vaak vast op exact hetzelfde punt: niemand twijfelt aan de noodzaak van re-integratie, maar niemand voelt zich verantwoordelijk om de eerste stap te zetten. Door dit al bij aanmelding expliciet uit te vragen, in plaats van er tijdens het onderzoek pas achter te komen, voorkomt dit type onduidelijkheid stelselmatig vertraging, niet alleen in dit specifieke dossier.</p>
 <h3>Herkenbaar patroon?</h3>
@@ -3627,7 +3656,7 @@ whk: `
 <h3>Concreet effect over meerdere jaren</h3>
 <p>Doordat de aangepaste beoordeling plaatsvond vóórdat de formele WGA-instroom werd vastgesteld, telde het lagere uitkeringspercentage direct mee in de T-2-berekening van de eerstvolgende premiejaren, in plaats van pas na een latere, kostbaardere correctie. Voor een eigenrisicodrager is precies dát verschil (vóór versus ná instroom) vaak bepalend voor hoeveel jaar de besparing doorwerkt.</p>
 <h3>Herkenbaar patroon?</h3>
-<p>Voor eigenrisicodragers geldt vaker dan voor publiek verzekerde werkgevers dat het effect van vroege actie direct voelbaar is, er zit geen omweg via een collectieve premie tussen de actie en het resultaat. Dat maakt tijdige inzet bij ERD-organisaties nog net iets urgenter.</p><p style="margin-top:14px;">Wil je weten wat eigenrisicodragerschap voor jouw organisatie kan betekenen? <a class="blog-link" onclick="setView('offerte')">Vraag een offerte aan</a>.</p>`,
+<p>Voor eigenrisicodragers geldt vaker dan voor publiek verzekerde werkgevers dat het effect van vroege actie direct voelbaar is, er zit geen omweg via een collectieve premie tussen de actie en het resultaat. Dat maakt tijdige inzet bij ERD-organisaties nog net iets urgenter.</p><p style="margin-top:14px;">Wil je weten wat eigenrisicodragerschap voor jouw organisatie kan betekenen? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een offerte aan</a>.</p>`,
 
 "wat-doet-arbeidsdeskundige": `
 <h2>Wat doet een arbeidsdeskundige?</h2>
@@ -3678,7 +3707,7 @@ whk: `
 
 <h2>Moet een arbeidsdeskundige geregistreerd zijn?</h2>
 <p>Voor een rapport dat UWV serieus neemt: ja. Geregistreerde arbeidsdeskundigen staan in het Register Arbeidsdeskundigen (SRA), werken volgens een beroepscode en houden vakbekwaamheid bij via permanente educatie. Onafhankelijkheid hoort daarbij: het oordeel volgt de feiten, ongeacht of de werkgever of de werknemer de opdrachtgever is.</p>
-<p>arbeidsdeskundig.com is onderdeel van <a class="blog-link" onclick="setView('over')">Matchvermogen B.V.</a>: geregistreerde arbeidsdeskundigen, online of fysiek, door heel Nederland. Twijfel je of een onderzoek in jouw dossier zinvol is? <a class="blog-link" onclick="setView('offerte')">Vraag vrijblijvend een offerte aan</a> of <a class="blog-link" onclick="setView('aanmelden')">meld een onderzoek aan</a> reactie binnen 24 uur.</p>`,
+<p>arbeidsdeskundig.com is onderdeel van <a class="blog-link" href="/over-ons" onclick="event.preventDefault(); setView('over')">Matchvermogen B.V.</a>: geregistreerde arbeidsdeskundigen, online of fysiek, door heel Nederland. Twijfel je of een onderzoek in jouw dossier zinvol is? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag vrijblijvend een offerte aan</a> of <a class="blog-link" href="/aanmelden" onclick="event.preventDefault(); setView('aanmelden')">meld een onderzoek aan</a> reactie binnen 24 uur.</p>`,
 
 "loonwaardeonderzoek": `
 <h2>Wat is loonwaarde?</h2>
@@ -3698,14 +3727,14 @@ whk: `
 <p>Stel: iemand werkt in een functie waarin het gangbare loon €2.800,- per maand is, maar door beperkingen haalt diegene nog maar 60% van de gangbare productiviteit. De loonwaarde komt dan uit op €1.680,- per maand. Dit percentage is precies wat bij een <a class="blog-link" onclick="openArtikel('loonsanctie')">WGA-onderzoek</a> gebruikt wordt om het uitkeringspercentage te onderbouwen.</p>
 <h3>Loonwaarde is geen momentopname</h3>
 <p>Belastbaarheid en dus loonwaarde kunnen wijzigen: door herstel, door aanpassingen op de werkplek, of juist door verslechtering. Een verouderde loonwaardemeting is een <a class="blog-link" onclick="openArtikel('wia-aanvraag')">veelgemaakte fout bij een WIA-aanvraag</a>.</p>
-<p>Twijfel je of een loonwaardeonderzoek nodig is in jouw situatie? <a class="blog-link" onclick="setView('offerte')">Neem vrijblijvend contact op</a>.</p>
+<p>Twijfel je of een loonwaardeonderzoek nodig is in jouw situatie? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Neem vrijblijvend contact op</a>.</p>
 <h3>Hoe lang blijft een loonwaardemeting geldig?</h3>
 <p>Loonwaarde is geen momentopname voor onbepaalde tijd: bij wijziging van functie, uren of belastbaarheid moet de meting worden herhaald. Bij langlopende trajecten wordt periodiek herbeoordeeld, vaak jaarlijks, om te voorkomen dat een uitkering of loonkostensubsidie op verouderde cijfers wordt gebaseerd.</p>
 <h3>Een rekenvoorbeeld</h3>
 <p>Iemand werkt in een functie met een gangbaar loon van €2.800,- per maand, maar levert door beperkingen 60% van de gangbare productiviteit. De loonwaarde komt dan uit op €1.680,- per maand. Stijgt die loonwaarde door gerichte begeleiding naar 75%, dan loopt dit bedrag op naar €2.100,-, een verschil dat direct doorwerkt in het WGA-uitkeringspercentage of de benodigde loonkostensubsidie.</p>
 <h3>Wie voert de meting uit?</h3>
 <p>Een loonwaardemeting gebeurt volgens een gestandaardiseerde, gecertificeerde methodiek, vaak op de werkplek zelf. Dit gebeurt in nauwe samenwerking met de arbeidsdeskundige, zodat de meting aansluit bij de bredere conclusies uit het onderzoek naar mogelijkheden en beperkingen.</p>
-<p>Wil je weten of een loonwaardeonderzoek in jouw situatie relevant is? <a class="blog-link" onclick="setView('offerte')">Neem vrijblijvend contact op</a>.</p>`,
+<p>Wil je weten of een loonwaardeonderzoek in jouw situatie relevant is? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Neem vrijblijvend contact op</a>.</p>`,
 
 "deskundigenoordeel": `
 <h2>Wat is een deskundigenoordeel?</h2>
@@ -3724,14 +3753,14 @@ whk: `
 <p>Een deskundigenoordeel vraag je aan tíjdens een lopend traject, om een vastgelopen discussie te doorbreken. <a class="blog-link" onclick="openArtikel('bezwaar-wia')">Bezwaar maken</a> doe je pas ná een formele UWV-beslissing, zoals een WIA-beoordeling. Beide kunnen elkaar aanvullen: een deskundigenoordeel eerder in het traject voorkomt soms dat een bezwaarprocedure later nodig is.</p>
 <h3>Wie kan een deskundigenoordeel aanvragen?</h3>
 <p>Zowel de werkgever als de werknemer kan dit zelfstandig doen: je hebt hiervoor geen toestemming van de andere partij nodig, al is het wel gebruikelijk dit vooraf te melden.</p>
-<p>Overweeg je een deskundigenoordeel aan te vragen? Zorg eerst voor een actueel <a class="blog-link" onclick="setView('offerte')">arbeidsdeskundig onderzoek</a> als onderbouwing.</p>
+<p>Overweeg je een deskundigenoordeel aan te vragen? Zorg eerst voor een actueel <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">arbeidsdeskundig onderzoek</a> als onderbouwing.</p>
 <h3>Wat kost een deskundigenoordeel, en hoe lang duurt het?</h3>
 <p>UWV rekent een vast tarief per deskundigenoordeel-aanvraag (check de actuele tarieven op uwv.nl); reken op enkele weken doorlooptijd tussen aanvraag en uitkomst, afhankelijk van de actuele wachttijden.</p>
 <h3>Wat als het oordeel negatief uitpakt?</h3>
 <p>Een deskundigenoordeel is niet juridisch bindend, maar weegt wel zwaar mee bij een latere WIA-beoordeling of eventuele rechtszaak. Een negatief oordeel is dus geen eindpunt, maar wél een serieus signaal om het dossier of de aanpak te heroverwegen.</p>
 <h3>Kan een deskundigenoordeel een lopend geschil doorbreken?</h3>
 <p>Ja, dat is precies de meerwaarde: waar werkgever en werknemer er onderling niet uitkomen, geeft een onafhankelijk, extern oordeel vaak de doorslag om het traject weer in beweging te krijgen, zonder dat het meteen een juridisch geschil hoeft te worden.</p>
-<p>Loopt jouw dossier vast? <a class="blog-link" onclick="setView('offerte')">Wij denken vrijblijvend mee over de te volgen route</a>.</p>`,
+<p>Loopt jouw dossier vast? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Wij denken vrijblijvend mee over de te volgen route</a>.</p>`,
 
 "poortwachter-tijdlijn": `
 <h2>De Wet Poortwachter-tijdlijn stap voor stap</h2>
@@ -3750,7 +3779,7 @@ whk: `
 <p>Een gemiste termijn is niet per definitie een verloren zaak, maar wel een signaal om nu extra zorgvuldig te handelen. Een alsnog uitgevoerd, gedegen arbeidsdeskundig onderzoek toont aan dat er alsnog serieus naar de mogelijkheden is gekeken, wat het risico op een loonsanctie kan beperken, ook als het niet meer op het ideale moment gebeurt.</p>
 <h3>Ziektewet: dezelfde klok, ander startpunt</h3>
 <p>Bij de Ziektewet lopen deze termijnen ook, maar dan vanaf de eerste ziektedag ná uitdiensttreding. Zie ons artikel over <a class="blog-link" onclick="openArtikel('ziektewet')">arbeidsdeskundig onderzoek bij de Ziektewet</a> voor de verschillen.</p>
-<p>Wil je zeker weten dat je op schema ligt? <a class="blog-link" onclick="setView('calculator')">Bereken je tijdwinst</a> of vraag een <a class="blog-link" onclick="setView('offerte')">arbeidsdeskundig onderzoek</a> aan.</p>
+<p>Wil je zeker weten dat je op schema ligt? <a class="blog-link" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">Bereken je tijdwinst</a> of vraag een <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">arbeidsdeskundig onderzoek</a> aan.</p>
 <h3>De complete tijdlijn in één overzicht</h3>
 <ul>
 <li><strong>Week 1:</strong> ziekmelding</li>
@@ -3766,7 +3795,7 @@ whk: `
 <p>Niet elke gemiste termijn leidt automatisch tot een loonsanctie, UWV kijkt naar het geheel van inspanningen. Wel geldt: hoe meer termijnen zijn gemist of oppervlakkig zijn ingevuld, hoe groter de kans dat de RIV-toets negatief uitpakt. Lees meer over <a class="blog-link" onclick="openArtikel('riv-toets')">wat de RIV-toets precies beoordeelt</a>.</p>
 <h3>Kun je een gemiste termijn nog herstellen?</h3>
 <p>Vaak wel: alsnog een gedegen arbeidsdeskundig onderzoek laten uitvoeren, ook na een gemist ijkpunt, toont aan dat alsnog serieus naar de mogelijkheden is gekeken. Dat weegt mee bij de uiteindelijke beoordeling, ook al is het niet meer op het ideale moment.</p>
-<p>Wil je weten waar jouw dossier in deze tijdlijn staat? <a class="blog-link" onclick="setView('calculator')">Gebruik de rekentool</a> voor een concrete inschatting.</p>`,
+<p>Wil je weten waar jouw dossier in deze tijdlijn staat? <a class="blog-link" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">Gebruik de rekentool</a> voor een concrete inschatting.</p>`,
 
 "wia-aanvraag": `
 <h2>De WIA-aanvraag: wat moet er klaarliggen?</h2>
@@ -3786,14 +3815,14 @@ whk: `
 <p>Na de WIA-beoordeling volgt óf een WGA-uitkering (gedeeltelijk arbeidsgeschikt), óf een <a class="blog-link" onclick="openArtikel('iva-uitkering')">IVA-uitkering</a> (duurzaam en volledig arbeidsongeschikt), óf helemaal geen uitkering als er voldoende verdiencapaciteit resteert. Het arbeidsdeskundig rapport speelt in alle drie de uitkomsten een sleutelrol.</p>
 <h3>Niet eens met de uitkomst?</h3>
 <p>Dan kun je <a class="blog-link" onclick="openArtikel('bezwaar-wia')">bezwaar maken tegen de WIA-beslissing</a> binnen 6 weken na dagtekening.</p>
-<p>Zorg op tijd voor een actueel rapport. <a class="blog-link" onclick="setView('offerte')">Vraag een arbeidsdeskundig onderzoek aan</a> ruim vóór week 91. Lopen de aanvraag en spoor 2 tegelijk, zie <a class="blog-link" href="/kennisbank/wia-aanvraag-parallel-spoor-2" onclick="event.preventDefault(); openArtikel('wia-aanvraag-parallel-spoor-2')">WIA-aanvraag parallel aan spoor 2: wie coördineert wat</a>.</p>
+<p>Zorg op tijd voor een actueel rapport. <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een arbeidsdeskundig onderzoek aan</a> ruim vóór week 91. Lopen de aanvraag en spoor 2 tegelijk, zie <a class="blog-link" href="/kennisbank/wia-aanvraag-parallel-spoor-2" onclick="event.preventDefault(); openArtikel('wia-aanvraag-parallel-spoor-2')">WIA-aanvraag parallel aan spoor 2: wie coördineert wat</a>.</p>
 <h3>Wat gebeurt er na indiening van de aanvraag?</h3>
 <p>Na indiening beoordeelt UWV het dossier via een eigen verzekeringsarts en arbeidsdeskundige. Zij voeren doorgaans een apart spreekuur en, indien nodig, aanvullend onderzoek uit, los van eerdere rapportages, al worden die wel als basis meegenomen.</p>
 <h3>Hoe bereid je je voor op het UWV-gesprek?</h3>
 <p>Zorg dat je bekend bent met de inhoud van eerdere rapportages, en wees concreet over wat wel en niet is geprobeerd binnen spoor 1 en spoor 2. Tegenstrijdigheden tussen wat er in het dossier staat en wat tijdens het gesprek wordt verteld, kunnen de beoordeling vertragen.</p>
 <h3>Hoe lang duurt de WIA-beoordeling zelf?</h3>
 <p>UWV streeft sinds 1 januari 2026 naar een beslissing binnen 16 weken na de aanvraag (tijdelijk, was 8 weken). Soms duurt het langer; de verwachte datum staat in de ontvangstbevestiging. Wat die <a class="blog-link" href="/kennisbank/beslistermijn-wia-16-weken" onclick="event.preventDefault(); openArtikel('beslistermijn-wia-16-weken')">beslistermijn WIA 16 weken</a> praktisch betekent: houd het dossier UWV-proof terwijl je wacht. Een compleet en actueel dossier voorkomt extra vragen.</p>
-<p>Bereid je de WIA-aanvraag voor? <a class="blog-link" onclick="setView('offerte')">Laat het dossier tijdig checken</a>.</p>`,
+<p>Bereid je de WIA-aanvraag voor? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Laat het dossier tijdig checken</a>.</p>`,
 
 "passende-arbeid": `
 <h2>Wat is passende arbeid?</h2>
@@ -3814,14 +3843,14 @@ whk: `
 <p>Bij flexibele dienstverbanden wordt de vraag wie passend werk moet aanbieden nog wel eens onduidelijk. Lees meer over <a class="blog-link" onclick="openArtikel('uitzend')">verantwoordelijkheid bij uitzend en payroll</a> als dit voor jouw situatie relevant is.</p>
 <h3>Passende arbeid en loonwaarde hangen samen</h3>
 <p>Is een functie passend, maar met een lagere productiviteit dan gangbaar? Dan komt al snel de vraag naar <a class="blog-link" onclick="openArtikel('loonwaardeonderzoek')">loonwaarde</a> om de hoek kijken: een logisch vervolg op de vaststelling dat werk passend is.</p>
-<p>Twijfel je of een functie passend is? <a class="blog-link" onclick="setView('offerte')">Laat het objectief beoordelen</a>.</p>
+<p>Twijfel je of een functie passend is? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Laat het objectief beoordelen</a>.</p>
 <h3>Hoeveel reistijd wordt redelijk geacht?</h3>
 <p>Er bestaat geen harde wettelijke norm, maar in de praktijk wordt vaak uitgegaan van een reistijd die vergelijkbaar is met wat gangbaar is in de regio en functie, doorgaans niet meer dan zo'n anderhalf uur enkele reis, tenzij bijzondere omstandigheden (zoals beperkte mobiliteit) een kortere afstand rechtvaardigen.</p>
 <h3>Een voorbeeld van een afweging</h3>
 <p>Een functie die qua taken en belasting perfect aansluit, maar op twee uur reizen ligt terwijl er vergelijkbare functies dichterbij bestaan, wordt in de regel niet als enige passende optie beschouwd. De arbeidsdeskundige weegt dit soort praktische factoren nadrukkelijk mee naast de zuiver functionele match.</p>
 <h3>Wat als er geen enkele passende functie bestaat?</h3>
 <p>Blijkt na grondig onderzoek dat geen enkele functie, bij de eigen werkgever of daarbuiten, passend is, dan kan sprake zijn van marginale mogelijkheden. Dat vraagt om een zorgvuldige, aparte onderbouwing, vaak richting een deskundigenoordeel of IVA-traject.</p>
-<p>Twijfel je of een aangeboden functie daadwerkelijk passend is? <a class="blog-link" onclick="setView('offerte')">Laat dit objectief toetsen</a>.</p>`,
+<p>Twijfel je of een aangeboden functie daadwerkelijk passend is? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Laat dit objectief toetsen</a>.</p>`,
 
 "spoor2-kosten": `
 <h2>Wat kost een tweede spoor traject?</h2>
@@ -3837,15 +3866,15 @@ whk: `
 <h3>Waarom vroeg starten ook hier loont</h3>
 <p>Een tijdig gestart Spoor 2-traject is vaak goedkoper dan de kosten van een loonsanctie, al gauw een jaar extra loondoorbetaling. De investering in Spoor 2 verdient zichzelf in de praktijk vaak dubbel en dwars terug.</p>
 <h3>Reken het zelf door</h3>
-<p>Wil je weten wat vroeg starten in jouw situatie oplevert, inclusief het effect op de kans dat Spoor 2 nodig is? Gebruik onze <a class="blog-link" onclick="setView('calculator')">rekentool</a> die combineert tijdwinst met een geschat bespaarbedrag, gebaseerd op onder meer <a class="blog-link" onclick="openArtikel('vervroegd')">onderzoek naar vervroegde inzet</a>.</p>
-<p>Blijkt uit jouw arbeidsdeskundig onderzoek dat Spoor 2 nodig is? Vraag dit gewoon meteen mee aan bij je <a class="blog-link" onclick="setView('offerte')">offerte-aanvraag</a> dan sluit het naadloos op elkaar aan.</p>
+<p>Wil je weten wat vroeg starten in jouw situatie oplevert, inclusief het effect op de kans dat Spoor 2 nodig is? Gebruik onze <a class="blog-link" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">rekentool</a> die combineert tijdwinst met een geschat bespaarbedrag, gebaseerd op onder meer <a class="blog-link" onclick="openArtikel('vervroegd')">onderzoek naar vervroegde inzet</a>.</p>
+<p>Blijkt uit jouw arbeidsdeskundig onderzoek dat Spoor 2 nodig is? Vraag dit gewoon meteen mee aan bij je <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">offerte-aanvraag</a> dan sluit het naadloos op elkaar aan.</p>
 <h3>Een indicatieve kostenopbouw</h3>
 <p>Reken bij een gemiddeld traject van 9 tot 12 maanden op een combinatie van intake- en diagnosekosten, maandelijkse coachingsuren, en eventuele scholingskosten. Een compleet traject met sollicitatiebegeleiding tot en met plaatsing kost doorgaans enkele duizenden euro's in totaal, verspreid over de looptijd.</p>
 <h3>No-cure-no-pay: wat betekent dat precies?</h3>
 <p>Bij een no-cure-no-pay constructie betaalt de werkgever pas (volledig) bij een succesvolle plaatsing. Dit verlaagt het financiële risico, maar betekent niet automatisch dat het traject goedkoper is, vraag altijd na hoe het tarief bij succes is opgebouwd.</p>
 <h3>Scholing binnen Spoor 2</h3>
 <p>Soms is aanvullende scholing nodig om kansrijk te zijn op een nieuwe functie. Hiervoor bestaan losse subsidiemogelijkheden, los van het reguliere Spoor 2-budget, de coach van Best Match Re-integratie brengt dit gericht in kaart per dossier.</p>
-<p>Wil je een indicatie voor jouw specifieke situatie? <a class="blog-link" onclick="setView('offerte')">Vraag dit gelijk mee aan</a>.</p>`,
+<p>Wil je een indicatie voor jouw specifieke situatie? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag dit gelijk mee aan</a>.</p>`,
 
 "bezwaar-wia": `
 <h2>Bezwaar maken tegen een WIA-beslissing</h2>
@@ -3865,14 +3894,14 @@ whk: `
 <p>Loop je al tegen een discussie aan vóórdat er een formele beslissing ligt, dan is een <a class="blog-link" onclick="openArtikel('deskundigenoordeel')">deskundigenoordeel</a> vaak een sneller en lichter instrument dan een bezwaarprocedure. Ligt er al een WIA-beslissing waar je het niet mee eens bent, dan is bezwaar de juiste route.</p>
 <h3>Wat gebeurt er na een gegrond bezwaar?</h3>
 <p>UWV herziet de beslissing, wat kan leiden tot een aangepast uitkeringspercentage of, in specifieke gevallen, een heroverweging richting <a class="blog-link" onclick="openArtikel('iva-uitkering')">IVA</a>.</p>
-<p>Overweeg je bezwaar? <a class="blog-link" onclick="setView('offerte')">Vraag snel een onderbouwend onderzoek aan</a> we pakken pro-forma bezwaren doorgaans binnen een week op.</p>
+<p>Overweeg je bezwaar? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag snel een onderbouwend onderzoek aan</a> we pakken pro-forma bezwaren doorgaans binnen een week op.</p>
 <h3>En als het bezwaar wordt afgewezen?</h3>
 <p>Wijst UWV het bezwaar af, dan staat beroep open bij de rechtbank, binnen 6 weken na de bezwaarbeslissing. Ook in deze fase is een onafhankelijk, actueel arbeidsdeskundig rapport vaak essentieel voor de onderbouwing.</p>
 <h3>Kosten van een bezwaarprocedure</h3>
 <p>Het indienen van bezwaar bij UWV is gratis. Bij een beroepsprocedure bij de rechtbank is griffierecht verschuldigd; wint de zaak, dan kan dit bedrag (deels) worden vergoed via een proceskostenvergoeding.</p>
 <h3>Hoe lang duurt de hele procedure?</h3>
 <p>Een bezwaarprocedure duurt doorgaans enkele weken tot enkele maanden; een eventuele beroepsprocedure kan nog eens maanden extra vergen. Hoe vollediger en actueler de onderbouwing bij het eerste bezwaar, hoe groter de kans op een snellere, gunstige uitkomst.</p>
-<p>Overweeg je bezwaar tegen een WIA-beslissing? <a class="blog-link" onclick="setView('offerte')">Laat je dossier tijdig beoordelen</a>.</p>`,
+<p>Overweeg je bezwaar tegen een WIA-beslissing? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Laat je dossier tijdig beoordelen</a>.</p>`,
 
 "werknemer-zelf-aanvragen": `
 <h2>Kun je als werknemer zelf een onderzoek aanvragen?</h2>
@@ -3889,14 +3918,14 @@ whk: `
 <p>Dan biedt een <a class="blog-link" onclick="openArtikel('deskundigenoordeel')">deskundigenoordeel bij UWV</a> vaak uitkomst: met het arbeidsdeskundig rapport als stevige onderbouwing.</p>
 <h3>Wat mag je als werknemer verwachten?</h3>
 <p>Recht op een onafhankelijke beoordeling, een rapport dat objectief kijkt naar wat wél mogelijk is (niet alleen naar beperkingen), en, waar relevant, een heldere toelichting op wat dit betekent voor <a class="blog-link" onclick="openArtikel('passende-arbeid')">passende arbeid</a> binnen jouw traject.</p>
-<p><a class="blog-link" onclick="setView('offerte')">Vraag zelf een onderzoek aan</a> als je hier behoefte aan hebt.</p>
+<p><a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag zelf een onderzoek aan</a> als je hier behoefte aan hebt.</p>
 <h3>Wie betaalt als de werknemer zelf aanvraagt?</h3>
 <p>In de meeste gevallen ligt de kostenverantwoordelijkheid voor re-integratie bij de werkgever, ook als het initiatief voor het onderzoek van de werknemer komt. Maak dit vooraf expliciet bespreekbaar om onduidelijkheid achteraf te voorkomen.</p>
 <h3>Wat als de werkgever niet meewerkt aan een door de werknemer aangevraagd onderzoek?</h3>
 <p>De werkgever heeft, net als de werknemer, een medewerkverplichting binnen de Wet Poortwachter. Werkt de werkgever structureel niet mee, bijvoorbeeld door geen functie-informatie te verstrekken, dan kan ook dit worden voorgelegd aan UWV via een <a class="blog-link" onclick="openArtikel('deskundigenoordeel')">deskundigenoordeel</a>.</p>
 <h3>Levert dit spanning op met de werkgever?</h3>
 <p>Dat hoeft niet. Een onafhankelijk onderzoek is bedoeld om objectiviteit toe te voegen aan het traject, niet om partijen tegenover elkaar te zetten. In veel gevallen werkt de uitkomst juist verhelderend voor beide partijen.</p>
-<p>Overweeg je zelf een onderzoek aan te vragen? <a class="blog-link" onclick="setView('offerte')">Neem vrijblijvend contact op</a>.</p>`,
+<p>Overweeg je zelf een onderzoek aan te vragen? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Neem vrijblijvend contact op</a>.</p>`,
 
 "iva-uitkering": `
 <h2>Wat is een IVA-uitkering?</h2>
@@ -3915,14 +3944,14 @@ whk: `
 <p>Waar een <a class="blog-link" onclick="openArtikel('loonsanctie')">WGA-onderzoek</a> zich richt op het beperken van het uitkeringspercentage vanuit resterende mogelijkheden, draait een IVA-onderbouwing juist om het aantonen dát die mogelijkheden structureel ontbreken. Beide routes vragen dus een net andere insteek van hetzelfde arbeidsdeskundig onderzoek.</p>
 <h3>Niet eens met een afwijzing?</h3>
 <p>Dan kun je <a class="blog-link" onclick="openArtikel('bezwaar-wia')">bezwaar maken tegen de WIA-beslissing</a>, met een vernieuwd arbeidsdeskundig en medisch rapport als onderbouwing.</p>
-<p>Twijfel je of een IVA-richting van toepassing is? <a class="blog-link" onclick="setView('offerte')">Laat dit eerst goed onderzoeken</a>.</p>
+<p>Twijfel je of een IVA-richting van toepassing is? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Laat dit eerst goed onderzoeken</a>.</p>
 <h3>Hoe hoog is een IVA-uitkering?</h3>
 <p>Een IVA-uitkering bedraagt 75% van het (gemaximeerde) dagloon, ongeacht het arbeidsverleden, een gunstiger percentage dan bij een reguliere WGA-uitkering, waar de hoogte mede afhangt van de resterende verdiencapaciteit en het arbeidsverleden.</p>
 <h3>Wordt een IVA-uitkering nog herbeoordeeld?</h3>
 <p>In beginsel niet standaard periodiek, omdat duurzaamheid nu juist het uitgangspunt is. UWV kan wel een herbeoordeling initiëren als er concrete signalen zijn dat de situatie is gewijzigd, bijvoorbeeld bij een medische doorbraak in de behandeling.</p>
 <h3>IVA versus WGA: het financiële verschil voor de werkgever</h3>
 <p>Voor eigenrisicodragers WGA is een IVA-toekenning vaak gunstiger dan WGA-instroom, omdat de IVA buiten de WGA-schadelast valt die de <a class="blog-link" onclick="openArtikel('whk')">WHK-premie</a> beïnvloedt. Een goed onderbouwde IVA-aanvraag kan dus ook premietechnisch relevant zijn.</p>
-<p>Speelt een mogelijke IVA-aanvraag in jouw dossier? <a class="blog-link" onclick="setView('offerte')">Vraag een onderbouwend onderzoek aan</a>.</p>`,
+<p>Speelt een mogelijke IVA-aanvraag in jouw dossier? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onderbouwend onderzoek aan</a>.</p>`,
 
 "casus-complex-wga": `
 <p style="font-size:.8rem; color:var(--muted2); font-style:italic; margin-top:-8px;">Namen en details in deze casus zijn gefingeerd en samengesteld uit vergelijkbare situaties binnen onze 1.500+ uitgevoerde onderzoeken, ter bescherming van de privacy van betrokkenen.</p>
@@ -3934,7 +3963,7 @@ whk: `
 <p>In plaats van de eerdere generieke conclusie over te nemen, voerden we een gedetailleerde sector-voor-sector analyse uit: welke specifieke taken waren, ondanks de combinatie van beperkingen, wél haalbaar? Daaruit kwamen concrete mogelijkheden naar voren in rustige, goed gestructureerde omgevingen met beperkte tijdsdruk.</p>
 <h2>Waarde van het onderzoek</h2>
 <p>Deze grondigere analyse voorkwam een te snelle, onterechte conclusie dat er geen benutbare mogelijkheden meer waren. Voor Erik betekende dit reëel perspectief op passend werk in plaats van definitieve uitsluiting van de arbeidsmarkt, en voor de eigenrisicodrager een onderbouwing die een IVA-traject (dat hier niet gerechtvaardigd zou zijn geweest) voorkwam.</p>
-<p>Herken je een vergelijkbaar complex dossier? <a class="blog-link" onclick="openArtikel('loonsanctie')">Lees meer over WGA-onderzoek</a> of <a class="blog-link" onclick="setView('offerte')">vraag een onderzoek aan</a>.</p>
+<p>Herken je een vergelijkbaar complex dossier? <a class="blog-link" onclick="openArtikel('loonsanctie')">Lees meer over WGA-onderzoek</a> of <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">vraag een onderzoek aan</a>.</p>
 <h3>Waarom een snelle conclusie hier zo verleidelijk was</h3>
 <p>Bij een dossier met meerdere, elkaar versterkende beperkingen ligt een generieke conclusie ("geen mogelijkheden meer") voor de hand, simpelweg omdat een sector-voor-sector analyse aanzienlijk meer tijd kost. In dit dossier bleek precies die extra tijdsinvestering het verschil te maken tussen een onterechte IVA-uitsluiting van de arbeidsmarkt en een reëel, passend functieprofiel.</p>
 <h3>Herkenbaar patroon?</h3>
@@ -3954,7 +3983,7 @@ whk: `
 <h3>Hoeveel tijd dit daadwerkelijk bespaarde</h3>
 <p>Vergelijkbare driehoeksdossiers waarin de verantwoordelijkheid pas tijdens het traject wordt uitgezocht, lopen in de praktijk al snel 4 tot 6 weken vertraging op, uitsluitend door onderling overleg tussen payrollbedrijf en zorginstelling. Door dit al bij de intake helder te krijgen, ging in dit dossier geen enkele week verloren aan die discussie.</p>
 <h3>Herkenbaar patroon?</h3>
-<p>Drie-partijenconstructies, payrollbedrijf, feitelijke werkplek en medewerker, leiden vaker tot vertraging door onduidelijke verantwoordelijkheid dan door inhoudelijke onenigheid. Dit vooraf helder vastleggen is verreweg de meest effectieve manier om dit te voorkomen.</p><p style="margin-top:14px;">Speelt dit in een van jouw payroll- of driehoeksdossiers? <a class="blog-link" onclick="setView('offerte')">Vraag een onderzoek aan</a>.</p>`,
+<p>Drie-partijenconstructies, payrollbedrijf, feitelijke werkplek en medewerker, leiden vaker tot vertraging door onduidelijke verantwoordelijkheid dan door inhoudelijke onenigheid. Dit vooraf helder vastleggen is verreweg de meest effectieve manier om dit te voorkomen.</p><p style="margin-top:14px;">Speelt dit in een van jouw payroll- of driehoeksdossiers? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onderzoek aan</a>.</p>`,
 
 "casus-fysiek-bouw": `
 <p style="font-size:.8rem; color:var(--muted2); font-style:italic; margin-top:-8px;">Namen en details in deze casus zijn gefingeerd en samengesteld uit vergelijkbare situaties binnen onze 1.500+ uitgevoerde onderzoeken, ter bescherming van de privacy van betrokkenen.</p>
@@ -3966,7 +3995,7 @@ whk: `
 <p>Precies om deze reden kozen we hier voor een <strong>fysiek onderzoek</strong>: de arbeidsdeskundige bracht een dag door op de bouwplaats, observeerde het werk in de praktijk en sprak ter plekke met zowel Marco als zijn leidinggevende. Dat leverde een veel scherper beeld op dan een onderzoek op afstand ooit had kunnen geven.</p>
 <h2>Waarde van het onderzoek</h2>
 <p>De objectieve, op locatie vastgestelde belasting nam de discussie tussen werkgever en werknemer weg. Beide partijen accepteerden de uitkomst, omdat die zichtbaar op de werkelijke situatie was gebaseerd, niet op een inschatting van papier. Dit is precies het type situatie waarin fysiek onderzoek geen kwestie van voorkeur is, maar van noodzaak.</p>
-<p>Twijfel je of jouw situatie ook om een fysiek bezoek vraagt? <a class="blog-link" onclick="setView('advies', {tool:'keuzehulp'})">Doe de gratis keuzehulp</a>.</p>
+<p>Twijfel je of jouw situatie ook om een fysiek bezoek vraagt? <a class="blog-link" href="/keuzehulp?tool=keuzehulp" onclick="event.preventDefault(); setView('advies', {tool:'keuzehulp'})">Doe de gratis keuzehulp</a>.</p>
 <h3>Wat een online onderzoek hier had gemist</h3>
 <p>Bij navraag bleek dat de werkgever de belasting inschatte op basis van de functieomschrijving op papier, terwijl de daadwerkelijke belasting sterk varieerde per locatie en type klus. Een online gesprek had dit verschil vermoedelijk niet blootgelegd, precies omdat de kern van de discussie zat in wat er upzichtbaar mist in een beschrijving, en pas zichtbaar wordt op locatie zelf.</p>
 <h3>Herkenbaar patroon?</h3>
@@ -3986,7 +4015,7 @@ whk: `
 <h3>Wat dit dossier onderscheidt van een regulier traject</h3>
 <p>Bij een langer dienstverband had de arbeidsdeskundige kunnen terugvallen op eerdere functioneringsgesprekken of verzuimhistorie. Hier ontbrak dat volledig, het onderzoek moest dus vrijwel geheel steunen op het gesprek zelf en de actuele situatie. Dat maakte snelheid niet alleen wenselijk, maar ook methodisch de enige haalbare route.</p>
 <h3>Herkenbaar patroon?</h3>
-<p>Bij korte dienstverbanden met weinig dossierhistorie loont snelheid extra: hoe korter de voorgeschiedenis, hoe minder er te "inhalen" valt als vroeg wordt gestart. Voor eigenrisicodragers Ziektewet is dit vaak het verschil tussen een kort en een langdurig ZW-flex-dossier.</p><p style="margin-top:14px;">Wil je hetzelfde tempo in jouw ZW-flex-dossiers? <a class="blog-link" onclick="setView('offerte')">Vraag een offerte aan</a>.</p>`,
+<p>Bij korte dienstverbanden met weinig dossierhistorie loont snelheid extra: hoe korter de voorgeschiedenis, hoe minder er te "inhalen" valt als vroeg wordt gestart. Voor eigenrisicodragers Ziektewet is dit vaak het verschil tussen een kort en een langdurig ZW-flex-dossier.</p><p style="margin-top:14px;">Wil je hetzelfde tempo in jouw ZW-flex-dossiers? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een offerte aan</a>.</p>`,
 
 "casus-werknemer-initiatief": `
 <p style="font-size:.8rem; color:var(--muted2); font-style:italic; margin-top:-8px;">Namen en details in deze casus zijn gefingeerd en samengesteld uit vergelijkbare situaties binnen onze 1.500+ uitgevoerde onderzoeken, ter bescherming van de privacy van betrokkenen.</p>
@@ -4002,7 +4031,7 @@ whk: `
 <h3>Waarom onafhankelijkheid hier de sleutel was</h3>
 <p>Had de werkgever het onderzoek aangevraagd, dan was de kans reëel dat Tom de uitkomst met wantrouwen had ontvangen, ongeacht hoe objectief die was. Doordat het initiatief van Tom zelf kwam, kon niemand de conclusie wegzetten als "in opdracht van de werkgever bedacht", wat de acceptatie van de uitkomst aanzienlijk vergemakkelijkte.</p>
 <h3>Herkenbaar patroon?</h3>
-<p>Vastgelopen dossiers ontstaan zelden door onwil, maar vaker door een gebrek aan gedeeld, objectief beeld. Een onafhankelijk onderzoek, ongeacht wie het initiatief neemt, verlegt de discussie vrijwel altijd van standpunten naar concrete vervolgstappen.</p><p style="margin-top:14px;">Loopt een dossier vast door gebrek aan overeenstemming? <a class="blog-link" onclick="setView('offerte')">Vraag een onafhankelijk onderzoek aan</a>.</p>`,
+<p>Vastgelopen dossiers ontstaan zelden door onwil, maar vaker door een gebrek aan gedeeld, objectief beeld. Een onafhankelijk onderzoek, ongeacht wie het initiatief neemt, verlegt de discussie vrijwel altijd van standpunten naar concrete vervolgstappen.</p><p style="margin-top:14px;">Loopt een dossier vast door gebrek aan overeenstemming? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onafhankelijk onderzoek aan</a>.</p>`,
 
 "casus-iva-duurzaam": `
 <p style="font-size:.8rem; color:var(--muted2); font-style:italic; margin-top:-8px;">Namen en details in deze casus zijn gefingeerd en samengesteld uit vergelijkbare situaties binnen onze 1.500+ uitgevoerde onderzoeken, ter bescherming van de privacy van betrokkenen.</p>
@@ -4018,7 +4047,7 @@ whk: `
 <h3>Waarom terughoudendheid hier essentieel was</h3>
 <p>Een te snelle IVA-conclusie na de eerste mislukte poging had net zo goed onterecht kunnen zijn als een vierde, kansloze Spoor 2-poging. Pas na een grondige analyse van het patroon achter alle eerdere pogingen, en een expliciete, strikte bevestiging van de bedrijfsarts, werd de IVA-route ingeslagen. Die zorgvuldigheid nam meer tijd, maar voorkwam een onderbouwing die bij een eventuele toetsing niet had standgehouden.</p>
 <h3>Herkenbaar patroon?</h3>
-<p>Herhaalde, telkens vastlopende Spoor 2-pogingen zijn vaak een signaal dat de onderliggende duurzaamheid van de beperkingen nog niet scherp genoeg is onderzocht. Eerder een gedegen IVA-afweging maken, bespaart dan niet alleen tijd, maar voorkomt ook onnodige teleurstelling voor de werknemer.</p><p style="margin-top:14px;">Twijfel je of een IVA-traject in jouw dossier haalbaar is? <a class="blog-link" onclick="setView('offerte')">Vraag een onderzoek aan</a>.</p>`,
+<p>Herhaalde, telkens vastlopende Spoor 2-pogingen zijn vaak een signaal dat de onderliggende duurzaamheid van de beperkingen nog niet scherp genoeg is onderzocht. Eerder een gedegen IVA-afweging maken, bespaart dan niet alleen tijd, maar voorkomt ook onnodige teleurstelling voor de werknemer.</p><p style="margin-top:14px;">Twijfel je of een IVA-traject in jouw dossier haalbaar is? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onderzoek aan</a>.</p>`,
 
 "casus-bezwaar-succesvol": `
 <p style="font-size:.8rem; color:var(--muted2); font-style:italic; margin-top:-8px;">Namen en details in deze casus zijn gefingeerd en samengesteld uit vergelijkbare situaties binnen onze 1.500+ uitgevoerde onderzoeken, ter bescherming van de privacy van betrokkenen.</p>
@@ -4034,7 +4063,7 @@ whk: `
 <h3>Hoeveel tijd de pro-forma route won</h3>
 <p>Door eerst een pro-forma bezwaar in te dienen, ontstond ruimte om de herbeoordeling zorgvuldig uit te voeren zonder de bezwaartermijn te overschrijden. Zonder die tussenstap had de werkgever gedwongen geweest om binnen de reguliere 6 weken een volledige, inhoudelijke onderbouwing te leveren, een tijdsdruk die de kwaliteit van het nieuwe rapport had kunnen ondermijnen.</p>
 <h3>Herkenbaar patroon?</h3>
-<p>WIA-beoordelingen die zijn gebaseerd op een gedateerd arbeidsdeskundig rapport zijn een van de meest voorkomende, en goed te herstellen, redenen voor een succesvol bezwaar. Een frisse, actuele herbeoordeling is vaak al voldoende om een reëel verschil te maken.</p><p style="margin-top:14px;">Overweeg je bezwaar tegen een WIA-beslissing? <a class="blog-link" onclick="setView('offerte')">Laat je dossier beoordelen</a>.</p>`,
+<p>WIA-beoordelingen die zijn gebaseerd op een gedateerd arbeidsdeskundig rapport zijn een van de meest voorkomende, en goed te herstellen, redenen voor een succesvol bezwaar. Een frisse, actuele herbeoordeling is vaak al voldoende om een reëel verschil te maken.</p><p style="margin-top:14px;">Overweeg je bezwaar tegen een WIA-beslissing? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Laat je dossier beoordelen</a>.</p>`,
 
 "casus-60plus": `
 <p style="font-size:.8rem; color:var(--muted2); font-style:italic; margin-top:-8px;">Namen en details in deze casus zijn gefingeerd en samengesteld uit vergelijkbare situaties binnen onze 1.500+ uitgevoerde onderzoeken, ter bescherming van de privacy van betrokkenen.</p>
@@ -4050,7 +4079,7 @@ whk: `
 <h3>Waarom de combinatie hier de uitkomst bepaalde</h3>
 <p>Was er uitsluitend gekozen voor de vereenvoudigde 60+-claimbeoordeling, dan was Hendrika's kans op daadwerkelijke herplaatsing niet volledig benut. Was er uitsluitend gekozen voor een volwaardig Spoor 2-traject, dan liep de werkgever het risico op een te zware, onrealistische toetsing achteraf. De combinatie van beide bleek in de praktijk de enige aanpak die recht deed aan zowel de resterende mogelijkheden als de realistische arbeidsmarktpositie.</p>
 <h3>Herkenbaar patroon?</h3>
-<p>Bij 60-plussers wordt de vereenvoudigde claimbeoordeling regelmatig over het hoofd gezien, terwijl deze, gecombineerd met een regulier Spoor 2-traject, vaak tot een sneller én realistischer traject leidt dan een volledig zware toetsing.</p><p style="margin-top:14px;">Speelt dit bij een 60-plusser in jouw organisatie? <a class="blog-link" onclick="setView('offerte')">Vraag een onderzoek aan</a>.</p>`,
+<p>Bij 60-plussers wordt de vereenvoudigde claimbeoordeling regelmatig over het hoofd gezien, terwijl deze, gecombineerd met een regulier Spoor 2-traject, vaak tot een sneller én realistischer traject leidt dan een volledig zware toetsing.</p><p style="margin-top:14px;">Speelt dit bij een 60-plusser in jouw organisatie? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onderzoek aan</a>.</p>`,
 
 "casus-loonwaarde-spoor1": `
 <p style="font-size:.8rem; color:var(--muted2); font-style:italic; margin-top:-8px;">Namen en details in deze casus zijn gefingeerd en samengesteld uit vergelijkbare situaties binnen onze 1.500+ uitgevoerde onderzoeken, ter bescherming van de privacy van betrokkenen.</p>
@@ -4066,7 +4095,7 @@ whk: `
 <h3>Wat als de loonwaardemeting was overgeslagen?</h3>
 <p>Zonder een objectief percentage had de werkgever waarschijnlijk moeten kiezen tussen twee ongewenste opties: Bas op basis van een schatting toch het volledige loon betalen voor een lagere productiviteit, of de aangepaste functie afwijzen als financieel niet haalbaar. De meting maakte een derde, beter onderbouwde weg mogelijk, inclusief een reëel gesprek over eventuele loonkostensubsidie.</p>
 <h3>Herkenbaar patroon?</h3>
-<p>Een aangepaste, lichtere functie binnen de eigen organisatie wordt vaak te snel als "niet haalbaar" bestempeld, terwijl een concrete loonwaardemeting juist kan aantonen dat een functie financieel en praktisch wél werkbaar is, voor beide partijen.</p><p style="margin-top:14px;">Benieuwd of een aangepaste functie financieel haalbaar is? <a class="blog-link" onclick="setView('offerte')">Vraag een loonwaardeonderzoek aan</a>.</p>`,
+<p>Een aangepaste, lichtere functie binnen de eigen organisatie wordt vaak te snel als "niet haalbaar" bestempeld, terwijl een concrete loonwaardemeting juist kan aantonen dat een functie financieel en praktisch wél werkbaar is, voor beide partijen.</p><p style="margin-top:14px;">Benieuwd of een aangepaste functie financieel haalbaar is? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een loonwaardeonderzoek aan</a>.</p>`,
 
 "casus-deskundigenoordeel-taalbarriere": `
 <p style="font-size:.8rem; color:var(--muted2); font-style:italic; margin-top:-8px;">Namen en details in deze casus zijn gefingeerd en samengesteld uit vergelijkbare situaties binnen onze 1.500+ uitgevoerde onderzoeken, ter bescherming van de privacy van betrokkenen.</p>
@@ -4084,7 +4113,7 @@ whk: `
 <h3>Herkenbaar patroon?</h3>
 <p>Taalbarrières worden soms verward met inhoudelijke onwil of onduidelijkheid over mogelijkheden. Onderzoek mét tolk, gevolgd door een objectief deskundigenoordeel bij aanhoudende discussie, voorkomt dat een communicatieprobleem escaleert tot een inhoudelijk geschil.</p><p>Deze casus gaat over de communicatie tijdens het onderzoek, met een tolk. Hoe taalniveau meeweegt bij de functie zelf, in het arbeidsdeskundig onderzoek en bij UWV-functieduiding, lees je in <a class="blog-link" href="/kennisbank/taalbeheersing-passende-functies-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('taalbeheersing-passende-functies-arbeidsdeskundige')">taalbeheersing en passende functies</a>.</p>
 <p>Hoe een onderzoek met een professionele tolk, beëdigd indien nodig, verloopt, lees je op <a class="blog-link" href="/arbeidsdeskundige-met-tolk" onclick="event.preventDefault(); setView('tolk')">arbeidsdeskundige met tolk</a>.</p>
-<p style="margin-top:14px;">Speelt een taalbarrière in jouw dossier een rol? <a class="blog-link" onclick="setView('offerte')">Vraag een onderzoek mét tolk aan</a>.</p>`,
+<p style="margin-top:14px;">Speelt een taalbarrière in jouw dossier een rol? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onderzoek mét tolk aan</a>.</p>`,
 
 "fml-uitleg": `
 <h2>Wat is een Functionele Mogelijkhedenlijst?</h2>
@@ -4102,14 +4131,14 @@ whk: `
 <p>De arbeidsdeskundige toetst een functie of functieomschrijving aan de FML: welke taken vallen binnen de grenzen, en welke niet? Bij twijfel over de juistheid van een FML kan een <a class="blog-link" onclick="openArtikel('deskundigenoordeel')">deskundigenoordeel</a> bij UWV worden aangevraagd.</p>
 <h3>FML versus LAB, BML en IZP</h3>
 <p>Naast de FML bestaan varianten zoals de LAB (voor mensen boven de 65), BML en IZP, deze werken volgens hetzelfde principe, maar zijn toegesneden op specifieke doelgroepen of situaties. Werk je bij HR of als casemanager en moet je zo'n document lezen zonder medische achtergrond? Lees <a class="blog-link" onclick="openArtikel('fml-izp-lezen-belastbaarheid')">hoe je een FML of IZP leest en wat belastbaarheid betekent voor re-integratie</a>.</p>
-<p>Heb je een FML nodig als basis voor je arbeidsdeskundig onderzoek? <a class="blog-link" onclick="setView('offerte')">Vraag vrijblijvend een offerte aan</a>.</p>
+<p>Heb je een FML nodig als basis voor je arbeidsdeskundig onderzoek? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag vrijblijvend een offerte aan</a>.</p>
 <h3>Hoe lang is een FML geldig?</h3>
 <p>Een FML heeft geen vaste wettelijke geldigheidsduur, maar wordt in de praktijk geacht actueel te zijn zolang de situatie ongewijzigd is. Verandert de belastbaarheid, door herstel, verslechtering of een nieuwe diagnose, dan moet de bedrijfsarts een nieuwe FML opstellen. Een verouderde FML is een veelgemaakte fout in dossiers die richting de WIA-aanvraag gaan. Voor HR: <a class="blog-link" href="/kennisbank/belastbaarheid-verouderd-nieuwe-fml-izp" onclick="event.preventDefault(); openArtikel('belastbaarheid-verouderd-nieuwe-fml-izp')">wanneer je geen onderzoek start zonder nieuwe FML of IZP</a>.</p>
 <h3>Een voorbeeld: hoe een FML in de praktijk werkt</h3>
 <p>Staat er in de FML een beperking op "dynamisch tillen tot maximaal 5 kilo", dan toetst de arbeidsdeskundige elke taak in de functieomschrijving hieraan. Functies die structureel zwaarder tillen vereisen, vallen dan af, tenzij een aanpassing (zoals een hulpmiddel) de belasting binnen die grens brengt.</p>
 <h3>Wat als werkgever en werknemer het niet eens zijn over de FML?</h3>
 <p>De FML zelf staat niet ter discussie tussen werkgever en werknemer, die wordt uitsluitend door de bedrijfsarts vastgesteld. Bij twijfel over de juistheid kan een <a class="blog-link" onclick="openArtikel('deskundigenoordeel')">deskundigenoordeel</a> bij UWV worden aangevraagd, dat een onafhankelijke medische herbeoordeling omvat.</p>
-<p>Wil je weten hoe een FML zich vertaalt naar concrete arbeidsmogelijkheden? <a class="blog-link" onclick="setView('offerte')">Vraag een arbeidsdeskundig onderzoek aan</a>.</p>`,
+<p>Wil je weten hoe een FML zich vertaalt naar concrete arbeidsmogelijkheden? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een arbeidsdeskundig onderzoek aan</a>.</p>`,
 
 "fml-izp-lezen-belastbaarheid": `
 <h2>Je krijgt een FML of IZP, en nu?</h2>
@@ -4167,7 +4196,7 @@ whk: `
 </ul>
 <h2>Klaar voor de volgende stap?</h2>
 <p>Heb je een FML of IZP en is onduidelijk of het eigen werk nog past? Dat is precies het moment waarop een arbeidsdeskundig onderzoek duidelijkheid geeft, voor HR, de medewerker én het dossier richting UWV. Matchvermogen (arbeidsdeskundig.com) vertaalt de belastbaarheid naar concrete mogelijkheden, online of fysiek.</p>
-<p>Wil je weten wat er in jouw situatie nog mogelijk is? <a class="blog-link" onclick="setView('offerte')">Vraag vrijblijvend een offerte aan</a> of <a class="blog-link" onclick="setView('aanmelden')">meld een onderzoek aan</a>. Weet je hoe je het document leest, maar niet wat je nú mag beslissen? Zie <a class="blog-link" href="/kennisbank/fml-izp-hr-beslissen-actualiseren" onclick="event.preventDefault(); openArtikel('fml-izp-hr-beslissen-actualiseren')">wat HR mag beslissen, en wanneer je actualiseert</a>. Liever eerst de basis? Lees <a class="blog-link" onclick="openArtikel('fml-uitleg')">wat er in een FML staat</a> of <a class="blog-link" onclick="openArtikel('wat-doet-arbeidsdeskundige')">wat een arbeidsdeskundige doet</a>.</p>`,
+<p>Wil je weten wat er in jouw situatie nog mogelijk is? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag vrijblijvend een offerte aan</a> of <a class="blog-link" href="/aanmelden" onclick="event.preventDefault(); setView('aanmelden')">meld een onderzoek aan</a>. Weet je hoe je het document leest, maar niet wat je nú mag beslissen? Zie <a class="blog-link" href="/kennisbank/fml-izp-hr-beslissen-actualiseren" onclick="event.preventDefault(); openArtikel('fml-izp-hr-beslissen-actualiseren')">wat HR mag beslissen, en wanneer je actualiseert</a>. Liever eerst de basis? Lees <a class="blog-link" onclick="openArtikel('fml-uitleg')">wat er in een FML staat</a> of <a class="blog-link" onclick="openArtikel('wat-doet-arbeidsdeskundige')">wat een arbeidsdeskundige doet</a>.</p>`,
 
 "belastbaarheid-verouderd-nieuwe-fml-izp": `
 <h2>Belastbaarheid verouderd: wanneer start je geen arbeidsdeskundig onderzoek zonder nieuwe FML/IZP?</h2>
@@ -4318,14 +4347,14 @@ whk: `
 <p>De no-risk polis verlaagt de financiële drempel om iemand met een arbeidsbeperking aan te nemen, het risico van uitval ligt namelijk niet volledig bij de werkgever. Dit sluit vaak aan bij een <a class="blog-link" onclick="openArtikel('spoor2-kosten')">Spoor 2-traject</a>, waar een nieuwe werkgever gezocht wordt.</p>
 <h3>Aanvragen en voorwaarden</h3>
 <p>De no-risk polis geldt vaak automatisch bij een doelgroep-status, maar navraag bij UWV over de actuele voorwaarden is altijd verstandig, deze kunnen per situatie verschillen.</p>
-<p>Meer weten over hoe dit past bij jouw re-integratietraject? <a class="blog-link" onclick="setView('offerte')">Neem contact op</a>.</p>
+<p>Meer weten over hoe dit past bij jouw re-integratietraject? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Neem contact op</a>.</p>
 <h3>Hoe lang geldt de no-risk polis?</h3>
 <p>De no-risk polis geldt doorgaans voor een periode van vijf jaar vanaf de eerste werkdag, met de mogelijkheid tot verlenging in specifieke gevallen. Na afloop van deze termijn draagt de werkgever het reguliere ziekterisico weer zelf.</p>
 <h3>Verschil met loonkostenvoordeel</h3>
 <p>De no-risk polis en het <a class="blog-link" onclick="openArtikel('doelgroepregister')">loonkostenvoordeel (LKV)</a> worden vaak in één adem genoemd, maar zijn afzonderlijke regelingen: de no-risk polis compenseert loon bij ziekte, het LKV is een structurele tegemoetkoming in de loonkosten. Beide kunnen tegelijk van toepassing zijn.</p>
 <h3>Wie regelt de aanvraag?</h3>
 <p>Bij de meeste doelgroep-statussen geldt de no-risk polis automatisch, zonder aparte aanvraag. Bij twijfel of onduidelijkheid is het verstandig dit expliciet te laten bevestigen door UWV, vóórdat een dienstverband wordt aangegaan.</p>
-<p>Overweeg je iemand met een arbeidsbeperking aan te nemen? <a class="blog-link" onclick="setView('offerte')">Wij denken graag mee over de voorwaarden</a>.</p>`,
+<p>Overweeg je iemand met een arbeidsbeperking aan te nemen? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Wij denken graag mee over de voorwaarden</a>.</p>`,
 
 "35-min-regeling": `
 <h2>Wat is de 35-minregeling?</h2>
@@ -4336,14 +4365,14 @@ whk: `
 <p>Een zorgvuldig arbeidsdeskundig onderzoek is cruciaal om te onderbouwen of de grens van 35% terecht is vastgesteld, een te lage inschatting van beperkingen kan onterecht tot een 35-minoordeel leiden, met alle gevolgen van dien voor de werknemer.</p>
 <h3>Wat als de situatie verslechtert?</h3>
 <p>Een 35-minoordeel is niet definitief: bij verslechtering van de gezondheidssituatie kan een herbeoordeling alsnog tot een WGA-uitkering leiden.</p>
-<p>Twijfel je over een 35-minoordeel in jouw situatie? <a class="blog-link" onclick="setView('offerte')">Laat het opnieuw beoordelen</a>.</p>
+<p>Twijfel je over een 35-minoordeel in jouw situatie? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Laat het opnieuw beoordelen</a>.</p>
 <h3>Bezwaar tegen een 35-minoordeel</h3>
 <p>Ben je het niet eens met een 35-minoordeel, dan kun je binnen 6 weken bezwaar aantekenen bij UWV. Een onafhankelijk, actueel arbeidsdeskundig rapport is hierbij vaak doorslaggevend, omdat het de feitelijke belasting en belastbaarheid concreet naast elkaar zet. Lees ook <a class="blog-link" onclick="openArtikel('bezwaar-wia')">onze uitleg over bezwaar maken tegen een WIA-beslissing</a>.</p>
 <h3>Herbeoordeling bij verslechtering</h3>
 <p>Verslechtert de situatie na een 35-minoordeel, dan kan een herbeoordeling alsnog leiden tot een WGA-uitkering. Ook hier geldt: een tijdig en gedegen arbeidsdeskundig onderzoek onderbouwt of een herbeoordeling gegrond is.</p>
 <h3>Een praktijkvoorbeeld</h3>
 <p>Een werknemer met terugkerende rugklachten werd aanvankelijk op 28% arbeidsongeschikt beoordeeld, net onder de 35%-grens. Een vervolgonderzoek, uitgevoerd na een periode van verslechtering, bracht een structureel lagere belastbaarheid in kaart, wat na herbeoordeling alsnog tot een WGA-uitkering leidde.</p>
-<p>Twijfel je aan een 35-minoordeel in jouw dossier? <a class="blog-link" onclick="setView('offerte')">Laat dit onafhankelijk toetsen</a>.</p>`,
+<p>Twijfel je aan een 35-minoordeel in jouw dossier? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Laat dit onafhankelijk toetsen</a>.</p>`,
 
 "ontslag-tijdens-ziekte": `
 <h2>Mag je iemand ontslaan tijdens ziekte?</h2>
@@ -4359,14 +4388,14 @@ whk: `
 <p>Bij een ontslagprocedure die raakt aan de re-integratie-inspanningen, is een actueel arbeidsdeskundig rapport vaak onmisbaar: het toont aan wat er wel en niet is onderzocht, en onderbouwt of aan de wettelijke inspanningsverplichting is voldaan.</p>
 <h3>Wat als een tijdelijk contract afloopt tijdens ziekte?</h3>
 <p>Dan valt de werknemer vaak onder de <a class="blog-link" onclick="openArtikel('ziektewet')">Ziektewet</a> met een net iets andere aanpak van het arbeidsdeskundig onderzoek.</p>
-<p>Twijfel je over de juiste procedure? <a class="blog-link" onclick="setView('offerte')">Vraag vrijblijvend advies</a>.</p>
+<p>Twijfel je over de juiste procedure? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag vrijblijvend advies</a>.</p>
 <h3>Het slapend dienstverband: waarom dit vaak onverstandig is</h3>
 <p>Sommige werkgevers laten een dienstverband na 104 weken "slapend" voortbestaan om de transitievergoeding te ontlopen. Sinds de Wet compensatie transitievergoeding kan deze vergoeding echter door UWV worden gecompenseerd, waardoor slapend houden in de praktijk vaak geen financieel voordeel meer oplevert, en wel onnodige onzekerheid voor de werknemer.</p>
 <h3>De transitievergoeding na twee jaar ziekte</h3>
 <p>Bij beëindiging van het dienstverband na het einde van de wachttijd is de werkgever in beginsel een transitievergoeding verschuldigd, ook al is de werknemer nog ziek. Deze vergoeding kan, onder voorwaarden, worden gecompenseerd door UWV.</p>
 <h3>UWV-toestemming: wanneer nodig?</h3>
 <p>Bij bedrijfseconomisch ontslag tijdens ziekte is voorafgaande toestemming van UWV vereist via de ontslagprocedure. Een actueel arbeidsdeskundig rapport ondersteunt hierbij de onderbouwing dat aan de re-integratieverplichtingen is voldaan, wat de procedure aanzienlijk kan versoepelen.</p>
-<p>Speelt dit in jouw organisatie? <a class="blog-link" onclick="setView('offerte')">Laat het dossier tijdig checken</a>.</p>`,
+<p>Speelt dit in jouw organisatie? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Laat het dossier tijdig checken</a>.</p>`,
 
 "tweede-ziektejaar": `
 <h2>Wat verandert er in het tweede ziektejaar?</h2>
@@ -4377,14 +4406,14 @@ whk: `
 <p>Tenzij een uitzondering van toepassing is, moet uiterlijk in <a class="blog-link" onclick="openArtikel('poortwachter-tijdlijn')">week 78</a> van het tweede jaar een Spoor 2-traject zijn gestart. Dit is precies de reden waarom vroeg starten met een arbeidsdeskundig onderzoek zoveel uitmaakt.</p>
 <h3>Richting de WIA-aanvraag</h3>
 <p>Het tweede ziektejaar loopt uit op de voorbereiding van de <a class="blog-link" onclick="openArtikel('wia-aanvraag')">WIA-aanvraag</a> rond week 91-104: het moment waarop UWV de volledige re-integratie-inspanning van de afgelopen twee jaar toetst.</p>
-<p>Zit je in het tweede ziektejaar en twijfel je of je op schema ligt? <a class="blog-link" onclick="setView('calculator')">Bereken je tijdwinst</a>.</p>
+<p>Zit je in het tweede ziektejaar en twijfel je of je op schema ligt? <a class="blog-link" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">Bereken je tijdwinst</a>.</p>
 <h3>Praktische aandachtspunten voor werkgevers in jaar twee</h3>
 <p>Zorg dat het dossier na de eerstejaars-evaluatie actueel blijft: plan tussentijdse evaluatiemomenten, en wacht niet tot week 78 om spoor 2 te overwegen als spoor 1 stagneert. Een dossier dat pas in het tweede jaar voor het eerst kritisch wordt bekeken, biedt weinig ruimte meer om nog bij te sturen.</p>
 <h3>Wat verwacht UWV precies rond week 78?</h3>
 <p>UWV verwacht op dat moment een aantoonbare, actieve poging tot spoor 2, tenzij een concreet en onderbouwd perspectief op werkhervatting binnen spoor 1 bestaat, bevestigd door zowel bedrijfsarts als arbeidsdeskundige. Zonder die onderbouwing loop je het risico dat dit als onvoldoende inspanning wordt gezien bij de RIV-toets.</p>
 <h3>Richting het einde van de wachttijd</h3>
 <p>Vanaf week 91 bereidt het dossier zich voor op de WIA-aanvraag: alle eerdere stappen worden gebundeld in het re-integratieverslag. Een actueel arbeidsdeskundig rapport, dicht bij dit moment opgesteld, voorkomt dat UWV het dossier als gedateerd beoordeelt.</p>
-<p>Zit je middenin het tweede ziektejaar? <a class="blog-link" onclick="setView('calculator')">Bereken wat een tijdig onderzoek nu nog oplevert</a>.</p>`,
+<p>Zit je middenin het tweede ziektejaar? <a class="blog-link" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">Bereken wat een tijdig onderzoek nu nog oplevert</a>.</p>`,
 
 "werkplekaanpassingen-subsidie": `
 <h2>Financiering van werkplekaanpassingen</h2>
@@ -4399,14 +4428,14 @@ whk: `
 <p>Een arbeidsdeskundige onderbouwt in het rapport welke aanpassing nodig is en waarom, deze onderbouwing is vaak een vereiste bij de aanvraag van een UWV-voorziening.</p>
 <h3>Waarom vroeg aanvragen loont</h3>
 <p>De doorlooptijd van een aanvraag kan weken in beslag nemen. Vroeg in het traject al nagaan of een aanpassing nodig is, voorkomt vertraging in de daadwerkelijke werkhervatting.</p>
-<p>Twijfel je of een werkplekaanpassing jouw situatie kan oplossen? <a class="blog-link" onclick="setView('offerte')">Laat het onderzoeken</a>.</p>
+<p>Twijfel je of een werkplekaanpassing jouw situatie kan oplossen? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Laat het onderzoeken</a>.</p>
 <h3>Concrete voorbeelden per type beperking</h3>
 <p>Bij fysieke beperkingen gaat het vaak om een sta-zit-bureau, een aangepaste stoel of tiloplossingen. Bij visuele of auditieve beperkingen kan het gaan om aangepaste software of extra beeldschermen. Bij psychische klachten wordt eerder gedacht aan een prikkelarme werkplek of ruimte voor een jobcoach dan aan fysieke hulpmiddelen.</p>
 <h3>Het aanvraagproces in grote lijnen</h3>
 <p>Een aanvraag verloopt doorgaans in drie stappen: (1) de arbeidsdeskundige onderbouwt in het rapport welke aanpassing nodig is en waarom, (2) de aanvraag wordt bij UWV ingediend, door werkgever of werknemer, afhankelijk van het type voorziening, en (3) UWV beoordeelt en keert bij toekenning (deels) uit. Reken op enkele weken doorlooptijd voor de beoordeling.</p>
 <h3>Jobcoach: voorziening of maatwerk?</h3>
 <p>Een jobcoach wordt ingezet bij structurele begeleiding op de werkvloer, bijvoorbeeld bij een doelgroep-status. Dit is een aparte voorziening naast fysieke werkplekaanpassingen, en wordt eveneens vaak onderbouwd door de conclusies uit een arbeidsdeskundig onderzoek.</p>
-<p>Twijfel je of een werkplekaanpassing in jouw situatie vergoed kan worden? <a class="blog-link" onclick="setView('offerte')">Vraag een onderzoek aan</a>.</p>`,
+<p>Twijfel je of een werkplekaanpassing in jouw situatie vergoed kan worden? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onderzoek aan</a>.</p>`,
 
 "praktijkroute-wia": `
 <h2>Wat is de praktijkroute?</h2>
@@ -4417,14 +4446,14 @@ whk: `
 <p>De praktijkroute kan duidelijkheid en zekerheid bieden, omdat de beoordeling aansluit bij de werkelijkheid. Tegelijk vraagt dit dat er al een concrete werkplek is gerealiseerd, niet in elke situatie haalbaar of wenselijk.</p>
 <h3>De rol van de arbeidsdeskundige</h3>
 <p>De arbeidsdeskundige adviseert welke route het beste past, en documenteert het praktijkresultaat zorgvuldig richting UWV.</p>
-<p>Twijfel je welke route bij jouw situatie past? <a class="blog-link" onclick="setView('offerte')">Vraag advies aan</a>.</p>
+<p>Twijfel je welke route bij jouw situatie past? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag advies aan</a>.</p>
 <h3>Een voorbeeld uit de praktijk</h3>
 <p>Stel: iemand met fysieke beperkingen is via Spoor 2 succesvol geplaatst in een lichte administratieve functie bij een nieuwe werkgever. In plaats van dat UWV bij de WIA-beoordeling theoretische functies uit de hele arbeidsmarkt beoordeelt, wordt dan gekeken naar déze concrete, al gerealiseerde functie, inclusief het daadwerkelijke loon dat daarmee wordt verdiend.</p>
 <h3>Wanneer wijst UWV de praktijkroute af?</h3>
 <p>UWV accepteert de praktijkroute alleen als de gerealiseerde functie ook daadwerkelijk duurzaam en passend is, een tijdelijke of proefplaatsing telt in de regel niet automatisch mee. Ook moet de loonwaarde van de functie objectief zijn vastgesteld.</p>
 <h3>Bewijslast: praktijkroute versus theoretische schatting</h3>
 <p>Bij de theoretische schatting moet UWV aantonen dat passende functies in theorie bestaan; bij de praktijkroute ligt de nadruk op het aantonen dat de gerealiseerde functie representatief en bestendig is. Een gedegen arbeidsdeskundig rapport, inclusief loonwaardebepaling, is bij deze route onmisbaar.</p>
-<p>Werk je toe naar een WIA-beoordeling via de praktijkroute? <a class="blog-link" onclick="setView('offerte')">Laat de onderbouwing tijdig checken</a>.</p>`,
+<p>Werk je toe naar een WIA-beoordeling via de praktijkroute? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Laat de onderbouwing tijdig checken</a>.</p>`,
 
 "avg-arbeidsdeskundig": `
 <h2>Privacy en medische gegevens binnen een arbeidsdeskundig onderzoek</h2>
@@ -4439,14 +4468,14 @@ whk: `
 <p>De medische diagnose zelf, specifieke behandelinformatie, en andere gezondheidsgegevens die niet direct relevant zijn voor de arbeidsgeschiktheid.</p>
 <h3>Hoe wij hiermee omgaan</h3>
 <p>Bij een <a class="blog-link" onclick="openArtikel('online-fysiek')">online onderzoek</a> verloopt alle uitwisseling via een AVG-proof klantportaal, en rapportages worden zo geschreven dat medische details buiten beeld blijven bij de werkgever.</p>
-<p>Vragen over privacy binnen jouw traject? <a class="blog-link" onclick="setView('offerte')">Neem gerust contact op</a>.</p>
+<p>Vragen over privacy binnen jouw traject? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Neem gerust contact op</a>.</p>
 <h3>Wie binnen ons bureau heeft toegang tot medische gegevens?</h3>
 <p>Alleen de arbeidsdeskundige die het dossier behandelt heeft toegang tot de onderliggende medische stukken, zoals de FML. Collega's, planners of administratief personeel zien deze gegevens niet, toegang is rolgebaseerd geregeld, precies zoals de AVG dat voorschrijft bij verwerking van bijzondere persoonsgegevens.</p>
 <h3>Hoe lang worden gegevens bewaard?</h3>
 <p>Arbeidsdeskundige rapportages worden niet onbeperkt bewaard. Wij hanteren een bewaartermijn die aansluit bij het wettelijk vereiste (doorgaans enkele jaren na afronding van het traject, tenzij een langere termijn wettelijk verplicht is), waarna gegevens worden vernietigd. De exacte termijn wordt vooraf gecommuniceerd.</p>
 <h3>Welke rechten heeft de werknemer zelf?</h3>
 <p>Naast inzage heeft de werknemer recht op correctie van feitelijke onjuistheden, en, binnen de grenzen van het doel van het dossier, recht om bezwaar te maken tegen bepaalde verwerkingen. Deze rechten gelden los van wat de werkgever wel of niet mag weten.</p>
-<p>Vragen over privacy binnen jouw traject? <a class="blog-link" onclick="setView('offerte')">Neem contact op</a>.</p>`,
+<p>Vragen over privacy binnen jouw traject? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Neem contact op</a>.</p>`,
 
 "doelgroepregister": `
 <h2>Wat is het doelgroepregister?</h2>
@@ -4457,14 +4486,14 @@ whk: `
 <p>Meestal via een beoordeling door UWV, bijvoorbeeld na een WIA- of Wajong-traject, of via de banenafspraak. Een arbeidsdeskundig onderzoek kan hierbij de onderbouwing leveren dat iemand tot de doelgroep behoort.</p>
 <h3>Relevantie bij Spoor 2</h3>
 <p>Bij <a class="blog-link" onclick="openArtikel('spoor2')">Spoor 2-trajecten</a> is het doelgroepregister vaak relevant: het maakt kandidaten aantrekkelijker voor nieuwe werkgevers door de financiële voordelen die ermee gepaard gaan.</p>
-<p>Wil je weten of dit voor jouw situatie relevant is? <a class="blog-link" onclick="setView('offerte')">Vraag een onderzoek aan</a>.</p>
+<p>Wil je weten of dit voor jouw situatie relevant is? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onderzoek aan</a>.</p>
 <h3>Hoe lang sta je in het doelgroepregister?</h3>
 <p>Registratie is in beginsel niet tijdelijk: iemand blijft in het doelgroepregister staan zolang de onderliggende beoordeling (bijvoorbeeld een Wajong- of WIA-status) van kracht is. Bij structurele verbetering van de arbeidsmogelijkheden kan een herbeoordeling volgen.</p>
 <h3>Doelgroepregister versus 35-minregeling en no-risk polis</h3>
 <p>Deze drie regelingen raken elkaar, maar zijn niet hetzelfde. Het <a class="blog-link" onclick="openArtikel('35-min-regeling')">35-minoordeel</a> gaat over de mate van arbeidsongeschiktheid; de <a class="blog-link" onclick="openArtikel('no-risk-polis')">no-risk polis</a> compenseert het ziekterisico voor de werkgever; het doelgroepregister bepaalt recht op loonkostenvoordeel. Iemand kan in meerdere van deze regelingen tegelijk vallen.</p>
 <h3>Checken of iemand al geregistreerd staat</h3>
 <p>Werkgevers kunnen navragen bij UWV, of de werknemer kan dit zelf navragen via het eigen UWV-account. Bij twijfel is het raadzaam dit te checken vóórdat loonkostenvoordeel wordt aangevraagd, om terugvordering achteraf te voorkomen.</p>
-<p>Wil je weten of loonkostenvoordeel in jouw situatie kan worden benut? <a class="blog-link" onclick="setView('offerte')">Vraag advies aan</a>.</p>`,
+<p>Wil je weten of loonkostenvoordeel in jouw situatie kan worden benut? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag advies aan</a>.</p>`,
 
 "kosten-geen-onderzoek": `
 <h2>De prijs van uitstel</h2>
@@ -4478,15 +4507,15 @@ whk: `
 <h3>Een rekenvoorbeeld</h3>
 <p>Een loonsanctie van een jaar loon overtreft de investering vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek, al snel met een factor 20 tot 40, afhankelijk van het salaris. Zelfs een kleine kans op een loonsanctie rechtvaardigt daarmee al gauw de investering in een tijdig onderzoek.</p>
 <h3>Bereken het voor jouw situatie</h3>
-<p>Onze <a class="blog-link" onclick="setView('calculator')">rekentool</a> maakt dit verschil concreet: hoeveel tijd en geld je bespaart door nu te starten, in plaats van te wachten.</p>
-<p>Wacht niet langer. <a class="blog-link" onclick="setView('offerte')">Vraag vandaag nog een offerte aan</a>.</p>
+<p>Onze <a class="blog-link" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">rekentool</a> maakt dit verschil concreet: hoeveel tijd en geld je bespaart door nu te starten, in plaats van te wachten.</p>
+<p>Wacht niet langer. <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag vandaag nog een offerte aan</a>.</p>
 <h3>Meer dan alleen directe kosten</h3>
 <p>Naast loonsanctie en premie-effecten spelen indirecte kosten mee: een vastgelopen dossier kost tijd van HR en leidinggevenden, kan de relatie met de werknemer onder druk zetten, en vertraagt duidelijkheid voor iedereen. Deze kosten zijn moeilijker te becijferen, maar in de praktijk minstens zo reëel.</p>
 <h3>Het meerjarige effect via de WHK-premie</h3>
 <p>Instroom in de WGA of Ziektewet werkt door de T-2-systematiek pas na twee jaar door in de premie, en blijft vervolgens meerdere jaren invloed houden. Eén vermijdbaar dossier kan dus jarenlang een net iets hogere premie betekenen, een kostenpost die vaak wordt onderschat omdat het effect pas later zichtbaar wordt. Lees meer in <a class="blog-link" onclick="openArtikel('whk')">onze uitleg over de WHK-premie</a>.</p>
 <h3>Een vergelijking in cijfers</h3>
 <p>Zet de investering vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek, eens naast een gemiddeld dossier zonder tijdig onderzoek: een loonsanctie van een jaar salaris, plus enkele jaren een verhoogde WHK-premie, plus interne uren aan een vastgelopen dossier. Vrijwel altijd weegt tijdig onderzoek daar ruimschoots tegenop.</p>
-<p>Wacht niet langer. <a class="blog-link" onclick="setView('offerte')">Vraag vandaag nog een offerte aan</a>.</p>`,
+<p>Wacht niet langer. <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag vandaag nog een offerte aan</a>.</p>`,
 "burn-out-re-integratie": `
 <h2>Wat doet een arbeidsdeskundige bij burn-out?</h2>
 <p>Een arbeidsdeskundige brengt bij burn-out in kaart welke belastbaarheid iemand op dit moment heeft, en vertaalt dat naar een concreet, haalbaar re-integratiepad. Anders dan bij een fysieke blessure is er bij burn-out geen duidelijk medisch beeld met een vaste hersteltermijn, belastbaarheid bouwt geleidelijk en soms grillig op, en dat vraagt om een aanpak die daarop is afgestemd in plaats van een standaard stappenplan.</p>
@@ -4498,7 +4527,7 @@ whk: `
 <p>Bij burn-out adviseert de arbeidsdeskundige zelden een vast urenschema vanaf dag één. Gebruikelijker is een geleidelijke opbouw in kleine stappen, met ruimte om tussentijds bij te stellen: bijvoorbeeld starten met enkele uren administratief, prikkelarm werk, en pas later weer toewerken naar de oorspronkelijke functie of taken met meer druk en sociale interactie. De arbeidsdeskundige toetst daarbij expliciet of de belasting van de (aangepaste) functie aansluit bij wat iemand op dat moment daadwerkelijk aankan.</p>
 <h3>Wat als burn-out uitmondt in langdurige uitval?</h3>
 <p>Bij een deel van de dossiers blijft herstel achter bij de verwachting. Dan verschuift de rol van de arbeidsdeskundige: niet langer alleen opbouwbegeleiding, maar ook een eerlijke inschatting of spoor 1 haalbaar blijft, of dat tijdig moet worden gekeken naar spoor 2. Hoe eerder dat inzicht er is, hoe meer ruimte er overblijft om dat traject nog goed binnen de wettelijke termijnen af te ronden.</p>
-<p>Twijfel je over het juiste moment om een arbeidsdeskundige te betrekken bij een burn-outdossier? <a class="blog-link" onclick="setView('advies', {tool:'keuzehulp'})">Doe de gratis keuzehulp</a> of lees meer over <a class="blog-link" onclick="openArtikel('psychische-klachten-werkhervatting')">werkhervatting bij psychische klachten in het algemeen</a>.</p>`,
+<p>Twijfel je over het juiste moment om een arbeidsdeskundige te betrekken bij een burn-outdossier? <a class="blog-link" href="/keuzehulp?tool=keuzehulp" onclick="event.preventDefault(); setView('advies', {tool:'keuzehulp'})">Doe de gratis keuzehulp</a> of lees meer over <a class="blog-link" onclick="openArtikel('psychische-klachten-werkhervatting')">werkhervatting bij psychische klachten in het algemeen</a>.</p>`,
 
 "psychische-klachten-werkhervatting": `
 <h2>Waarom werkhervatting bij psychische klachten om een andere aanpak vraagt</h2>
@@ -4513,7 +4542,7 @@ whk: `
 <p>Ook bij psychische klachten geldt onverkort: de werkgever ontvangt nooit de diagnose, alleen de functionele gevolgen ervan. Dat is niet alleen een AVG-vereiste, het voorkomt ook dat een werkgever onbedoeld verkeerde aannames doet over wat iemand wel of niet aankan.</p>
 <h3>Wanneer is aanvullend advies nodig?</h3>
 <p>Bij complexe psychische dossiers werkt de arbeidsdeskundige vaak nauw samen met de bedrijfsarts en, waar relevant, een bedrijfsmaatschappelijk werker of psycholoog. Loopt het traject vast, dan kan een deskundigenoordeel bij UWV helderheid geven over de juiste vervolgstap.</p>
-<p>Meer weten over de opbouw bij burn-out specifiek? Lees <a class="blog-link" onclick="openArtikel('burn-out-re-integratie')">ons artikel over burn-out en re-integratie</a>, of <a class="blog-link" onclick="setView('offerte')">vraag een onderzoek aan</a>.</p>`,
+<p>Meer weten over de opbouw bij burn-out specifiek? Lees <a class="blog-link" onclick="openArtikel('burn-out-re-integratie')">ons artikel over burn-out en re-integratie</a>, of <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">vraag een onderzoek aan</a>.</p>`,
 
 "wga-vast-wga-flex": `
 <h2>Het verschil tussen WGA-vast en WGA-flex</h2>
@@ -4526,7 +4555,7 @@ whk: `
 <p>Voor beide categorieën geldt dat een tijdig en gedegen arbeidsdeskundig onderzoek de kans op (langdurige) WGA-instroom verkleint, en dat een goed onderbouwd uitkeringspercentage bij eventuele instroom de schadelast beperkt. Bij WGA-flex-dossiers is er een extra aandachtspunt: omdat het dienstverband vaak al is beëindigd, moet spoor 1 bij de (ex-)werkgever nét zo zorgvuldig worden afgedicht als bij een Ziektewet-dossier, zie ons artikel over <a class="blog-link" onclick="openArtikel('ziektewet')">arbeidsdeskundig onderzoek bij de Ziektewet</a> voor de vergelijkbare aanpak daar.</p>
 <h3>Praktisch: wat kun je als werkgever nu al doen?</h3>
 <p>Breng in kaart welk deel van je huidige schadelast uit WGA-vast en welk deel uit WGA-flex komt, dat bepaalt waar de grootste premiewinst te behalen valt. Werkgevers met veel tijdelijke contracten of uitzendkrachten doen er goed aan om ook bij ex-medewerkers alert te blijven op een tijdig arbeidsdeskundig onderzoek, ook al is het dienstverband al beëindigd.</p>
-<p>Wil je weten hoe dit voor jouw organisatie uitpakt? Lees ook <a class="blog-link" onclick="openArtikel('whk')">onze uitleg over de WHK-premie in het algemeen</a>, of <a class="blog-link" onclick="setView('offerte')">vraag een onderzoek aan</a>.</p>`,
+<p>Wil je weten hoe dit voor jouw organisatie uitpakt? Lees ook <a class="blog-link" onclick="openArtikel('whk')">onze uitleg over de WHK-premie in het algemeen</a>, of <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">vraag een onderzoek aan</a>.</p>`,
 
 "arbeidsdeskundig-rapport-voorbeeld": `
 <h2>Wat zit er in een arbeidsdeskundig rapport? Sectie voor sectie, wat UWV verwacht</h2>
@@ -4897,7 +4926,7 @@ whk: `
 <h3>Hoe je een negatieve RIV-toets voorkomt</h3>
 <p>Zorg dat het laatste arbeidsdeskundig onderzoek aansluit bij het moment van de WIA-aanvraag (rond week 91-93), dat alle eerdere stappen goed gedocumenteerd zijn, en dat de conclusies onderling logisch op elkaar aansluiten. Lees ook <a class="blog-link" onclick="openArtikel('wia-aanvraag')">onze uitleg over het voorbereiden van de WIA-aanvraag</a>.</p>
 <p>Op 27 maart 2026 kondigde de Rijksoverheid een wetsvoorstel aan om het advies van de bedrijfsarts leidend te maken bij de RIV-toets. Dat is nog geen geldend recht. Wat dat zou betekenen voor het arbeidsdeskundig onderzoek: <a class="blog-link" href="/kennisbank/riv-toets-bedrijfsarts-leidend" onclick="event.preventDefault(); openArtikel('riv-toets-bedrijfsarts-leidend')">RIV-toets: bedrijfsarts leidend</a>.</p>
-<p>Twijfel je of jouw dossier de RIV-toets doorstaat? <a class="blog-link" onclick="setView('offerte')">Vraag een actueel onderzoek aan</a> voordat de WIA-aanvraag wordt ingediend.</p>`,
+<p>Twijfel je of jouw dossier de RIV-toets doorstaat? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een actueel onderzoek aan</a> voordat de WIA-aanvraag wordt ingediend.</p>`,
 
 "spoor1a-spoor1b": `
 <h2>Spoor 1a en spoor 1b: het verschil in het kort</h2>
@@ -4912,7 +4941,7 @@ whk: `
 <p>Zodra gemotiveerd vaststaat dat noch de eigen functie, noch een andere functie bij dezelfde werkgever haalbaar is, is het moment aangebroken om spoor 2 te starten: <a href="https://matchvermogen.nl/derde-en-tweede-spoor/" target="_blank" rel="noopener">passend werk bij een andere werkgever</a>. Hoe eerder dat inzicht er is, hoe meer tijd er binnen de wettelijke termijnen overblijft om spoor 2 zorgvuldig te doorlopen.</p>
 <p>Blijft de re-integratie in het eigen werk hangen rond een deel van de contracturen, zonder dat de taken meegroeien, dan is dat een apart moment voor die toets. Lees <a class="blog-link" href="/kennisbank/urenopbouw-stagneert-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('urenopbouw-stagneert-arbeidsdeskundig-onderzoek')">wanneer je bij een stagnerende urenopbouw een arbeidsdeskundig onderzoek inzet</a>.</p>
 <p>Meer weten over de vervolgstap? Lees <a class="blog-link" onclick="openArtikel('spoor2')">wanneer spoor 2 volgt uit een arbeidsdeskundig onderzoek</a>, of <a class="blog-link" onclick="openArtikel('passende-arbeid')">wat precies onder passende arbeid valt</a>. Spoor 1 hoeft niet eerst afgerond te zijn: <a class="blog-link" href="/kennisbank/spoor-2-zonder-spoor-1-afgerond" onclick="event.preventDefault(); openArtikel('spoor-2-zonder-spoor-1-afgerond')">wanneer je spoor 2 wél eerder mag starten</a>.</p>
-<p style="margin-top:14px;">Twijfel je of spoor 1a of 1b haalbaar is in jouw dossier? <a class="blog-link" onclick="setView('offerte')">Vraag een onderzoek aan</a>.</p>`,
+<p style="margin-top:14px;">Twijfel je of spoor 1a of 1b haalbaar is in jouw dossier? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onderzoek aan</a>.</p>`,
 
 "arbeidsdeskundige-vs-bedrijfsarts-casemanager": `
 <h2>Drie rollen, drie verantwoordelijkheden</h2>
@@ -4927,7 +4956,7 @@ whk: `
 <p>Deze rolverdeling bestaat niet toevallig: het voorkomt belangenverstrengeling en zorgt dat elke beslissing wordt genomen door wie daar het meest deskundig én onafhankelijk voor is. Een casemanager die ook medisch zou oordelen, of een arbeidsdeskundige die zelf de diagnose zou beoordelen, ondermijnt de objectiviteit die deze trajecten juist nodig hebben.</p>
 <h3>Wie schakel je wanneer in?</h3>
 <p>Bij twijfel over het proces of de termijnen: de casemanager. Bij twijfel over de medische belastbaarheid: de bedrijfsarts. Bij twijfel over concrete arbeidsmogelijkheden, een naderende WIA-aanvraag, of de onderbouwing richting UWV: de arbeidsdeskundige.</p>
-<p>Wil je weten wanneer in jouw dossier het moment is om een arbeidsdeskundige te betrekken? <a class="blog-link" onclick="setView('advies', {tool:'keuzehulp'})">Doe de gratis keuzehulp</a> of <a class="blog-link" onclick="setView('offerte')">vraag direct een onderzoek aan</a>.</p>`,
+<p>Wil je weten wanneer in jouw dossier het moment is om een arbeidsdeskundige te betrekken? <a class="blog-link" href="/keuzehulp?tool=keuzehulp" onclick="event.preventDefault(); setView('advies', {tool:'keuzehulp'})">Doe de gratis keuzehulp</a> of <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">vraag direct een onderzoek aan</a>.</p>`,
 
 "spoor3-outplacement": `
 <h2>Wat is spoor 3?</h2>
@@ -4940,7 +4969,7 @@ whk: `
 <p>Een arbeidsdeskundig onderzoek dat eerder in het traject is uitgevoerd, bijvoorbeeld tijdens spoor 2, bevat vaak precies de informatie die een outplacementcoach nodig heeft: welke functies passen, welke sectoren kansrijk zijn, en welke beperkingen of juist sterke punten meespelen. Dat voorkomt dat een spoor 3-traject bij nul moet beginnen.</p>
 <h3>Wie verzorgt spoor 3?</h3>
 <p>Spoor 3-trajecten worden, net als spoor 2, via ons netwerk van re-integratiecoaches bij Best Match Re-integratie opgepakt, met dezelfde persoonlijke aanpak, maar zonder de wettelijke Poortwachter-kaders.</p>
-<p>Wil je weten of spoor 3 in jouw situatie een logische vervolgstap is? <a class="blog-link" onclick="setView('offerte')">Neem contact op</a> of lees meer over <a class="blog-link" onclick="openArtikel('spoor2')">hoe spoor 2 wordt aangevraagd</a>.</p>`,
+<p>Wil je weten of spoor 3 in jouw situatie een logische vervolgstap is? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Neem contact op</a> of lees meer over <a class="blog-link" onclick="openArtikel('spoor2')">hoe spoor 2 wordt aangevraagd</a>.</p>`,
 
 "onderzoek-weigert-medewerking": `
 <h2>De meewerkverplichting binnen de Wet Poortwachter</h2>
@@ -4956,7 +4985,7 @@ whk: `
 </ul>
 <h3>Wat als de weigering wél gegrond is?</h3>
 <p>Soms is weigering terecht: bijvoorbeeld als de gevraagde vorm van onderzoek medisch niet verantwoord is op dat moment. Ook dan is het verstandig dit te laten toetsen via een deskundigenoordeel, in plaats van dat werkgever en werknemer hier onderling over blijven twisten.</p>
-<p>Loopt een dossier vast door onenigheid over het onderzoek? Lees meer over <a class="blog-link" onclick="openArtikel('deskundigenoordeel')">het deskundigenoordeel bij UWV</a>, of <a class="blog-link" onclick="setView('offerte')">neem contact op voor advies</a>.</p>`,
+<p>Loopt een dossier vast door onenigheid over het onderzoek? Lees meer over <a class="blog-link" onclick="openArtikel('deskundigenoordeel')">het deskundigenoordeel bij UWV</a>, of <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">neem contact op voor advies</a>.</p>`,
 
 "second-opinion-arbeidsdeskundige": `
 <h2>Second opinion arbeidsdeskundige: wanneer twijfel terecht is</h2>
@@ -5170,7 +5199,7 @@ whk: `
 <p>Een broodfonds keert uit op basis van onderlinge solidariteit, niet op basis van een formele verzekeringspolis, wat betekent dat de exacte voorwaarden per broodfonds kunnen verschillen. Sommige broodfondsen vragen bij langduriger uitval om een onafhankelijke onderbouwing van de mate van arbeidsongeschiktheid, juist om onderlinge discussie tussen deelnemers te voorkomen. Een arbeidsdeskundig rapport kan die onderbouwing bieden zonder dat dit een formele, juridische lading krijgt.</p>
 <h3>Een praktisch stappenplan voor zzp'ers</h3>
 <p>Twijfel je of een onderzoek voor jou zinvol is? Begin met navraag bij je AOV-verzekeraar of broodfonds over wat zij als onderbouwing verwachten. Vraag vervolgens een onderzoek aan met die specifieke vraagstelling als uitgangspunt, dat voorkomt dat het rapport achteraf niet aansluit bij wat de verzekeraar of het broodfonds nodig heeft. Bewaar ten slotte alle communicatie met de verzekeraar zorgvuldig; die vormt vaak nuttige context voor de arbeidsdeskundige.</p>
-<p>Twijfel je of dit voor jouw situatie als zelfstandige zinvol is? <a class="blog-link" onclick="setView('offerte')">Vraag vrijblijvend advies aan</a>.</p>`,
+<p>Twijfel je of dit voor jouw situatie als zelfstandige zinvol is? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag vrijblijvend advies aan</a>.</p>`,
 
 "dga-arbeidsongeschiktheid": `
 <h2>Waarom een DGA een aparte positie heeft</h2>
@@ -5185,7 +5214,7 @@ whk: `
 <p>Het onderscheid zit in het aandelenbelang: een DGA met een meerderheidsbelang (doorgaans meer dan 50%, of een zodanige zeggenschap dat ontslag feitelijk niet kan worden afgedwongen) valt buiten de verplichte werknemersverzekeringen. Een DGA met een kleiner belang, of waarbij meerdere aandeelhouders elkaar over en weer kunnen ontslaan, kan wél verzekerd zijn. Dit wordt per situatie beoordeeld, en is niet altijd op het eerste gezicht duidelijk.</p>
 <h3>Een praktijkvoorbeeld</h3>
 <p>Stel: een DGA met 100% van de aandelen in een adviesbureau raakt na een herseninfarct langdurig beperkt in concentratie en belastbaarheid. Zonder WIA-vangnet en zonder AOV zou dit direct de continuïteit van de onderneming raken. Een arbeidsdeskundig onderzoek brengt dan in kaart welke taken nog wel zelfstandig uitgevoerd kunnen worden, en welke structureel moeten worden overgedragen aan een mede-eigenaar of leidinggevende werknemer, vaak de enige praktische route zonder financieel vangnet.</p>
-<p>Speelt dit in jouw onderneming? <a class="blog-link" onclick="setView('offerte')">Neem vrijblijvend contact op</a>.</p>`,
+<p>Speelt dit in jouw onderneming? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Neem vrijblijvend contact op</a>.</p>`,
 
 "long-covid-wia": `
 <h2>Wat maakt long covid anders bij een arbeidsdeskundig onderzoek?</h2>
@@ -5200,7 +5229,7 @@ whk: `
 <p>Bij long covid is de samenwerking met de bedrijfsarts nog belangrijker dan gebruikelijk: omdat er geen eenduidige medische test bestaat, hangt de FML sterk af van zorgvuldige, herhaalde anamnese. Een bedrijfsarts die ervaring heeft met post-infectieuze aandoeningen kan hier net een scherper beeld van geven dan een eenmalig contactmoment zou opleveren.</p>
 <h3>Een praktisch stappenplan</h3>
 <p>In de praktijk werkt de volgende aanpak vaak goed: begin met een voorzichtige, kleine urenopbouw op basis van de dagen dat iemand zich relatief goed voelt, evalueer wekelijks in plaats van maandelijks, en stel het opbouwtempo bij op basis van de gemiddelde belastbaarheid over meerdere weken, niet op basis van één goede of slechte dag. Pas als dit patroon stabiliseert, is een definitiever arbeidsdeskundig advies verantwoord.</p>
-<p>Speelt long covid een rol in een lopend dossier? <a class="blog-link" onclick="setView('offerte')">Vraag een onderzoek aan</a>, of lees meer over <a class="blog-link" onclick="openArtikel('chronische-vermoeidheid-fibromyalgie')">de aanpak bij chronische vermoeidheid in het algemeen</a>.</p>`,
+<p>Speelt long covid een rol in een lopend dossier? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onderzoek aan</a>, of lees meer over <a class="blog-link" onclick="openArtikel('chronische-vermoeidheid-fibromyalgie')">de aanpak bij chronische vermoeidheid in het algemeen</a>.</p>`,
 
 "benutbare-marginale-mogelijkheden": `
 <h2>Het verschil tussen "geen benutbare mogelijkheden" en "marginale mogelijkheden"</h2>
@@ -5215,7 +5244,7 @@ whk: `
 <p>Bij marginale mogelijkheden speelt vaak ook de vraag naar loonwaarde: als de resterende mogelijkheid zo beperkt is dat de productiviteit nog maar een fractie van het gangbare niveau bedraagt, is een concrete loonwaardemeting soms nodig om te onderbouwen of er daadwerkelijk een reële, marktconforme functie bij hoort, of dat de mogelijkheid inderdaad te marginaal is om als benutbaar te gelden.</p>
 <h3>Waarom dit geen momentopname mag zijn</h3>
 <p>Zowel "geen benutbare mogelijkheden" als "marginale mogelijkheden" zijn conclusies die aansluiten bij de situatie op het moment van onderzoek, niet noodzakelijk blijvend. Bij verbetering of verslechtering van de gezondheidssituatie kan een herbeoordeling tot een andere conclusie leiden. Dat is waarom UWV bij IVA-toekenningen soms alsnog een herbeoordeling initieert wanneer er concrete signalen zijn van verandering.</p>
-<p>Twijfel je hoe dit in jouw dossier ligt? <a class="blog-link" onclick="setView('offerte')">Laat dit objectief beoordelen</a>, of lees <a class="blog-link" onclick="openArtikel('iva-uitkering')">meer over de IVA-uitkering</a>.</p>`,
+<p>Twijfel je hoe dit in jouw dossier ligt? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Laat dit objectief beoordelen</a>, of lees <a class="blog-link" onclick="openArtikel('iva-uitkering')">meer over de IVA-uitkering</a>.</p>`,
 
 "arbeidsdeskundige-letselschade": `
 <h2>Arbeidsdeskundig onderzoek buiten de Wet Poortwachter</h2>
@@ -5230,7 +5259,7 @@ whk: `
 <p>Stel: iemand loopt bij een verkeersongeval blijvend letsel op aan een been, waardoor het oorspronkelijke, fysiek zware beroep niet meer haalbaar is. De arbeidsdeskundige brengt in kaart wat de resterende verdiencapaciteit is in vergelijkbare, minder fysiek belastende functies, en berekent het verschil met het inkomen dat zonder het ongeval realistisch was geweest. Dat verschil vormt een kernonderdeel van de uiteindelijke schadeclaim.</p>
 <h3>Verschil in rapportstructuur</h3>
 <p>Een letselschaderapport wijkt qua opbouw af van een regulier Poortwachter-rapport: naast de functionele mogelijkheden en beperkingen bevat het doorgaans een expliciete berekening van het verlies aan verdienvermogen, vaak uitgesplitst naar verschillende scenario's (bijvoorbeeld met en zonder scholing, of bij volledige versus gedeeltelijke werkhervatting). Dit vraagt een net andere rapportagevaardigheid dan een regulier arbeidsdeskundig onderzoek.</p>
-<p>Ben je betrokken bij een letselschadezaak en is een onafhankelijk arbeidsdeskundig onderzoek gewenst? <a class="blog-link" onclick="setView('offerte')">Neem contact op</a>.</p>`,
+<p>Ben je betrokken bij een letselschadezaak en is een onafhankelijk arbeidsdeskundig onderzoek gewenst? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Neem contact op</a>.</p>`,
 
 "functionele-capaciteit-evaluatie": `
 <h2>Wat is een Functionele Capaciteit Evaluatie?</h2>
@@ -5245,7 +5274,7 @@ whk: `
 <p>Een FCE bestaat doorgaans uit een reeks gestandaardiseerde testonderdelen: tilen op verschillende hoogtes, duwen en trekken, traplopen, langdurig staan of zitten, en fijne motoriek. Elk onderdeel wordt herhaald en vergeleken met normwaarden, zodat niet één losse waarneming, maar een consistent patroon de basis vormt voor de conclusie.</p>
 <h3>Wat een FCE niet kan</h3>
 <p>Een FCE meet fysieke capaciteit op het testmoment zelf, niet noodzakelijk de duurzaamheid daarvan over een volledige werkweek. Iemand kan tijdens een eenmalige test bepaalde bewegingen goed uitvoeren, maar daar de volgende dagen een terugslag van ondervinden. Daarom wordt een FCE altijd gecombineerd met het bredere arbeidsdeskundige beeld, niet als losstaand, allesbepalend gegeven gebruikt.</p>
-<p>Twijfel je of een FCE in jouw dossier meerwaarde heeft? <a class="blog-link" onclick="setView('offerte')">Bespreek dit vrijblijvend</a>.</p>`,
+<p>Twijfel je of een FCE in jouw dossier meerwaarde heeft? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Bespreek dit vrijblijvend</a>.</p>`,
 
 "bedrijfsarts-arbeidsdeskundige-oneens": `
 <h2>Kunnen een bedrijfsarts en een arbeidsdeskundige het oneens zijn?</h2>
@@ -5260,7 +5289,7 @@ whk: `
 <p>Bij psychische klachten komt het voor dat de bedrijfsarts aangeeft dat iemand "beperkt belastbaar is voor sociale interactie", terwijl de arbeidsdeskundige constateert dat een functie met beperkt, voorspelbaar klantcontact toch haalbaar lijkt. Ook hier is de oplossing niet dat een van beide partijen "gelijk krijgt", maar een gezamenlijk gesprek waarin wordt uitgezocht of de aard van dat specifieke klantcontact wel of niet binnen de beperking valt.</p>
 <h3>Hoe voorkom je dit als werkgever?</h3>
 <p>Betrek de bedrijfsarts vroeg bij het opstellen van een functieprofiel voor een aangepaste of alternatieve functie, in plaats van pas achteraf. Dat voorkomt dat de arbeidsdeskundige en de bedrijfsarts los van elkaar tot een ander beeld komen, en bespaart in de praktijk vaak een extra overlegronde.</p>
-<p>Loopt een dossier vast door een verschil van inzicht? <a class="blog-link" onclick="setView('offerte')">Vraag een onafhankelijke blik aan</a>.</p>`,
+<p>Loopt een dossier vast door een verschil van inzicht? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onafhankelijke blik aan</a>.</p>`,
 
 "chronische-vermoeidheid-fibromyalgie": `
 <h2>De uitdaging bij chronische vermoeidheid en fibromyalgie</h2>
@@ -5275,7 +5304,7 @@ whk: `
 <p>Geef ruimte voor onvoorspelbaarheid in het opbouwschema, communiceer niet in absolute aantallen uren maar in bandbreedtes, en plan evaluatiemomenten dichter op elkaar dan bij een regulier re-integratietraject gebruikelijk is. Vermijd daarnaast impliciete druk om "eindelijk weer normaal" te functioneren, dat werkt bij deze aandoeningen vaak averechts en kan tot terugval leiden.</p>
 <h3>Verschil met de aanpak bij burn-out</h3>
 <p>Hoewel de wisselende belastbaarheid bij burn-out en bij chronische vermoeidheid/fibromyalgie oppervlakkig op elkaar lijkt, verschilt het verwachte hersteltraject: bij burn-out is een geleidelijke, min of meer voorspelbare verbetering over maanden gebruikelijk, terwijl bij fibromyalgie en ME/CVS het beloop vaak minder voorspelbaar blijft, soms zonder duidelijk eindpunt. Dat vraagt om een aanpak die niet uitgaat van een vast herstelperspectief.</p>
-<p>Speelt dit in een lopend dossier? <a class="blog-link" onclick="setView('offerte')">Vraag een zorgvuldig onderzoek aan</a>.</p>`,
+<p>Speelt dit in een lopend dossier? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een zorgvuldig onderzoek aan</a>.</p>`,
 
 "faillissement-werkgever-onderzoek": `
 <h2>Wie is verantwoordelijk bij een faillissement tijdens ziekte?</h2>
@@ -5290,7 +5319,7 @@ whk: `
 <p>Is een onderzoek al gestart of afgerond vóór het faillissement, dan valt een openstaande factuur onder de faillissementsboedel, net als andere schulden van de failliete werkgever. Dit staat los van de bruikbaarheid van het rapport zelf: ook een nog niet volledig betaald rapport blijft inhoudelijk geldig en bruikbaar voor het vervolg van het traject.</p>
 <h3>Praktisch stappenplan voor een curator of HR bij faillissement</h3>
 <p>Breng zo snel mogelijk in kaart welke re-integratiedossiers lopen, verzamel alle beschikbare documentatie (FML, Plan van Aanpak, eventueel arbeidsdeskundig rapport), en meld dit proactief bij UWV. Hoe vollediger het dossier bij overdracht, hoe minder vertraging de betrokken werknemer ondervindt in een toch al onzekere periode.</p>
-<p>Speelt dit in jouw situatie? <a class="blog-link" onclick="setView('offerte')">Vraag advies aan</a>.</p>`,
+<p>Speelt dit in jouw situatie? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag advies aan</a>.</p>`,
 
 "hartinfarct-beroerte-re-integratie": `
 <h2>Terugkeer na een hartinfarct of beroerte: waarom dit vraagt om een brede blik</h2>
@@ -5305,7 +5334,7 @@ whk: `
 <p>Na een hartinfarct wordt vaak begonnen met enkele uren per dag, administratief of rustig werk, met expliciete aandacht voor het vermijden van piekbelasting (zowel fysiek als qua stress). Pas als dit enkele weken stabiel verloopt, wordt voorzichtig opgebouwd richting meer uren of intensievere taken, altijd in overleg met de cardioloog via de bedrijfsarts.</p>
 <h3>Waarom medisch-specialistische rapportage zo belangrijk is</h3>
 <p>Anders dan bij veel andere aandoeningen, is bij hart- en vaatproblematiek de inschatting van de cardioloog over belastbaarheid vaak leidend voor wat medisch verantwoord is, de arbeidsdeskundige vertaalt dit naar werk, maar wijkt niet af van de medisch-specialistische grenzen. Een goede, actuele brief van de cardioloog of neuroloog is daarom net zo belangrijk als de FML van de bedrijfsarts zelf.</p>
-<p>Speelt dit in jouw organisatie of eigen situatie? <a class="blog-link" onclick="setView('offerte')">Vraag een onderzoek aan</a>.</p>`,
+<p>Speelt dit in jouw organisatie of eigen situatie? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onderzoek aan</a>.</p>`,
 
 "terugwerkende-kracht-onderzoek": `
 <h2>Heeft een laat arbeidsdeskundig onderzoek nog zin?</h2>
@@ -5320,7 +5349,7 @@ whk: `
 <p>Stel: een werkgever realiseert zich pas in week 85 dat er nooit een arbeidsdeskundig onderzoek is uitgevoerd, terwijl de WIA-aanvraag dichterbij komt. Alsnog op dat moment een gedegen onderzoek laten uitvoeren, levert weliswaar geen extra weken tijdwinst meer op, maar wel een onderbouwing die de RIV-toets een stuk beter kan doorstaan dan een dossier zonder enige arbeidsdeskundige rapportage.</p>
 <h3>Beter laat dan nooit: maar niet als vervanging van tijdige actie</h3>
 <p>Een laat onderzoek is een vangnet, geen vervanging van de tijdwinst die vroege inzet had kunnen opleveren. Werkgevers die dit patroon herkennen, doen er goed aan om voor toekomstige dossiers een vast, vroeg ijkmoment in te bouwen, bijvoorbeeld standaard bij aanvang van het tweede kwartaal van het verzuim, in plaats van te vertrouwen op het alsnog kunnen herstellen achteraf.</p>
-<p>Is een eerder ijkpunt in jouw dossier al gepasseerd? <a class="blog-link" onclick="setView('offerte')">Het is nooit te laat om dit alsnog te laten onderzoeken</a>.</p>`,
+<p>Is een eerder ijkpunt in jouw dossier al gepasseerd? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Het is nooit te laat om dit alsnog te laten onderzoeken</a>.</p>`,
 
 "mediation-arbeidsconflict": `
 <h2>Wanneer lopen re-integratie en een arbeidsconflict door elkaar?</h2>
@@ -5335,7 +5364,7 @@ whk: `
 <p>In de meeste gevallen betaalt de werkgever de mediationkosten, vergelijkbaar met de kostenverantwoordelijkheid voor re-integratie in het algemeen. Sommige rechtsbijstandsverzekeringen van de werknemer dekken een deel van de kosten bij een arbeidsconflict, dit is het navragen waard voordat een traject start.</p>
 <h3>Een praktijkvoorbeeld</h3>
 <p>Stel: een werknemer en leidinggevende zijn het fundamenteel oneens over of een aangeboden functie passend is, en het gesprek loopt vast in wederzijds wantrouwen. Een arbeidsdeskundig onderzoek stelt objectief vast dat de functie inderdaad passend is, wat de mediator vervolgens gebruikt om het gesprek te verleggen van "is dit werk wel geschikt" naar "hoe pakken we de overgang naar dit werk samen aan", een veel constructievere basis voor het vervolg.</p>
-<p>Loopt een re-integratietraject vast door een arbeidsconflict? <a class="blog-link" onclick="setView('offerte')">Vraag een onafhankelijk onderzoek aan</a>.</p>`,
+<p>Loopt een re-integratietraject vast door een arbeidsconflict? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onafhankelijk onderzoek aan</a>.</p>`,
 
 "oneens-met-arbeidsdeskundige": `
 <h2>Wat kun je doen als je het niet eens bent met de conclusie?</h2>
@@ -5348,7 +5377,7 @@ whk: `
 <p>Blijft het verschil van inzicht bestaan, dan is een deskundigenoordeel bij UWV de formele, onafhankelijke route, zowel werknemer als werkgever kan dit aanvragen. Zie <a class="blog-link" onclick="openArtikel('deskundigenoordeel')">onze uitleg over het deskundigenoordeel</a> voor hoe dat precies werkt.</p>
 <h3>Stap 4: een nieuw onderzoek of second opinion</h3>
 <p>Als zwaarste middel kan een volledig nieuw onderzoek worden aangevraagd, bijvoorbeeld bij een ander bureau. Dat is een stevige stap, lees eerst <a class="blog-link" href="/kennisbank/second-opinion-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('second-opinion-arbeidsdeskundige')">wanneer een second opinion arbeidsdeskundige wel en niet zinvol is</a> voordat je die route inslaat.</p>
-<p>Loopt jouw dossier hierop vast? <a class="blog-link" onclick="setView('offerte')">Vraag vrijblijvend advies aan</a>.</p>
+<p>Loopt jouw dossier hierop vast? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag vrijblijvend advies aan</a>.</p>
 <p>De zwaardere route is een <a class="blog-link" href="/kennisbank/second-opinion-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('second-opinion-arbeidsdeskundige')">second opinion arbeidsdeskundige</a>. <a class="blog-link" href="/offerte-aanvragen?dienst=second-opinion" onclick="event.preventDefault(); openOfferte('second-opinion')">Rapport laten toetsen</a>.</p>`,
 
 "bedrijfsarts-onpartijdig": `
@@ -5362,7 +5391,7 @@ whk: `
 <p>Bespreek dit eerst rechtstreeks met de bedrijfsarts: vaak is onduidelijkheid over de redenering de eigenlijke oorzaak, niet partijdigheid. Blijft de twijfel bestaan, dan is een deskundigenoordeel bij UWV de aangewezen route: een onafhankelijke, tweede medische blik op hetzelfde dossier.</p>
 <h3>Waar de arbeidsdeskundige in dit plaatje past</h3>
 <p>De arbeidsdeskundige werkt met wat de bedrijfsarts heeft vastgesteld (de FML), maar is een aparte professional met een eigen onafhankelijkheid. Bij structurele twijfel aan het medisch oordeel kan een arbeidsdeskundig onderzoek dus niet de medische kant corrigeren, daarvoor blijft het deskundigenoordeel de juiste weg.</p>
-<p>Twijfel je over een lopend dossier? <a class="blog-link" onclick="setView('offerte')">Neem vrijblijvend contact op</a>.</p>`,
+<p>Twijfel je over een lopend dossier? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Neem vrijblijvend contact op</a>.</p>`,
 
 "hoe-lang-duurt-onderzoek": `
 <h2>Van aanmelding tot rapport: hoeveel tijd kost het?</h2>
@@ -5375,7 +5404,7 @@ whk: `
 <p>Ja: als een deadline dichtbij is (bijvoorbeeld de eerstejaars-evaluatie of een WIA-aanvraag), is een spoedonderzoek mogelijk. Dat brengt de doorlooptijd terug naar ongeveer 1 tot 1,5 week, al blijft er een minimum aan tijd nodig om het onderzoek zorgvuldig te kunnen uitvoeren, sneller dan dat gaat ten koste van de kwaliteit.</p>
 <h3>Wat vertraagt een onderzoek het vaakst?</h3>
 <p>In de praktijk is de meest voorkomende vertraging niet het onderzoek zelf, maar het verzamelen van actuele medische informatie bij de bedrijfsarts. Zorg dat die informatie zo actueel mogelijk is vóór aanmelding, dat scheelt vaak enkele dagen.</p>
-<p>Wil je weten wat vroeg starten jou concreet aan tijd oplevert? <a class="blog-link" onclick="setView('calculator')">Bereken je tijdwinst</a>.</p>`,
+<p>Wil je weten wat vroeg starten jou concreet aan tijd oplevert? <a class="blog-link" href="/rekentool" onclick="event.preventDefault(); setView('calculator')">Bereken je tijdwinst</a>.</p>`,
 
 "waar-let-arbeidsdeskundige-op": `
 <h2>Waar kijkt een arbeidsdeskundige precies naar?</h2>
@@ -5388,7 +5417,7 @@ whk: `
 <p>Naast de belasting zelf spelen ook praktische zaken mee: reistijd naar het werk, werktijden, de mogelijkheid tot pauzes, en of aanpassingen aan de werkplek realistisch haalbaar zijn. Deze factoren bepalen samen of een functie niet alleen medisch, maar ook praktisch passend is.</p>
 <h3>Het gesprek zelf</h3>
 <p>Tijdens het gesprek wordt gevraagd naar een representatieve dag: wat lukt wel, wat kost merkbaar meer moeite, en waar loopt iemand tegenaan. Dat gesprek is een aanvulling op de FML, niet een herbeoordeling van de medische situatie zelf.</p>
-<p>Wil je weten wat dit voor jouw specifieke situatie betekent? <a class="blog-link" onclick="setView('offerte')">Vraag een onderzoek aan</a>.</p>`,
+<p>Wil je weten wat dit voor jouw specifieke situatie betekent? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een onderzoek aan</a>.</p>`,
 
 "ervaringen-arbeidsdeskundig-onderzoek": `
 <h2>Wat ervaren mensen echt bij een arbeidsdeskundig onderzoek?</h2>
@@ -5396,13 +5425,13 @@ whk: `
 <h3>Wat werknemers vaak terugmelden</h3>
 <p>Het meest gehoorde signaal is opluchting: eindelijk iemand die objectief luistert, zonder een belang bij een bepaalde uitkomst. Uit onze eigen klantreacties: <em>"Niels heeft mij enorm geholpen met de herbeoordeling van mijn WGA-uitkering,"</em> en <em>"Speciale dank aan Niels, een echte expert die je voor 100% kunt vertrouwen."</em> Dat vertrouwen ontstaat meestal niet vooraf, maar tijdens het gesprek zelf.</p>
 <h3>Wat werkgevers en HR-professionals waarderen</h3>
-<p>Bij werkgevers en casemanagers gaat de waardering vaker over praktische zaken: snelheid, en een rapport waar je daadwerkelijk iets mee kunt. Zoals een van onze klanten het verwoordde: <em>"Vanaf het eerste contact tot het uiteindelijke rapport erg tevreden over de service en inhoud."</em> Bekijk ook de <a class="blog-link" onclick="setView('home')">volledige reviews op de homepage</a>.</p>
+<p>Bij werkgevers en casemanagers gaat de waardering vaker over praktische zaken: snelheid, en een rapport waar je daadwerkelijk iets mee kunt. Zoals een van onze klanten het verwoordde: <em>"Vanaf het eerste contact tot het uiteindelijke rapport erg tevreden over de service en inhoud."</em> Bekijk ook de <a class="blog-link" href="/" onclick="event.preventDefault(); setView('home')">volledige reviews op de homepage</a>.</p>
 <h3>Waarom de spanning vooraf zo vaak voorkomt</h3>
 <p>Die spanning ontstaat meestal doordat mensen niet weten wat er precies gevraagd gaat worden, en soms bang zijn dat het gesprek gebruikt wordt om verzuim "af te straffen". In werkelijkheid is een arbeidsdeskundig onderzoek een objectief gesprek over mogelijkheden, niet over motivatie of goede wil.</p>
 <h3>Een blijvend patroon</h3>
 <p>Vrijwel niemand die het traject heeft doorlopen, ervaart het achteraf nog als bedreigend. De meest gehoorde reactie is dat het meeviel, en vaker nog: dat het hielp om knopen door te hakken die anders waren blijven liggen.</p>
 <p>Zoek je juist naar wat er <em>binnen</em> het onderzoek kan wringen: FML/IZP, rapportkeuzes, gesprek? Dat staat in <a class="blog-link" href="/kennisbank/nadelen-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('nadelen-arbeidsdeskundig-onderzoek')">nadelen van een arbeidsdeskundig onderzoek</a>.</p>
-<p>Benieuwd hoe dat voor jouw situatie zou zijn? <a class="blog-link" onclick="setView('offerte')">Neem vrijblijvend contact op</a>.</p>`,
+<p>Benieuwd hoe dat voor jouw situatie zou zijn? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Neem vrijblijvend contact op</a>.</p>`,
 
 "voorbereiden-gesprek-arbeidsdeskundige": `
 <p>Een gesprek met de arbeidsdeskundige voorbereiden draait om drie praktische dingen: wat je meeneemt, wat je wilt vragen, en of er iemand met je meegaat. Je mag iemand meenemen naar het arbeidsdeskundig onderzoek als je dat vooraf meldt. Het gesprek zelf duurt meestal ongeveer een uur tot anderhalf uur. Een arbeidsdeskundig gesprek hoeft geen uitgebreide voorbereiding te zijn, maar wie feiten over het eigen werk meeneemt, krijgt een completer rapport.</p>
@@ -5470,7 +5499,7 @@ whk: `
 <p>Een onderzoek hoeft niet pas ingezet te worden als het verplicht voelt. Ook als er nog geen acute Poortwachter-druk is, kan een onderzoek al vroeg duidelijkheid geven, wat later in het traject tijd en discussie bespaart. Wat de wet wél en niet verplicht stelt, staat in <a class="blog-link" href="/kennisbank/verplicht-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('verplicht-arbeidsdeskundig-onderzoek')">is een arbeidsdeskundig onderzoek verplicht?</a></p>
 <h3>Waar dit overzicht verder leidt</h3>
 <p>Dit artikel is bewust een kort overzicht. Wil je dieper in een van deze onderwerpen? De <a class="blog-link" onclick="openArtikel('poortwachter-tijdlijn')">volledige Poortwachter-tijdlijn</a>, <a class="blog-link" onclick="openArtikel('wat-doet-arbeidsdeskundige')">wat een arbeidsdeskundige precies doet</a>, en <a class="blog-link" onclick="openArtikel('kosten-geen-onderzoek')">wat het kost als je géén onderzoek laat uitvoeren</a> gaan allemaal dieper op een specifiek onderdeel in.</p>
-<p>Twijfel je of dit moment voor jou is aangebroken? <a class="blog-link" onclick="setView('offerte')">Vraag vrijblijvend advies aan</a>. Voor de Poortwachter-timing rond week 42–52 en na 1 jaar ziekte: <a class="blog-link" href="/kennisbank/arbeidsdeskundig-onderzoek-na-1-jaar-ziekte" onclick="event.preventDefault(); openArtikel('arbeidsdeskundig-onderzoek-na-1-jaar-ziekte')">wanneer een arbeidsdeskundig onderzoek (na 1 jaar ziekte)</a>.</p>`,
+<p>Twijfel je of dit moment voor jou is aangebroken? <a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag vrijblijvend advies aan</a>. Voor de Poortwachter-timing rond week 42–52 en na 1 jaar ziekte: <a class="blog-link" href="/kennisbank/arbeidsdeskundig-onderzoek-na-1-jaar-ziekte" onclick="event.preventDefault(); openArtikel('arbeidsdeskundig-onderzoek-na-1-jaar-ziekte')">wanneer een arbeidsdeskundig onderzoek (na 1 jaar ziekte)</a>.</p>`,
 
 "arbeidsdeskundig-onderzoek-na-1-jaar-ziekte": `
 <h2>Wanneer een arbeidsdeskundig onderzoek na 1 jaar ziekte?</h2>
@@ -6055,6 +6084,7 @@ whk: `
   let kbFiltersExpanded = false;
 
   function renderFilters(){
+    if(!filterRow) return;
     filterRow.innerHTML = '';
     const extraTags = allTags.filter(tag => !PRIMARY_KB_TAGS.includes(tag));
     const activeIsExtra = extraTags.includes(activeTag);
@@ -6087,6 +6117,7 @@ whk: `
     }
   }
   function renderPosts(){
+    if(!kGrid) return;
     kGrid.innerHTML = '';
     const list = activeTag === "Alles" ? posts : posts.filter(p=>p.tag===activeTag);
     list.forEach(p=>{
@@ -6127,6 +6158,10 @@ whk: `
   }
 
   function openPersona(slug, opts){
+    if(!document.getElementById('view-persona')){
+      window.location.assign('/voor/' + slug);
+      return;
+    }
     const persona = personaData.find(p => p.slug === slug);
     if(!persona) return;
     document.title = persona.seoTitle || (String(persona.title || '').replace(/\s*[\u2014\u2013]\s*/g, ', ').replace(/\s+$/,'') + ' | Arbeidsdeskundig.com');
@@ -6178,7 +6213,12 @@ whk: `
   }
 
   function filterKennisbankVanArtikel(){
-    const tag = document.getElementById('artikel-tag').textContent;
+    const tagEl = document.getElementById('artikel-tag');
+    const tag = tagEl ? tagEl.textContent : '';
+    if(!document.getElementById('view-kennisbank')){
+      window.location.assign('/kennisbank?tag=' + encodeURIComponent(tag));
+      return;
+    }
     setView('kennisbank');
     setTimeout(()=>{ activeTag = tag; renderFilters(); renderPosts(); }, 0);
   }
@@ -6215,7 +6255,7 @@ whk: `
     const post = posts.find(p=>p.slug===slug);
     // Andere artikelen zitten niet in de eerste HTML. Een echte navigatie
     // laadt dan de pagina die alleen dát artikel bevat.
-    if(!post || !articleContent[slug]){
+    if(!post || !articleContent[slug] || !document.getElementById('view-artikel')){
       const target = '/kennisbank/' + slug;
       if(location.pathname !== target){
         window.location.assign(target);
@@ -6272,6 +6312,13 @@ whk: `
       history.pushState({view:'artikel', slug}, '', artikelPath);
     }
   }
+  if(filterRow){
+    const tagParam = new URLSearchParams(location.search).get('tag');
+    if(tagParam && allTags.includes(tagParam)){
+      activeTag = tagParam;
+      if(!PRIMARY_KB_TAGS.includes(tagParam)) kbFiltersExpanded = true;
+    }
+  }
   renderFilters(); renderPosts();
 
   /* ---------- FAQ ---------- */
@@ -6306,6 +6353,7 @@ whk: `
     over: { label: 'Lees meer over ons →', view: 'over' },
   };
   const faqList = document.getElementById('faq-list');
+  if(faqList){
   faqList.innerHTML = '';
   faqs.forEach(([q,a,slug,ctaKey])=>{
     const item = document.createElement('div'); item.className = 'accordion-item';
@@ -6321,11 +6369,13 @@ whk: `
       ? ` <a class="blog-link" href="${slug}" onclick="event.preventDefault(); setView('${tolkView}')">Lees hoe een onderzoek met tolk werkt</a>`
       : (slug ? ` <a class="blog-link" onclick="openArtikel('${slug}')">Lees het volledige artikel →</a>` : '');
     const ctaOpts = cta && cta.tool ? `, {tool:'${cta.tool}'}` : '';
-    const ctaBtn = cta ? `<div style="margin-top:12px;"><button class="btn-ghost btn-small" onclick="setView('${cta.view}'${ctaOpts})">${cta.label}</button></div>` : '';
+    const ctaHref = !cta ? '/' : ((cta.view === 'advies' && cta.tool) ? '/keuzehulp?tool=' + cta.tool : (VIEW_TO_PATH[cta.view] || '/'));
+    const ctaBtn = cta ? `<div style="margin-top:12px;"><a class="btn-ghost btn-small" href="${ctaHref}" onclick="event.preventDefault(); setView('${cta.view}'${ctaOpts})">${cta.label}</a></div>` : '';
     inner.innerHTML = `<p style="margin:0;">${a}${readLink}</p>${ctaBtn}`;
     body.appendChild(inner); item.appendChild(head); item.appendChild(body);
     faqList.appendChild(item);
   });
+  }
 
   /* ---------- Rekentool: eerder starten = eerder klaar ---------- */
   const elapsedMap = { vroeg:8, mid1:20, mid2:34, jaarseval:47, "2e":70, grens:97, zw:26, wga:115 };
@@ -6572,7 +6622,9 @@ whk: `
     else if(spoor2 === 'nee' && twijfel === 'nee') suggestion = 'laag';
     document.getElementById('calc-complex').value = suggestion;
   }
-  document.getElementById('calc-complex').addEventListener('change', () => {
+  const calcComplex = document.getElementById('calc-complex');
+  if(calcComplex){
+  calcComplex.addEventListener('change', () => {
     complexManuallySet = true;
     const hint = document.getElementById('calc-complex-hint');
     if(hint) hint.textContent = 'Je eigen inschatting, we passen dit niet meer automatisch aan.';
@@ -6587,6 +6639,7 @@ whk: `
   });
   suggestComplexity();
   recalc();
+  }
 
   /* ---------- Aanmeldflow ---------- */
   /* ================= Onderzoek keuzehulp: fysiek vs online ================= */
@@ -6745,6 +6798,10 @@ whk: `
   }
   function openOfferte(dienst){
     const next = dienst ? ('/offerte-aanvragen?dienst=' + encodeURIComponent(dienst)) : '/offerte-aanvragen';
+    if(!document.getElementById('view-offerte')){
+      window.location.assign(next);
+      return;
+    }
     if((location.pathname + location.search) !== next){
       history.pushState({view:'offerte', dienst: dienst || ''}, '', next);
     }
@@ -6785,27 +6842,56 @@ whk: `
       setFieldValidity(el, fieldMessageFor(['naam','email','telefoon'][i], el.value));
     });
   }
-  function gaNaarAanmelden(){
-    document.getElementById('inp-aanvrager-naam').value = document.getElementById('of-naam').value.trim();
-    document.getElementById('inp-aanvrager-werkgever').value = document.getElementById('of-bedrijf').value.trim();
-    document.getElementById('inp-aanvrager-email').value = document.getElementById('of-email').value.trim();
-    document.getElementById('inp-aanvrager-tel').value = document.getElementById('of-telefoon').value.trim();
-    if(offerteData.vorm && offerteData.vorm !== 'Weet niet'){
+  function pasAanmeldGegevensToe(payload){
+    if(!payload) return;
+    const set = (id, value) => {
+      const el = document.getElementById(id);
+      if(el && value) el.value = value;
+    };
+    set('inp-aanvrager-naam', payload.naam);
+    set('inp-aanvrager-werkgever', payload.werkgever);
+    set('inp-aanvrager-email', payload.email);
+    set('inp-aanvrager-tel', payload.tel);
+    if(payload.vorm && payload.vorm !== 'Weet niet'){
       const vormRow = document.querySelector('#view-aanmelden .choice-row[data-group="vorm"]');
       if(vormRow){
-        vormRow.querySelectorAll('.choice').forEach(b=> b.classList.toggle('selected', b.dataset.value === offerteData.vorm));
-        formData.vorm = offerteData.vorm;
+        vormRow.querySelectorAll('.choice').forEach(b=> b.classList.toggle('selected', b.dataset.value === payload.vorm));
+        formData.vorm = payload.vorm;
       }
     }
-    if(offerteData.grootte){
+    if(payload.grootte){
       const grootteRow = document.querySelector('#view-aanmelden .choice-row[data-group="grootte"]');
       if(grootteRow){
-        grootteRow.querySelectorAll('.choice').forEach(b=> b.classList.toggle('selected', b.dataset.value === offerteData.grootte));
-        formData.grootte = offerteData.grootte;
+        grootteRow.querySelectorAll('.choice').forEach(b=> b.classList.toggle('selected', b.dataset.value === payload.grootte));
+        formData.grootte = payload.grootte;
       }
     }
     checkStep1();
+  }
+  function gaNaarAanmelden(){
+    const payload = {
+      naam: (document.getElementById('of-naam').value || '').trim(),
+      werkgever: (document.getElementById('of-bedrijf').value || '').trim(),
+      email: (document.getElementById('of-email').value || '').trim(),
+      tel: (document.getElementById('of-telefoon').value || '').trim(),
+      vorm: offerteData.vorm || '',
+      grootte: offerteData.grootte || '',
+    };
+    if(!document.getElementById('view-aanmelden')){
+      try { sessionStorage.setItem('offerteNaarAanmelden', JSON.stringify(payload)); } catch(e){}
+      window.location.assign('/aanmelden');
+      return;
+    }
+    pasAanmeldGegevensToe(payload);
     setView('aanmelden');
+  }
+  function applyOfferteHandoff(){
+    if(!document.getElementById('view-aanmelden')) return;
+    let raw = '';
+    try { raw = sessionStorage.getItem('offerteNaarAanmelden') || ''; } catch(e){ return; }
+    if(!raw) return;
+    try { sessionStorage.removeItem('offerteNaarAanmelden'); } catch(e){}
+    try { pasAanmeldGegevensToe(JSON.parse(raw)); } catch(e){}
   }
   /* ================= Belopties op bevestigingspagina ================= */
   const bevBelWrap = document.getElementById('bev-belopties');
@@ -6999,15 +7085,21 @@ whk: `
     const el = document.getElementById(id); if(el){ el.addEventListener('input', checkStep5); }
   });
 
-  document.getElementById('chk-akkoord').addEventListener('change', (e)=>{
-    document.getElementById('handtekening-wrap').classList.toggle('hidden', !e.target.checked);
-    if(e.target.checked) setTimeout(initSignaturePad, 30);
-    checkStep6();
-  });
   function checkStep6(){
-    const akkoord = document.getElementById('chk-akkoord').checked;
+    const akkoordEl = document.getElementById('chk-akkoord');
+    const nextBtn = document.getElementById('btn-to-step7');
+    if(!akkoordEl || !nextBtn) return;
+    const akkoord = akkoordEl.checked;
     const naamOndertekenaar = reqVal('inp-ondertekenaar-naam');
-    document.getElementById('btn-to-step7').disabled = !(akkoord && hasSignature && naamOndertekenaar);
+    nextBtn.disabled = !(akkoord && hasSignature && naamOndertekenaar);
+  }
+  const chkAkkoord = document.getElementById('chk-akkoord');
+  if(chkAkkoord){
+    chkAkkoord.addEventListener('change', (e)=>{
+      document.getElementById('handtekening-wrap').classList.toggle('hidden', !e.target.checked);
+      if(e.target.checked) setTimeout(initSignaturePad, 30);
+      checkStep6();
+    });
   }
   document.addEventListener('input', (e)=>{ if(e.target && e.target.id === 'inp-ondertekenaar-naam') checkStep6(); });
 
@@ -7428,6 +7520,7 @@ whk: `
   } else {
     setView('home', {skipPush:true});
   }
+  applyOfferteHandoff();
   _routerSync = false;
 </script>
 </body>

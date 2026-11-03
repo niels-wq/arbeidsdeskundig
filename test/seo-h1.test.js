@@ -81,12 +81,16 @@ describe('SEO: exactly one h1 per route', () => {
         });
     }
 
-    it('inactive view titles are h2, not a second h1', async () => {
+    it('homepage serves only its own view and one h1', async () => {
         const html = await (await fetch(base + '/')).text();
-        assert.match(html, /<h2[^>]*class="[^"]*\broute-h1\b[^"]*"[^>]*>Eerder starten = eerder klaar<\/h2>/);
-        assert.match(html, /<h2[^>]*class="[^"]*\broute-h1\b[^"]*"[^>]*>Vraag je offerte aan: vanaf €999,-<\/h2>/);
-        assert.match(html, /<h2[^>]*id="artikel-titel"[^>]*>Titel<\/h2>/);
+        assert.match(html, /<div class="view active" id="view-home">/);
+        assert.equal((html.match(/<div class="view\b/g) || []).length, 1);
+        assert.doesNotMatch(html, /id="view-calculator"/);
+        assert.doesNotMatch(html, /id="view-offerte"/);
+        assert.doesNotMatch(html, /id="of-naam"/);
+        assert.doesNotMatch(html, /id="form-step-1"/);
         assert.doesNotMatch(html, /<h1[^>]*>Eerder starten = eerder klaar<\/h1>/);
         assert.doesNotMatch(html, /<h1[^>]*>Waar wil je hulp bij\?<\/h1>/);
+        assert.doesNotMatch(html, /<h1[^>]*>Vraag je offerte aan: vanaf €999,-<\/h1>/);
     });
 });

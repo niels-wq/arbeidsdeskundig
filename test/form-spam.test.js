@@ -316,14 +316,14 @@ describe('verborgen velden op de pagina', () => {
         return { status: res.status, html };
     }
 
-    function assertFields(html) {
+    function assertFields(html, ids) {
         assert.match(html, /\.hp-field\{position:absolute !important; left:-10000px;/);
-        for (const id of ['of-website', 'inp-website', 'cl-website', 'bt-website']) {
+        for (const id of ids) {
             assert.match(html, honeypot(id));
         }
         assert.doesNotMatch(html, /__FORM_TS__/);
         const tokens = [...html.matchAll(/name="form_ts" value="(\d+\.[a-f0-9]{64})"/g)].map((m) => m[1]);
-        assert.equal(tokens.length, 4);
+        assert.equal(tokens.length, ids.length);
         assert.equal(new Set(tokens).size, 1);
         assert.equal(formSpam.timingReason(tokens[0]), 'too_fast');
         assert.match(html, /function formSpamToken\(\)/);
@@ -331,14 +331,23 @@ describe('verborgen velden op de pagina', () => {
     }
 
     it('rendert offerte, aanmelden en de homepage met honeypot en tijdstempel', async () => {
-        for (const pathname of ['/', '/offerte-aanvragen', '/aanmelden']) {
-            const { status, html } = await page(pathname);
-            assert.equal(status, 200, pathname);
-            assertFields(html);
-        }
+        const shared = ['cl-website', 'bt-website'];
+        const home = await page('/');
+        assert.equal(home.status, 200);
+        assertFields(home.html, shared);
+        assert.doesNotMatch(home.html, /id="of-website"/);
+        assert.doesNotMatch(home.html, /id="inp-website"/);
+
         const offerte = await page('/offerte-aanvragen');
+        assert.equal(offerte.status, 200);
+        assertFields(offerte.html, ['of-website', ...shared]);
+        assert.doesNotMatch(offerte.html, /id="inp-website"/);
         assert.match(offerte.html, /<h1[^>]*>Vraag je offerte aan/);
+
         const aanmelden = await page('/aanmelden');
+        assert.equal(aanmelden.status, 200);
+        assertFields(aanmelden.html, ['inp-website', ...shared]);
+        assert.doesNotMatch(aanmelden.html, /id="of-website"/);
         assert.match(aanmelden.html, /id="view-aanmelden"/);
         assert.match(aanmelden.html, /id="form-step-1"/);
     });

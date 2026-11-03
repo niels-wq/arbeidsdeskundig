@@ -407,6 +407,34 @@ function activateView(html, view) {
     return html;
 }
 
+// Google indexeert verborgen SPA-views alsnog mee. Elke URL houdt daarom alleen
+// de eigen view. view-fysiek-tarief heeft geen route; de knop staat op de offertepagina.
+function viewIdsToKeep(view) {
+    const activeId = (!view || view === 'home') ? 'view-home' : 'view-' + view;
+    const keep = new Set([activeId]);
+    if (view === 'offerte') keep.add('view-fysiek-tarief');
+    return keep;
+}
+
+function stripInactiveViews(html, view) {
+    const keep = viewIdsToKeep(view);
+    const re = /<div class="view(?: active)?" id="(view-[^"]+)"(?: hidden)?>/g;
+    const ranges = [];
+    let m;
+    while ((m = re.exec(html))) {
+        if (keep.has(m[1])) continue;
+        const block = extractBalancedDiv(html, m.index);
+        if (!block) continue;
+        ranges.push([m.index, block.end]);
+        re.lastIndex = block.end;
+    }
+    let out = html;
+    for (let i = ranges.length - 1; i >= 0; i--) {
+        out = out.slice(0, ranges[i][0]) + out.slice(ranges[i][1]);
+    }
+    return out;
+}
+
 // Kosten- en goedkoopste-pagina: de samenvatting hoort direct bij de H1,
 // vóór de site-brede views. Andere artikelen blijven in de bestaande volgorde.
 const COST_LEAD_SLUGS = new Set([
@@ -801,6 +829,7 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
     if (route && route.view === 'faq') {
         html = hydrateFaqView(html, siteFaqs);
     }
+    html = stripInactiveViews(html, route && route.view);
     html = enforceSingleH1(html, route && route.view);
     html = stripSitewideFaqPage(html);
 

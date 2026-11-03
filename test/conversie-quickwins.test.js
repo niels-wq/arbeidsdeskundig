@@ -87,9 +87,9 @@ describe('conversie quick win: kosten', () => {
         assert.match(html, /"dateModified":"2026-10-28"/);
         const h1At = html.indexOf('id="artikel-titel"');
         const kortAt = html.indexOf('>In het kort<');
-        const homeAt = html.indexOf('id="view-home"');
         const h2At = html.search(/<h2\b/);
-        assert.ok(h1At > 0 && kortAt > h1At && kortAt < homeAt, 'H1 en In het kort horen vóór de template-blokken');
+        assert.equal(html.includes('id="view-home"'), false);
+        assert.ok(h1At > 0 && kortAt > h1At, 'H1 en In het kort horen in het artikel');
         assert.ok(h2At === -1 || h1At < h2At, 'H1 hoort vóór template-h2s');
         assertNoDash(blok, 'prijsblok');
         assert.doesNotMatch(blok, /€\s?1\.095/);

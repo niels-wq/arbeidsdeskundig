@@ -1076,7 +1076,7 @@ describe('kennisbank article: deskundigenoordeel vs arbeidsdeskundig onderzoek',
         assert.match(html, /\/aanmelden/);
         assert.match(html, /calendly\.com\/matchvermogen\/call-15-min/);
         assert.match(html, /<div class="view active" id="view-artikel">/);
-        assert.match(html, /<div class="view" id="view-home" hidden>/);
+        assert.doesNotMatch(html, /id="view-home"/);
     });
 
     it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {
@@ -1146,7 +1146,7 @@ describe('kennisbank article: FML/IZP HR beslissen actualiseren', () => {
         assert.match(html, /\/offerte-aanvragen/);
         assert.match(html, /calendly\.com\/matchvermogen\/call-15-min/);
         assert.match(html, /<div class="view active" id="view-artikel">/);
-        assert.match(html, /<div class="view" id="view-home" hidden>/);
+        assert.doesNotMatch(html, /id="view-home"/);
     });
 
     it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {
@@ -1224,7 +1224,7 @@ describe('kennisbank article: arbeidsdeskundig rapport checklist rechtspraak', (
         assert.match(html, /\/offerte-aanvragen/);
         assert.match(html, /\/aanmelden/);
         assert.match(html, /<div class="view active" id="view-artikel">/);
-        assert.match(html, /<div class="view" id="view-home" hidden>/);
+        assert.doesNotMatch(html, /id="view-home"/);
 
         const pages = [];
         const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
@@ -1283,7 +1283,7 @@ describe('kennisbank article: loonsanctie voorkomen dossierfouten', () => {
         assert.match(html, /geregistreerd arbeidsdeskundige/);
         assert.match(html, /<h2[^>]*>Veelgestelde vragen<\/h2>/);
         assert.match(html, /<div class="view active" id="view-artikel">/);
-        assert.match(html, /<div class="view" id="view-home" hidden>/);
+        assert.doesNotMatch(html, /id="view-home"/);
 
         const h1s = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/g) || [];
         assert.equal(h1s.length, 1, `expected 1 <h1>, got ${h1s.length}`);
@@ -1578,9 +1578,9 @@ describe('kennisbank article: goedkoopste arbeidsdeskundig onderzoek', () => {
         assert.doesNotMatch(html, /2027/);
         const leadH1 = html.indexOf('id="artikel-titel"');
         const leadKort = html.indexOf('>In het kort<');
-        const leadHome = html.indexOf('id="view-home"');
         const leadH2 = html.search(/<h2\b/);
-        assert.ok(leadH1 > 0 && leadKort > leadH1 && leadKort < leadHome, 'H1 en In het kort horen vóór de template-blokken');
+        assert.equal(html.includes('id="view-home"'), false);
+        assert.ok(leadH1 > 0 && leadKort > leadH1, 'H1 en In het kort horen in het artikel');
         assert.ok(leadH2 === -1 || leadH1 < leadH2, 'H1 hoort vóór template-h2s');
         assert.equal(articles[0].author.name, 'Niels Alderding');
         assert.equal(articles[0].author.jobTitle, 'geregistreerd arbeidsdeskundige');

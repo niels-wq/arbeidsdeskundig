@@ -47,23 +47,33 @@ function parseViews(html) {
     return views;
 }
 
-function assertOutline(html, activeId) {
+function assertOnlyActiveView(html, activeId, extras = []) {
     const views = parseViews(html);
-    assert.ok(views.length >= 10, `expected the SPA views, got ${views.length}`);
+    const ids = views.map((v) => v.id);
+    assert.deepEqual(ids, [activeId, ...extras]);
     const active = views.filter((v) => v.active);
-    assert.equal(active.length, 1, `expected exactly one .view.active, got ${active.map((v) => v.id).join(',')}`);
+    assert.equal(active.length, 1);
     assert.equal(active[0].id, activeId);
-    assert.equal(active[0].hidden, false, `${activeId} must not have hidden`);
+    assert.equal(active[0].hidden, false);
     for (const view of views) {
         if (view.id === activeId) continue;
-        assert.equal(view.active, false, `${view.id} must not be active`);
-        assert.equal(view.hidden, true, `${view.id} must have hidden`);
+        assert.equal(view.hidden, true, `${view.id} must stay hidden`);
     }
+    const h1s = html.match(/<h1\b/g) || [];
+    assert.equal(h1s.length, 1, `expected 1 h1, got ${h1s.length}`);
 }
 
 describe('SEO: hidden inactive views + sitemap', () => {
     it('static homepage shell already hides inactive views', () => {
-        assertOutline(INDEX_HTML, 'view-home');
+        const views = parseViews(INDEX_HTML);
+        assert.ok(views.length >= 10, `expected the SPA views, got ${views.length}`);
+        const active = views.filter((v) => v.active);
+        assert.equal(active.length, 1);
+        assert.equal(active[0].id, 'view-home');
+        for (const view of views) {
+            if (view.id === 'view-home') continue;
+            assert.equal(view.hidden, true, `${view.id} must have hidden`);
+        }
     });
 
     it('setView toggles hidden together with active', () => {
@@ -81,7 +91,7 @@ describe('SEO: hidden inactive views + sitemap', () => {
             assert.equal(res.status, 200);
             const html = await res.text();
 
-            assertOutline(html, spec.active);
+            assertOnlyActiveView(html, spec.active, spec.path === '/offerte-aanvragen' ? ['view-fysiek-tarief'] : []);
             assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${spec.path.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}">`));
             assert.match(html, /<meta name="robots" content="index, follow">/);
             assert.match(html, new RegExp(`<meta property="og:url" content="https://www\\.arbeidsdeskundig\\.com${spec.path.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}">`));
@@ -96,7 +106,7 @@ describe('SEO: hidden inactive views + sitemap', () => {
         const res = await fetch(base + '/');
         assert.equal(res.status, 200);
         const html = await res.text();
-        assertOutline(html, 'view-home');
+        assertOnlyActiveView(html, 'view-home');
         assert.match(html, /<link rel="canonical" href="https:\/\/www\.arbeidsdeskundig\.com\/">/);
     });
 

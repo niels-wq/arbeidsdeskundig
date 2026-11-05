@@ -140,23 +140,42 @@ const KENNISBANK_SLUG_REDIRECTS = {
     'second-opinion': 'second-opinion-arbeidsdeskundige',
 };
 
-// personaData is pure JSON (gegenereerd met json.dumps), dus simpel te parsen —
-// geen regex-gepuzzel zoals bij de `posts`-array met zijn JS-objectliteral-syntax.
+// personaData is pure JSON. Haakjes binnen strings (een linkmarkering of een
+// FAQ) tellen niet mee, anders kapt de sitemap de array te vroeg af.
+function extractJsonArray(html, marker) {
+    const start = html.indexOf(marker);
+    if (start === -1) return null;
+    const jsonStart = html.indexOf('[', start);
+    if (jsonStart === -1) return null;
+    let depth = 0;
+    let inStr = false;
+    let escape = false;
+    for (let i = jsonStart; i < html.length; i++) {
+        const c = html[i];
+        if (inStr) {
+            if (escape) { escape = false; continue; }
+            if (c === '\\') { escape = true; continue; }
+            if (c === '"') inStr = false;
+            continue;
+        }
+        if (c === '"') { inStr = true; continue; }
+        if (c === '[') depth++;
+        else if (c === ']') {
+            depth--;
+            if (depth === 0) return html.slice(jsonStart, i + 1);
+        }
+    }
+    return null;
+}
+
 function extractPersonas(html) {
     try {
-        const start = html.indexOf('const personaData = ');
-        if (start === -1) {
+        const json = extractJsonArray(html, 'const personaData = ');
+        if (!json) {
             console.error('[seo] Geen `const personaData` gevonden in index.html — /voor/-URLs ontbreken in sitemap.');
             return [];
         }
-        const jsonStart = html.indexOf('[', start);
-        if (jsonStart === -1) return [];
-        let depth = 0, i = jsonStart;
-        for (; i < html.length; i++) {
-            if (html[i] === '[') depth++;
-            else if (html[i] === ']') { depth--; if (depth === 0) { i++; break; } }
-        }
-        const parsed = JSON.parse(html.slice(jsonStart, i));
+        const parsed = JSON.parse(json);
         return Array.isArray(parsed) ? parsed.filter((p) => p && p.slug) : [];
     } catch (e) {
         console.error('[seo] Personas uit index.html lezen mislukt — sitemap slaat /voor/-URLs over:', e);
@@ -609,11 +628,131 @@ function stripSitewideFaqPage(html) {
     );
 }
 
+// [[/pad|label]] in persona-alinea's wordt een interne link. Alleen paden die
+// met één slash beginnen; de rest blijft platte tekst.
+function renderPersonaInline(text) {
+    return escapeHtml(text).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (full, href, label) => {
+        if (!href.startsWith('/') || href.startsWith('//')) return full;
+        return `<a class="blog-link" href="${href}">${label}</a>`;
+    });
+}
+
+function personaParagraphs(lines) {
+    return (lines || []).map((p) => (
+        `<p style="margin-top:12px; font-size:.95rem; color:var(--muted); line-height:1.65;">${renderPersonaInline(p)}</p>`
+    )).join('');
+}
+
+function personaSectionsHtml(persona) {
+    return (persona.sections || []).map((s) => {
+        const list = (s.punten && s.punten.length)
+            ? `<ul style="margin:12px 0 0; padding-left:18px; color:var(--muted); font-size:.95rem; line-height:1.65;">${
+                s.punten.map((p) => `<li style="margin-top:8px;">${renderPersonaInline(p)}</li>`).join('')
+            }</ul>`
+            : '';
+        return (
+            `<section style="margin-top:36px;">` +
+            `<h2 style="font-size:1.35rem; color:var(--ink);">${escapeHtml(s.titel)}</h2>` +
+            personaParagraphs(s.alinea) +
+            list +
+            personaParagraphs(s.slot) +
+            `</section>`
+        );
+    }).join('');
+}
+
+function personaKernpuntenHtml(persona) {
+    const asHeading = !(persona.sections && persona.sections.length);
+    const cards = (persona.kernpunten || []).map((k) => {
+        const title = asHeading
+            ? `<h2 style="font-size:1.05rem; color:var(--ink); margin:0;">${escapeHtml(k.titel)}</h2>`
+            : `<p style="font-weight:600; font-size:.9rem; color:var(--ink); margin:0;">${escapeHtml(k.titel)}</p>`;
+        return (
+            `<div class="card" style="padding:18px 20px;">${title}` +
+            `<p style="margin-top:6px; font-size:.85rem; color:var(--muted);">${escapeHtml(k.tekst)}</p></div>`
+        );
+    }).join('');
+    if (!cards) return '';
+    const grid = `<div class="grid2" style="margin-top:${asHeading ? '28px' : '16px'}; gap:16px;">${cards}</div>`;
+    if (asHeading) return grid;
+    return `<h2 style="font-size:1.35rem; color:var(--ink); margin-top:36px;">In het kort</h2>${grid}`;
+}
+
+function personaCasesHtml(persona) {
+    if (!persona.cases || !persona.cases.length) return '';
+    const cards = persona.cases.map((c) => (
+        `<div class="card" style="padding:20px 22px; border-left:3px solid var(--teal);">` +
+        `<h3 style="font-size:.92rem; color:var(--ink); margin:0;">${escapeHtml(c.titel)}</h3>` +
+        `<p style="margin-top:8px; font-size:.87rem; color:var(--muted); line-height:1.6;">${escapeHtml(c.tekst)}</p>` +
+        `</div>`
+    )).join('');
+    return (
+        `<h2 style="font-size:1.35rem; color:var(--ink);">Praktijkvoorbeelden</h2>` +
+        `<div style="margin-top:16px; display:flex; flex-direction:column; gap:16px;">${cards}</div>`
+    );
+}
+
+function personaFaqHtml(persona) {
+    if (!persona.faq || !persona.faq.length) return '';
+    const items = persona.faq.map(([q, a]) => (
+        `<div class="accordion-item open">` +
+        `<button class="accordion-head" onclick="toggleAccordion(this)">${escapeHtml(q)}<span class="accordion-icon">+</span></button>` +
+        `<div class="accordion-body" style="max-height:none;"><div class="accordion-body-inner">${escapeHtml(a)}</div></div>` +
+        `</div>`
+    )).join('');
+    return (
+        `<h2 style="font-size:1.35rem; color:var(--ink);">Veelgestelde vragen</h2>` +
+        `<div id="persona-faq-list" style="margin-top:12px;">${items}</div>`
+    );
+}
+
+function personaLinksHtml(persona) {
+    const cards = (persona.links || []).map((slug) => {
+        const post = posts.find((p) => p.slug === slug);
+        if (!post) return '';
+        const safeSlug = String(post.slug).replace(/[^a-z0-9-]/g, '');
+        if (!safeSlug) return '';
+        return (
+            `<a href="/kennisbank/${safeSlug}" class="card" style="text-align:left; text-decoration:none; display:block; cursor:pointer;" onclick="event.preventDefault(); openArtikel('${safeSlug}');">` +
+            `<span class="mono eyebrow" style="color:var(--teal); text-transform:uppercase;">${escapeHtml(post.tag)}</span>` +
+            `<p style="font-weight:600; margin-top:6px; font-size:.85rem; color:var(--ink);">${escapeHtml(post.title)}</p></a>`
+        );
+    }).join('');
+    if (!cards) return '';
+    return (
+        `<h2 style="font-size:1.35rem; color:var(--ink);">Meer lezen</h2>` +
+        `<div class="grid3" style="margin-top:12px;">${cards}</div>`
+    );
+}
+
+function fillPersonaSlot(html, marker, inner, { hideWhenEmpty = false } = {}) {
+    const empty = hideWhenEmpty
+        ? `<div id="${marker}" style="margin-top:40px;" hidden></div>`
+        : `<div id="${marker}"></div>`;
+    if (!inner) return html;
+    const filled = hideWhenEmpty
+        ? `<div id="${marker}" style="margin-top:40px;">${inner}</div>`
+        : `<div id="${marker}">${inner}</div>`;
+    return html.replace(empty, filled);
+}
+
 function hydratePersonaView(html, persona) {
     if (!persona) return html;
     html = html.replace(
         'id="persona-titel">Titel</h1>',
         `id="persona-titel">${escapeHtml(persona.title)}</h1>`
+    );
+    html = html.replace(
+        'id="persona-intro"></p>',
+        `id="persona-intro">${escapeHtml(persona.intro || '')}</p>`
+    );
+    html = html.replace(
+        '<span id="persona-breadcrumb"></span>',
+        `<span id="persona-breadcrumb">${escapeHtml(persona.label || '')}</span>`
+    );
+    html = html.replace(
+        '<span id="persona-label"></span>',
+        `<span id="persona-label">${escapeHtml(String(persona.label || '').toLowerCase())}</span>`
     );
     if (persona.slug === 'werknemer') {
         html = html.replace(
@@ -621,6 +760,11 @@ function hydratePersonaView(html, persona) {
             '<p id="persona-tolk-link" style="margin-top:14px; font-size:.95rem; color:var(--muted); max-width:680px;">Spreek je onvoldoende Nederlands? Vraag om een <a class="blog-link" href="/arbeidsdeskundige-met-tolk">professionele tolk, beëdigd indien nodig</a>.</p>'
         );
     }
+    html = fillPersonaSlot(html, 'persona-sections', personaSectionsHtml(persona));
+    html = fillPersonaSlot(html, 'persona-kernpunten', personaKernpuntenHtml(persona));
+    html = fillPersonaSlot(html, 'persona-cases-wrap', personaCasesHtml(persona), { hideWhenEmpty: true });
+    html = fillPersonaSlot(html, 'persona-faq-wrap', personaFaqHtml(persona), { hideWhenEmpty: true });
+    html = fillPersonaSlot(html, 'persona-links-wrap', personaLinksHtml(persona), { hideWhenEmpty: true });
     return html;
 }
 
@@ -1102,11 +1246,14 @@ app.get('/voor/:slug', (req, res, next) => {
     const persona = personas.find((p) => p.slug === req.params.slug);
     if (!persona) return next(); // -> 404 handler
 
+    const faqJsonLd = (persona.faq && persona.faq.length) ? faqPageJsonLd(persona.faq) : null;
+
     renderPage(res, {
         title: pageTitle(persona.seoTitle, persona.title),
         description: persona.meta,
         canonicalPath: '/voor/' + persona.slug,
         route: { view: 'persona', slug: persona.slug },
+        faqJsonLd,
         breadcrumbJsonLd: breadcrumbFor([
             { name: 'Home', path: '/' },
             { name: persona.label, path: '/voor/' + persona.slug },
@@ -1286,7 +1433,7 @@ const LLMS_AUDIENCE_BLURBS = {
     'hr-adviseur': 'Poortwachter-termijnen bij meerdere verzuimdossiers',
     'werknemer': 'wat een onderzoek inhoudt en welke rechten je hebt',
     'casemanager': 'een vaste arbeidsdeskundige partner in het re-integratieproces',
-    'wga-specialist': 'onderbouwing bij WHK-premie en WGA-schadelast',
+    'wga-specialist': 'arbeidsdeskundig onderzoek WGA voor eigenrisicodragers Ziektewet en WGA',
     'directeur-eigenaar': 'kosten, risico en opbrengst van een onderzoek',
     'letselschadejurist': 'objectieve onderbouwing van verlies aan verdienvermogen',
 };

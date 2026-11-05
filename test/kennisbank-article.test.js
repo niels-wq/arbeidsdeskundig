@@ -192,20 +192,27 @@ const NADELEN_RESERVED = [
 ];
 
 describe('kennisbank article: nadelen arbeidsdeskundig onderzoek', () => {
-    it('serves unique investigation-inside article HTML with SEO tags and schema', async () => {
+    it('serves the employee and lawyer angle with FAQ schema and CTAs', async () => {
         const res = await fetch(base + NADELEN_PATH);
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>Nadelen van een arbeidsdeskundig onderzoek \| Arbeidsdeskundig\.com<\/title>/);
-        assert.match(html, /<meta name="description" content="Nadelen van een arbeidsdeskundig onderzoek: wat wringt in FML\/IZP, rapportkeuzes en het gesprek. Hoe je ze kleiner maakt. Offerte of kennismaking.">/);
+        const title = 'Nadelen arbeidsdeskundig onderzoek: werknemer en jurist | Arbeidsdeskundig.com';
+        const meta = 'Nadelen arbeidsdeskundig onderzoek: wat kan tegenvallen voor werknemer en jurist. Grenzen, voorbereiden, concept, deskundigenoordeel of second opinion.';
+        assert.match(html, new RegExp('<title>' + title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '</title>'));
+        assert.ok(title.toLowerCase().includes('nadelen arbeidsdeskundig onderzoek'));
+        assert.ok(title.endsWith(' | Arbeidsdeskundig.com'));
+        assert.match(html, new RegExp('<meta name="description" content="' + meta.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '">'));
+        assert.ok(meta.length >= 140 && meta.length <= 155, String(meta.length));
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${NADELEN_PATH}">`));
         assert.match(html, /"@type":"Article"/);
         assert.match(html, /"@type":"FAQPage"/);
+        assert.match(html, /Laatst bijgewerkt: 2026-11-02/);
+        assert.equal(html.includes('\u2014'), false);
 
         const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
         assert.ok(h1Match, 'SSR H1 missing');
-        assert.equal(h1Match[1], 'Nadelen van een arbeidsdeskundig onderzoek (en hoe je ze kleiner maakt)');
+        assert.equal(h1Match[1], 'Nadelen arbeidsdeskundig onderzoek: wat kan tegenvallen, en wat je er zelf aan doet');
 
         const marker = 'id="artikel-body">';
         const bodyStart = html.indexOf(marker);
@@ -213,31 +220,77 @@ describe('kennisbank article: nadelen arbeidsdeskundig onderzoek', () => {
         const after = html.slice(bodyStart + marker.length);
         const bodyEnd = after.indexOf('</div>');
         const body = after.slice(0, bodyEnd);
-        assert.match(body, /<h2>Nadelen van een arbeidsdeskundig onderzoek<\/h2>/);
+        for (const heading of [
+            'Wat kan tegenvallen',
+            'Welke beperkingen het onderzoek heeft',
+            'Wat je zelf doet: het gesprek voorbereiden',
+            'Reageren op het concept',
+            'Deskundigenoordeel of second opinion',
+            'De werkgeversafweging staat elders',
+            'Offerte of aanmelden',
+        ]) {
+            assert.match(body, new RegExp('<h2>' + heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '</h2>'));
+        }
         assert.match(body, /nadelen arbeidsdeskundig onderzoek/);
         assert.match(body, /binnen het onderzoek zelf/);
-        assert.match(body, /Rapportkeuzes die als nadeel voelen/);
-        assert.match(body, /Gespreksdynamiek/);
-        assert.match(body, /Hoe voorbereiding die nadelen kleiner maakt/);
+        assert.match(body, /7:658a lid 4 BW/);
+        assert.match(body, /https:\/\/www\.matchvermogen\.nl\/nadelen-van-arbeidsdeskundig-onderzoek\//);
         assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
         assert.doesNotMatch(body, /papieren werkelijkheid/);
         assert.doesNotMatch(body, /kille keuring/);
         assert.doesNotMatch(body, /mokerslag/);
         assert.doesNotMatch(body, /verplicht nummertje/);
         assert.doesNotMatch(body, /onmisbare waarde van de échte expert/);
+        assert.equal(body.includes('\u2014'), false);
+        assert.equal(body.includes('\u2013'), false);
+        assert.match(body, /function setView|setView\('aanmelden'\)/);
+        assert.match(body, /openArtikel\('voorbereiden-gesprek-arbeidsdeskundige'\)/);
 
-        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 100).join(' ');
+        const words = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+        assert.ok(words.length > 1500, String(words.length));
+        const firstWords = words.slice(0, 100).join(' ');
         assert.match(firstWords, /nadelen arbeidsdeskundig onderzoek/i);
         assert.match(firstWords, /nadelen van een arbeidsdeskundig onderzoek/i);
 
-        assert.match(html, /kennisbank\/voorbereiden-gesprek-arbeidsdeskundige/);
-        assert.match(html, /kennisbank\/passende-arbeid/);
-        assert.match(html, /kennisbank\/fml-izp-lezen-belastbaarheid/);
-        assert.match(html, /kennisbank\/tips-werknemer-arbeidsdeskundig-onderzoek/);
-        assert.match(html, /kennisbank\/kosten-arbeidsdeskundig-onderzoek/);
-        assert.match(html, /kennisbank\/wat-doet-arbeidsdeskundige/);
-        assert.match(html, /\/offerte-aanvragen/);
-        assert.match(html, /calendly\.com\/matchvermogen\/call-15-min/);
+        assert.match(body, /href="\/kennisbank\/voorbereiden-gesprek-arbeidsdeskundige"/);
+        assert.match(body, /href="\/kennisbank\/second-opinion-arbeidsdeskundige"/);
+        assert.match(body, /href="\/kennisbank\/deskundigenoordeel"/);
+        assert.match(body, /href="\/kennisbank\/deskundigenoordeel-vs-arbeidsdeskundig-onderzoek"/);
+        assert.match(body, /href="\/kennisbank\/passende-arbeid"/);
+        assert.match(body, /href="\/kennisbank\/fml-izp-lezen-belastbaarheid"/);
+        assert.match(body, /href="\/kennisbank\/tips-werknemer-arbeidsdeskundig-onderzoek"/);
+        assert.match(body, /href="\/kennisbank\/kosten-arbeidsdeskundig-onderzoek"/);
+        assert.match(body, /href="\/kennisbank\/wat-doet-arbeidsdeskundige"/);
+        assert.match(body, /href="\/offerte-aanvragen"/);
+        assert.match(body, /href="\/aanmelden"/);
+        assert.match(body, /calendly\.com\/matchvermogen\/call-15-min/);
+
+        const blocks = [];
+        const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+        let m;
+        while ((m = re.exec(html))) blocks.push(JSON.parse(m[1]));
+        const articles = blocks.filter((b) => b['@type'] === 'Article');
+        assert.equal(articles.length, 1);
+        assert.equal(articles[0].dateModified, '2026-11-02');
+        assert.equal(articles[0].headline, h1Match[1]);
+
+        const faqStart = html.indexOf('id="artikel-faq-list"');
+        assert.notEqual(faqStart, -1);
+        const faqSlice = html.slice(faqStart, html.indexOf('id="artikel-gerelateerd"', faqStart));
+        const questions = [...faqSlice.matchAll(/<button class="accordion-head"[^>]*>([^<]+)<span/g)].map((x) => x[1]);
+        const answers = [...faqSlice.matchAll(/<div class="accordion-body-inner">([^<]*)<\/div>/g)].map((x) => x[1]);
+        assert.equal(questions.length, answers.length);
+        assert.ok(questions.length >= 5 && questions.length <= 7, String(questions.length));
+        const faqs = blocks.filter((b) => b['@type'] === 'FAQPage');
+        assert.equal(faqs.length, 1);
+        assert.equal(faqs[0].mainEntity.length, questions.length);
+        faqs[0].mainEntity.forEach((item, i) => {
+            assert.equal(item.name, questions[i]);
+            assert.equal(item.acceptedAnswer.text, answers[i]);
+        });
+        assert.match(questions.join('\n'), /conceptrapport/);
+        assert.match(questions.join('\n'), /deskundigenoordeel/);
+        assert.match(questions.join('\n'), /second opinion/);
     });
 
     it('is listed once in sitemap.xml and does not collide with reserved slugs', async () => {

@@ -1072,9 +1072,9 @@ function absoluteUrl(pathname) {
     return BASE_URL + (pathname.startsWith('/') ? pathname : '/' + pathname);
 }
 
-function sitemapUrlEl(loc, { changefreq = 'weekly', priority = '0.7' } = {}) {
-    const today = new Date().toISOString().slice(0, 10);
-    return `  <url><loc>${xmlEscape(loc)}</loc><lastmod>${today}</lastmod><changefreq>${changefreq}</changefreq><priority>${priority}</priority></url>`;
+function sitemapUrlEl(loc, { changefreq = 'weekly', priority = '0.7', lastmod } = {}) {
+    const day = lastmod || new Date().toISOString().slice(0, 10);
+    return `  <url><loc>${xmlEscape(loc)}</loc><lastmod>${xmlEscape(day)}</lastmod><changefreq>${changefreq}</changefreq><priority>${priority}</priority></url>`;
 }
 
 function buildSitemapXml() {
@@ -1100,6 +1100,7 @@ function buildSitemapXml() {
             .map((p) => sitemapUrlEl(absoluteUrl('/kennisbank/' + p.slug), {
                 changefreq: 'monthly',
                 priority: '0.6',
+                lastmod: p.slug === 'fml-izp-lezen-belastbaarheid' ? (p.dateModified || '2026-11-09') : undefined,
             })),
     ];
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>`;

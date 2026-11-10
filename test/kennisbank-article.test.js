@@ -525,15 +525,26 @@ describe('kennisbank hub: gids arbeidsdeskundig onderzoek', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        assert.match(html, /<title>Gids arbeidsdeskundig onderzoek \| Arbeidsdeskundig\.com<\/title>/);
-        assert.match(html, /<meta name="description" content="Gids arbeidsdeskundig onderzoek: wat het is, of het moet, timing, kosten, werknemersrechten en UWV\. Links naar de diepte-artikelen\. Offerte of aanmelden\.">/);
+        const TITLE = 'Arbeidsdeskundig onderzoek: wat het is en hoe het werkt | Arbeidsdeskundig.com';
+        const META = 'Arbeidsdeskundig onderzoek: de vier kernvragen, timing en de stappen. Zo weet je of eigen werk nog past. Vraag een offerte aan of meld je aan.';
+        const H1 = 'Arbeidsdeskundig onderzoek: wat het is, wanneer en hoe het werkt';
+        const titleCore = TITLE.replace(/ \| Arbeidsdeskundig\.com$/, '');
+        assert.ok(titleCore.length >= 50 && titleCore.length <= 60, titleCore + ' (' + titleCore.length + ')');
+        assert.ok(META.length >= 140 && META.length <= 155, String(META.length));
+
+        assert.match(html, new RegExp('<title>' + TITLE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '</title>'));
+        assert.match(html, new RegExp('<meta name="description" content="' + META.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '">'));
+        assert.match(html, new RegExp('<meta property="og:title" content="' + TITLE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '">'));
+        assert.match(html, new RegExp('<meta property="og:description" content="' + META.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '">'));
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${GIDS_PATH}">`));
+        assert.equal((html.match(/<h1\b/g) || []).length, 1);
         assert.match(html, /"@type":"Article"/);
         assert.match(html, /"@type":"FAQPage"/);
+        assert.match(html, /"@type":"BreadcrumbList"/);
 
         const h1Match = html.match(/id="artikel-titel">([^<]+)<\/h1>/);
         assert.ok(h1Match, 'SSR H1 missing');
-        assert.equal(h1Match[1], 'Alles over arbeidsdeskundig onderzoek: de gids');
+        assert.equal(h1Match[1], H1);
         assert.notEqual(h1Match[1], 'Arbeidsdeskundig onderzoek. Vanaf €999,-.');
         assert.notEqual(h1Match[1], 'Alles over arbeidsdeskundig onderzoek');
 
@@ -543,22 +554,54 @@ describe('kennisbank hub: gids arbeidsdeskundig onderzoek', () => {
         const after = html.slice(bodyStart + marker.length);
         const bodyEnd = after.indexOf('</div>');
         const body = after.slice(0, bodyEnd);
-        assert.match(body, /<h2>Alles over arbeidsdeskundig onderzoek: de gids<\/h2>/);
-        assert.match(body, /gids arbeidsdeskundig onderzoek/);
-        assert.match(body, /kaart van het cluster/);
-        assert.match(body, /Wat het onderzoek is, en wat niet/);
-        assert.match(body, /Moet het, wanneer, en wat kost het/);
-        assert.match(body, /Als je werknemer bent/);
-        assert.match(body, /Als het wringt of je twijfelt/);
-        assert.match(body, /Richting UWV: RIV en de WIA-wacht/);
+        for (const heading of [
+            'Wat is een arbeidsdeskundig onderzoek?',
+            'Welke vier vragen beantwoordt het onderzoek?',
+            'Wanneer laat je een arbeidsdeskundig onderzoek doen?',
+            'Is een arbeidsdeskundig onderzoek verplicht?',
+            'Hoe verloopt een arbeidsdeskundig onderzoek?',
+            'Wie vraagt een arbeidsdeskundig onderzoek aan, en wie voert het uit?',
+            'Hoe lang duurt een arbeidsdeskundig onderzoek?',
+            'Wat kost een arbeidsdeskundig onderzoek?',
+            'Wat staat er in het rapport, en wat doe je ermee?',
+            'Welke rechten heeft de werknemer?',
+            'Wat is het verschil met de arbeidsdeskundige van UWV?',
+            'Wat als je het niet eens bent?',
+        ]) {
+            assert.match(body, new RegExp('<h2 id="gids-[^"]+">' + heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '</h2>'));
+        }
+        assert.match(html, /<h2[^>]*>Veelgestelde vragen<\/h2>/);
         assert.match(body, /matchvermogen\.nl/);
+        assert.match(body, /vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek/);
+        assert.doesNotMatch(body, /€1\.149|€1\.179|€1\.449|\+€295|\+€300/);
         assert.doesNotMatch(body, /Dit artikel wordt binnenkort toegevoegd/);
         assert.doesNotMatch(body, /Doe de gratis keuzehulp/);
-        assert.doesNotMatch(body, /Vanaf €999/);
+        assert.doesNotMatch(body, /—/);
+        assert.doesNotMatch(body, /–/);
+        assert.equal((body.match(/href="\/kennisbank\/voorbereiden-gesprek-arbeidsdeskundige"/g) || []).length, 1);
 
-        const firstWords = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 80).join(' ');
-        assert.match(firstWords, /gids arbeidsdeskundig onderzoek/i);
+        const words = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+        assert.ok(words.length >= 2000 && words.length <= 2800, 'word count ' + words.length);
+        const firstWords = words.slice(0, 40).join(' ');
+        assert.match(firstWords, /^Een arbeidsdeskundig onderzoek is /);
         assert.doesNotMatch(firstWords, /Binnen 24 uur opgepakt/);
+
+        assert.equal((body.match(/<a class="btn-primary" href="\/offerte-aanvragen"/g) || []).length, 3);
+        assert.equal((body.match(/<a class="btn-ghost" href="\/aanmelden"/g) || []).length, 3);
+
+        const blocks = [];
+        const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+        let match;
+        while ((match = re.exec(html))) blocks.push(JSON.parse(match[1]));
+        const articles = blocks.filter((b) => b['@type'] === 'Article');
+        assert.equal(articles.length, 1);
+        assert.equal(articles[0].headline, H1);
+        assert.equal(articles[0].dateModified, '2026-11-10');
+        const faqs = blocks.filter((b) => b['@type'] === 'FAQPage');
+        assert.equal(faqs.length, 1);
+        assert.ok(faqs[0].mainEntity.length >= 5 && faqs[0].mainEntity.length <= 6);
+        const crumbs = blocks.filter((b) => b['@type'] === 'BreadcrumbList');
+        assert.equal(crumbs.length, 1);
 
         for (const slug of GIDS_CLUSTER) {
             const hrefRe = new RegExp(`<a[^>]+href="/kennisbank/${slug}"`);
@@ -575,6 +618,7 @@ describe('kennisbank hub: gids arbeidsdeskundig onderzoek', () => {
         assert.equal(res.status, 200);
         const xml = await res.text();
         assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${GIDS_PATH}`));
+        assert.match(xml, /<loc>https:\/\/www\.arbeidsdeskundig\.com\/kennisbank\/arbeidsdeskundig-onderzoek-gids<\/loc><lastmod>2026-11-10<\/lastmod>/);
         assert.equal((xml.match(new RegExp(GIDS_SLUG, 'g')) || []).length, 1);
         for (const slug of GIDS_CLUSTER) {
             assert.notEqual(slug, GIDS_SLUG);
@@ -587,6 +631,23 @@ describe('kennisbank hub: gids arbeidsdeskundig onderzoek', () => {
         assert.equal(home.status, 200);
         const homeHtml = await home.text();
         assert.match(homeHtml, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"/);
+        assert.match(homeHtml, /<a class="blog-link" href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"[^>]*>arbeidsdeskundig onderzoek<\/a>/);
+
+        const linkedFrom = [
+            '/kennisbank/verplicht-arbeidsdeskundig-onderzoek',
+            '/kennisbank/arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
+            '/kennisbank/wat-doet-arbeidsdeskundige',
+        ];
+        for (const source of linkedFrom) {
+            const sourceHtml = await (await fetch(base + source)).text();
+            const sourceBodyStart = sourceHtml.indexOf('id="artikel-body">');
+            const sourceBody = sourceHtml.slice(sourceBodyStart, sourceHtml.indexOf('</div>', sourceBodyStart));
+            assert.match(
+                sourceBody,
+                /<a class="blog-link" href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"[^>]*>arbeidsdeskundig onderzoek<\/a>/,
+                source
+            );
+        }
 
         const listing = await fetch(base + '/kennisbank');
         assert.equal(listing.status, 200);

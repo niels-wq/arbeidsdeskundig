@@ -12,7 +12,7 @@ const VIEW_OPEN_RE = /<div class="(view(?: active)?)" id="(view-[^"]+)"( hidden)
 
 const PROBLEM_PATHS = [
     { path: '/kennisbank/wat-doet-arbeidsdeskundige', active: 'view-artikel', titleH1: /Wat doet een arbeidsdeskundige precies/ },
-    { path: '/kennisbank/arbeidsdeskundig-onderzoek-gids', active: 'view-artikel', titleH1: /Alles over arbeidsdeskundig onderzoek: de gids/ },
+    { path: '/kennisbank/arbeidsdeskundig-onderzoek-gids', active: 'view-artikel', titleH1: /Arbeidsdeskundig onderzoek: wat het is, wanneer en hoe het werkt/ },
     { path: '/offerte-aanvragen', active: 'view-offerte', titleH1: /Vraag je offerte aan: vanaf €999,-/ },
     { path: '/aanmelden', active: 'view-aanmelden', titleH1: /Meld je onderzoek aan: vanaf €999,-/ },
 ];

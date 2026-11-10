@@ -26,7 +26,7 @@ const ROUTES = [
     },
     {
         path: '/kennisbank/arbeidsdeskundig-onderzoek-gids',
-        h1: 'Alles over arbeidsdeskundig onderzoek: de gids',
+        h1: 'Arbeidsdeskundig onderzoek: wat het is, wanneer en hoe het werkt',
         article: true,
     },
 ];

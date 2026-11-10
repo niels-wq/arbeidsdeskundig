@@ -161,7 +161,7 @@ describe('conversie quick win: gids', () => {
         assert.equal(h1s.length, 1);
         const body = articleBody(html);
         assert.match(body, /<nav class="gids-toc" aria-label="Inhoudsopgave">/);
-        for (const id of ['gids-wat-het-is', 'gids-moet-wanneer-kosten', 'gids-werknemer', 'gids-wringt', 'gids-uwv', 'gids-offerte']) {
+        for (const id of ['gids-wat', 'gids-vier-vragen', 'gids-wanneer', 'gids-verplicht', 'gids-stappen', 'gids-wie', 'gids-duur', 'gids-kosten', 'gids-rapport', 'gids-rechten', 'gids-uwv', 'gids-oneens', 'gids-offerte']) {
             assert.match(body, new RegExp(`href="#${id}"`));
             assert.match(body, new RegExp(`id="${id}"`));
         }

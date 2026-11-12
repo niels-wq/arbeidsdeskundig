@@ -20,7 +20,7 @@ const ARTICLES = [
         path: '/kennisbank/voorbereiden-gesprek-arbeidsdeskundige',
         own: VOORBEREIDEN_BODY,
         foreign: [WERKNEMER_BODY, ERVARINGEN_BODY],
-        phrase: 'gesprek met de arbeidsdeskundige voorbereiden',
+        phrase: 'gesprek met de arbeidsdeskundige',
     },
     {
         path: '/kennisbank/tips-werknemer-arbeidsdeskundig-onderzoek',
@@ -144,7 +144,7 @@ describe('SEO: one article per URL', () => {
             assert.equal(html.includes(WERKNEMER_BODY), false);
             assert.match(html, /seoTitle:"[^"]+\| Arbeidsdeskundig\.com"/);
             assert.match(html, /slug:"voorbereiden-gesprek-arbeidsdeskundige"/);
-            assert.match(html, /title:"Gesprek met de arbeidsdeskundige voorbereiden: wat neem je mee en wat vraag je\?"/);
+            assert.match(html, /title:"Gesprek met de arbeidsdeskundige: voorbereiden, vragen en verloop"/);
             assert.ok(html.length < 750000, `${path} still too large: ${html.length}`);
         }
     });

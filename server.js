@@ -757,7 +757,7 @@ function hydratePersonaView(html, persona) {
     if (persona.slug === 'werknemer') {
         html = html.replace(
             '<p id="persona-tolk-link" hidden style="margin-top:14px; font-size:.95rem; color:var(--muted); max-width:680px;"></p>',
-            '<p id="persona-tolk-link" style="margin-top:14px; font-size:.95rem; color:var(--muted); max-width:680px;">Spreek je onvoldoende Nederlands? Vraag om een <a class="blog-link" href="/arbeidsdeskundige-met-tolk">professionele tolk, beëdigd indien nodig</a>.</p>'
+            '<p id="persona-tolk-link" style="margin-top:14px; font-size:.95rem; color:var(--muted); max-width:680px;">Spreek je onvoldoende Nederlands? Vraag om een <a class="blog-link" href="/arbeidsdeskundige-met-tolk">professionele tolk, beëdigd indien nodig</a>. Zo bereid je het <a class="blog-link" href="/kennisbank/voorbereiden-gesprek-arbeidsdeskundige">gesprek met de arbeidsdeskundige</a> voor.</p>'
         );
     }
     html = fillPersonaSlot(html, 'persona-sections', personaSectionsHtml(persona));
@@ -1104,7 +1104,9 @@ function buildSitemapXml() {
                     ? (p.dateModified || '2026-11-09')
                     : p.slug === 'arbeidsdeskundig-onderzoek-gids'
                         ? (p.dateModified || '2026-11-10')
-                        : undefined,
+                        : p.slug === 'voorbereiden-gesprek-arbeidsdeskundige'
+                            ? (p.dateModified || '2026-11-12')
+                            : undefined,
             })),
     ];
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>`;
@@ -1430,6 +1432,7 @@ const LLMS_EXTRA_ROUTES = [
     ['wia-aanvraag', 'WIA-aanvraag', 'de aanvraag voorbereiden met een arbeidsdeskundig rapport'],
     ['deskundigenoordeel', 'Deskundigenoordeel', 'wanneer je een deskundigenoordeel bij UWV aanvraagt'],
     ['hoe-lang-duurt-onderzoek', 'Doorlooptijd', 'hoe lang een arbeidsdeskundig onderzoek duurt'],
+    ['voorbereiden-gesprek-arbeidsdeskundige', 'Gesprek met de arbeidsdeskundige', 'verloop, vragen en wat je doet als je niet bent uitgenodigd'],
 ];
 
 // Alleen doelgroepen die personaData (en dus de sitemap) ook echt kent.

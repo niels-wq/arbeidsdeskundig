@@ -111,6 +111,19 @@ function extractPosts(html) {
 
 const posts = extractPosts(INDEX_HTML);
 
+// Eén datamap voor Article-JSON-LD, de zichtbare wijzigingsdatum en sitemap-lastmod.
+// Geen deploydatum: zie data/page-dates.json voor de methode.
+const PAGE_DATES = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'page-dates.json'), 'utf8'));
+for (const post of posts) {
+    const row = PAGE_DATES.kennisbank && PAGE_DATES.kennisbank[post.slug];
+    if (!row || !row.datePublished || !row.dateModified) {
+        console.error('[seo] Datum ontbreekt voor kennisbank/' + post.slug);
+        continue;
+    }
+    post.datePublished = row.datePublished;
+    post.dateModified = row.dateModified;
+}
+
 // Artikelteksten (template literals in `articleContent`) — nodig om kennisbank-
 // URL's zonder JavaScript al unieke, crawlbare content te geven. Zonder dit
 // ziet Google op elke artikel-URL dezelfde homepage (view-home is standaard
@@ -138,6 +151,8 @@ const articleBodies = extractArticleBodies(INDEX_HTML);
 const KENNISBANK_SLUG_REDIRECTS = {
     'mediations-arbeidsconflict': 'mediation-arbeidsconflict',
     'second-opinion': 'second-opinion-arbeidsdeskundige',
+    // Hybride pagina (title/H1 over WGA en IVA). De loonsanctie-uitleg staat op de dossierpagina.
+    'loonsanctie': 'loonsanctie-voorkomen-dossierfouten',
 };
 
 // personaData is pure JSON. Haakjes binnen strings (een linkmarkering of een
@@ -422,6 +437,8 @@ function activateView(html, view) {
     );
     if (view === 'offerte' || view === 'aanmelden') {
         html = html.replace('<body>', `<body class="conv-page conv-${view}">`);
+    } else if (view === 'calculator') {
+        html = html.replace('<body>', '<body class="view-calculator">');
     }
     return html;
 }
@@ -1037,7 +1054,8 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
     if (chatSnippet) html = html.replace('</body>', chatSnippet + '</body>');
 
     const routeScript = `<script>window.__ROUTE__ = ${JSON.stringify(route)};</script>\n`;
-    html = html.replace('<script>', routeScript + '<script>');
+    const datesScript = `<script>window.__ARTICLE_DATES__ = ${JSON.stringify(PAGE_DATES.kennisbank || {})};</script>\n`;
+    html = html.replace('<script>', datesScript + routeScript + '<script>');
 
     if (currentSlug && COST_LEAD_SLUGS.has(currentSlug)) {
         html = placeInHetKortAfterH1(html);
@@ -1072,9 +1090,26 @@ function absoluteUrl(pathname) {
     return BASE_URL + (pathname.startsWith('/') ? pathname : '/' + pathname);
 }
 
+function requireLastmod(lastmod, loc) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(lastmod || '')) {
+        throw new Error('lastmod ontbreekt voor ' + loc);
+    }
+    return lastmod;
+}
+
 function sitemapUrlEl(loc, { changefreq = 'weekly', priority = '0.7', lastmod } = {}) {
-    const day = lastmod || new Date().toISOString().slice(0, 10);
+    const day = requireLastmod(lastmod, loc);
     return `  <url><loc>${xmlEscape(loc)}</loc><lastmod>${xmlEscape(day)}</lastmod><changefreq>${changefreq}</changefreq><priority>${priority}</priority></url>`;
+}
+
+function staticLastmod(pathname) {
+    const row = PAGE_DATES.pages && PAGE_DATES.pages[pathname];
+    return requireLastmod(row && row.dateModified, pathname);
+}
+
+function personaLastmod(slug) {
+    const row = PAGE_DATES.personas && PAGE_DATES.personas[slug];
+    return requireLastmod(row && row.dateModified, '/voor/' + slug);
 }
 
 function buildSitemapXml() {
@@ -1088,25 +1123,21 @@ function buildSitemapXml() {
         ...staticPaths.map((p) => sitemapUrlEl(absoluteUrl(p), {
             changefreq: 'weekly',
             priority: p === '/' ? '1.0' : '0.7',
+            lastmod: staticLastmod(p),
         })),
         ...personaList
             .filter((p) => p && p.slug)
             .map((p) => sitemapUrlEl(absoluteUrl('/voor/' + p.slug), {
                 changefreq: 'monthly',
                 priority: '0.7',
+                lastmod: personaLastmod(p.slug),
             })),
         ...postList
-            .filter((p) => p && p.slug)
+            .filter((p) => p && p.slug && !KENNISBANK_SLUG_REDIRECTS[p.slug])
             .map((p) => sitemapUrlEl(absoluteUrl('/kennisbank/' + p.slug), {
                 changefreq: 'monthly',
                 priority: '0.6',
-                lastmod: p.slug === 'fml-izp-lezen-belastbaarheid'
-                    ? (p.dateModified || '2026-11-09')
-                    : p.slug === 'arbeidsdeskundig-onderzoek-gids'
-                        ? (p.dateModified || '2026-11-10')
-                        : p.slug === 'voorbereiden-gesprek-arbeidsdeskundige'
-                            ? (p.dateModified || '2026-11-12')
-                            : undefined,
+                lastmod: requireLastmod(p.dateModified, '/kennisbank/' + p.slug),
             })),
     ];
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>`;
@@ -1339,7 +1370,7 @@ app.get('/sitemap.xml', (req, res) => {
         sendSitemap(res, buildSitemapXml());
     } catch (err) {
         console.error('[sitemap] generatie mislukt, stuur minimale fallback:', err);
-        const fallback = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrlEl(absoluteUrl('/'), { changefreq: 'weekly', priority: '1.0' })}\n</urlset>`;
+        const fallback = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrlEl(absoluteUrl('/'), { changefreq: 'weekly', priority: '1.0', lastmod: staticLastmod('/') })}\n</urlset>`;
         sendSitemap(res, fallback);
     }
 });
@@ -2182,7 +2213,7 @@ app.use((err, req, res, next) => {
     console.error('[express] Onverwachte fout op', req.method, req.path, err);
     if (res.headersSent) return next(err);
     if (req.path === '/sitemap.xml') {
-        const fallback = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrlEl(absoluteUrl('/'), { changefreq: 'weekly', priority: '1.0' })}\n</urlset>`;
+        const fallback = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrlEl(absoluteUrl('/'), { changefreq: 'weekly', priority: '1.0', lastmod: staticLastmod('/') })}\n</urlset>`;
         return sendSitemap(res, fallback);
     }
     res.status(500).type('txt').send('Internal Server Error');

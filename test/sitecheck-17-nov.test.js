@@ -146,6 +146,21 @@ describe('sitecheck 17 november 2026', () => {
         assert.match(html, /<title>Loonsanctie voorkomen: dossierfouten \| Arbeidsdeskundig\.com<\/title>/);
     });
 
+    it('heeft geen en- of emdash op wat-doet-arbeidsdeskundige en de rekentool', async () => {
+        for (const path of ['/kennisbank/wat-doet-arbeidsdeskundige', '/rekentool']) {
+            const html = await (await fetch(base + path)).text();
+            assert.equal(html.includes('\u2014'), false, path + ' heeft een emdash');
+            assert.equal(html.includes('\u2013'), false, path + ' heeft een endash');
+        }
+        const wat = await (await fetch(base + '/kennisbank/wat-doet-arbeidsdeskundige')).text();
+        assert.match(wat, /week 42 tot 52/);
+        const calc = await (await fetch(base + '/rekentool')).text();
+        assert.match(calc, /13 tot 26 weken/);
+        assert.match(calc, /€3\.500 tot €6\.500/);
+        assert.match(calc, /tot €\$\{premieHi\.toLocaleString\('nl-NL'\)\}/);
+        assert.match(calc, /tot €\$\{totHi\.toLocaleString\('nl-NL'\)\}/);
+    });
+
     it('zet de unieke WGA-zin over het uitkeringspercentage op de WGA-pagina', async () => {
         const html = await (await fetch(base + '/voor/wga-specialist')).text();
         assert.match(html, /Het uitkeringspercentage in de WGA volgt uit het verschil tussen het maatmanloon en de resterende verdiencapaciteit/);

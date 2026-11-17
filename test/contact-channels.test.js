@@ -78,8 +78,8 @@ describe('contactkanalen: 06 alleen WhatsApp, bellen via 085', () => {
         const server = read('server.js');
         assert.match(server, /085 087 0307/);
         assert.doesNotMatch(server, /50213593/);
-        assert.match(server, /Bedankt, \$\{escapeHtml\(voornaam\)\} \u2014 we hebben je offerteaanvraag ontvangen/);
-        assert.match(server, /Bedankt, \$\{escapeHtml\(voornaam\)\} \u2014 we hebben je aanmelding ontvangen/);
+        assert.match(server, /Bedankt, \$\{escapeHtml\(voornaam\)\}\. We hebben je offerteaanvraag ontvangen/);
+        assert.match(server, /Bedankt, \$\{escapeHtml\(voornaam\)\}\. We hebben je aanmelding ontvangen/);
         assert.doesNotMatch(server, /tel:/);
     });
 });

@@ -11,7 +11,7 @@ const INDEX_HTML = fs.readFileSync(path.join(__dirname, '..', 'public', 'index.h
 const VIEW_OPEN_RE = /<div class="(view(?: active)?)" id="(view-[^"]+)"( hidden)?>/g;
 
 const PROBLEM_PATHS = [
-    { path: '/kennisbank/wat-doet-arbeidsdeskundige', active: 'view-artikel', titleH1: /Wat doet een arbeidsdeskundige precies/ },
+    { path: '/kennisbank/wat-doet-arbeidsdeskundige', active: 'view-artikel', titleH1: /Wat doet een arbeidsdeskundige\?/ },
     { path: '/kennisbank/arbeidsdeskundig-onderzoek-gids', active: 'view-artikel', titleH1: /Arbeidsdeskundig onderzoek: wat het is, wanneer en hoe het werkt/ },
     { path: '/offerte-aanvragen', active: 'view-offerte', titleH1: /Vraag je offerte aan: vanaf €999,-/ },
     { path: '/aanmelden', active: 'view-aanmelden', titleH1: /Meld je onderzoek aan: vanaf €999,-/ },

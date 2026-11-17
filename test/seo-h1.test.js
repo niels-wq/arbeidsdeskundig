@@ -16,7 +16,7 @@ const ROUTES = [
     { path: '/voor/hr-adviseur', h1: 'Arbeidsdeskundig onderzoek voor HR-adviseurs' },
     {
         path: '/kennisbank/wat-doet-arbeidsdeskundige',
-        h1: 'Wat doet een arbeidsdeskundige precies? (en wat niet)',
+        h1: 'Wat doet een arbeidsdeskundige?',
         article: true,
     },
     {

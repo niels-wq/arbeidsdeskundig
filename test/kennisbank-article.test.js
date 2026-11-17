@@ -2063,3 +2063,64 @@ describe('kennisbank article: vrijwillige verlenging loondoorbetaling', () => {
     });
 });
 
+const DOET_PATH = '/kennisbank/wat-doet-arbeidsdeskundige';
+const DOET_TITLE = 'Wat doet een arbeidsdeskundige? | Arbeidsdeskundig.com';
+const DOET_H1 = 'Wat doet een arbeidsdeskundige?';
+const DOET_META = 'Wat doet een arbeidsdeskundige? Je krijgt een rapport over welk werk nog past, spoor 1 of 2. Geen diagnose. Voor werknemer en HR bij de eerste kennismaking.';
+
+describe('kennisbank article: wat doet een arbeidsdeskundige', () => {
+    it('opent answer-first, met FAQ, bron en datum van vandaag', async () => {
+        const res = await fetch(base + DOET_PATH, GOOGLEBOT);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+        assert.equal(html.match(/<title>([^<]+)<\/title>/)[1], DOET_TITLE);
+        assert.equal(html.match(/<meta name="description" content="([^"]*)">/)[1], DOET_META);
+        const h1s = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/g) || [];
+        assert.equal(h1s.length, 1);
+        assert.match(h1s[0], /Wat doet een arbeidsdeskundige\?/);
+
+        const marker = 'id="artikel-body">';
+        const body = html.slice(html.indexOf(marker) + marker.length);
+        const article = body.slice(0, body.indexOf('</div>'));
+        const first = article.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 70).join(' ');
+        assert.match(first, /^Een arbeidsdeskundige bekijkt welk werk nog past/);
+        assert.match(article, /week 42 tot 52/);
+        assert.match(article, /geen afvinklijst/);
+        assert.match(article, /luistert echt/);
+        assert.match(article, /makkelijk in de omgang/);
+        assert.match(article, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"/);
+        assert.match(article, /href="\/kennisbank\/voorbereiden-gesprek-arbeidsdeskundige"/);
+        assert.match(article, /href="\/aanmelden"/);
+        assert.match(article, /mailto:info@arbeidsdeskundig\.com/);
+        assert.match(article, /https:\/\/matchvermogen\.nl\/arbeidsdeskundig-onderzoek\//);
+        assert.match(article, /https:\/\/www\.uwv\.nl\/nl\/wia\/wia-beoordeling/);
+        assert.doesNotMatch(article, /—/);
+        assert.doesNotMatch(article, /–/);
+        assert.doesNotMatch(article, /€/);
+        assert.doesNotMatch(article, /loonsanctie voorkomen/i);
+        assert.doesNotMatch(article, /eerstejaarsevaluatie/i);
+        assert.doesNotMatch(article, /loonkostensubsidie berekenen/i);
+        assert.doesNotMatch(article, /goedkoop/i);
+
+        const blocks = [];
+        const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+        let m;
+        while ((m = re.exec(html))) blocks.push(JSON.parse(m[1]));
+        const articles = blocks.filter((b) => b['@type'] === 'Article');
+        const faqs = blocks.filter((b) => b['@type'] === 'FAQPage');
+        assert.equal(articles.length, 1);
+        assert.equal(articles[0].headline, DOET_H1);
+        assert.equal(articles[0].datePublished, '2026-09-01');
+        assert.equal(articles[0].dateModified, '2026-11-17');
+        assert.equal(articles[0].image.url, 'https://www.arbeidsdeskundig.com/assets/og/wat-doet-arbeidsdeskundige.png');
+        assert.equal(faqs.length, 1);
+        assert.ok(faqs[0].mainEntity.length >= 4 && faqs[0].mainEntity.length <= 6);
+        assert.ok(faqs[0].mainEntity.some((q) => /diagnose/i.test(q.name)));
+
+        const xml = await (await fetch(base + '/sitemap.xml')).text();
+        assert.match(xml, /<loc>https:\/\/www\.arbeidsdeskundig\.com\/kennisbank\/wat-doet-arbeidsdeskundige<\/loc><lastmod>2026-11-17<\/lastmod>/);
+        const llms = await (await fetch(base + '/llms.txt')).text();
+        assert.match(llms, /https:\/\/www\.arbeidsdeskundig\.com\/kennisbank\/wat-doet-arbeidsdeskundige/);
+    });
+});
+

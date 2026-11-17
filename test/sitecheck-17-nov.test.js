@@ -159,6 +159,8 @@ describe('sitecheck 17 november 2026', () => {
         assert.match(calc, /€3\.500 tot €6\.500/);
         assert.match(calc, /tot €\$\{premieHi\.toLocaleString\('nl-NL'\)\}/);
         assert.match(calc, /tot €\$\{totHi\.toLocaleString\('nl-NL'\)\}/);
+        assert.match(calc, /body\.view-calculator #adc-fab/);
+        assert.match(calc, /body\.view-calculator #adc-chat\{display:none !important;\}/);
     });
 
     it('zet de unieke WGA-zin over het uitkeringspercentage op de WGA-pagina', async () => {

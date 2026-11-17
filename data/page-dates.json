@@ -76,7 +76,7 @@
     },
     "wia-aanvraag": {
       "datePublished": "2026-09-01",
-      "dateModified": "2026-10-20"
+      "dateModified": "2026-11-17"
     },
     "passende-arbeid": {
       "datePublished": "2026-09-01",
@@ -156,7 +156,7 @@
     },
     "tweede-ziektejaar": {
       "datePublished": "2026-09-01",
-      "dateModified": "2026-09-01"
+      "dateModified": "2026-11-17"
     },
     "werkplekaanpassingen-subsidie": {
       "datePublished": "2026-09-01",
@@ -373,6 +373,10 @@
     "maatmanloon-arbeidsdeskundige": {
       "datePublished": "2026-10-20",
       "dateModified": "2026-10-20"
+    },
+    "vrijwillige-verlenging-loondoorbetaling-arbeidsdeskundige": {
+      "datePublished": "2026-10-26",
+      "dateModified": "2026-11-17"
     }
   },
   "pages": {

@@ -1382,7 +1382,7 @@ app.get('/robots.txt', (req, res) => {
     const txt = `User-agent: *
 Allow: /
 
-# AI- / LLM-crawlers expliciet toegestaan — relevant voor vindbaarheid in
+# AI- / LLM-crawlers expliciet toegestaan, relevant voor vindbaarheid in
 # ChatGPT, Perplexity, Claude en vergelijkbare answer engines.
 # Samenvatting voor die crawlers: ${BASE_URL}/llms.txt
 User-agent: GPTBot
@@ -1847,11 +1847,11 @@ function genereerOffertePdf(fields) {
             const logoHeight = logoWidth / MATCHVERMOGEN_LOGO_RATIO;
             doc.image(MATCHVERMOGEN_LOGO, 56, 40, { width: logoWidth, height: logoHeight });
             doc.fillColor(ink).fontSize(15).font('Helvetica-Bold').text('Vrijblijvende offerte', 56, 40 + logoHeight + 14);
-            doc.fillColor(muted).fontSize(9).font('Helvetica').text('Arbeidsdeskundig onderzoek — mede mogelijk gemaakt door arbeidsdeskundig.com', 56, 40 + logoHeight + 34);
+            doc.fillColor(muted).fontSize(9).font('Helvetica').text('Arbeidsdeskundig onderzoek, mede mogelijk gemaakt door arbeidsdeskundig.com', 56, 40 + logoHeight + 34);
         } else {
             // Terugvalvariant zolang er geen logo-bestand aanwezig is
             doc.fillColor(ink).fontSize(20).font('Helvetica-Bold').text('Matchvermogen B.V.', 56, 40);
-            doc.fillColor(muted).fontSize(10).font('Helvetica').text('Vrijblijvende offerte — arbeidsdeskundig onderzoek, mede mogelijk gemaakt door arbeidsdeskundig.com', 56, 66);
+            doc.fillColor(muted).fontSize(10).font('Helvetica').text('Vrijblijvende offerte, arbeidsdeskundig onderzoek, mede mogelijk gemaakt door arbeidsdeskundig.com', 56, 66);
         }
 
         doc.moveTo(56, 128).lineTo(doc.page.width - 56, 128).strokeColor(teal).lineWidth(2).stroke();
@@ -1865,10 +1865,10 @@ function genereerOffertePdf(fields) {
 
         doc.fillColor(ink).fontSize(11).font('Helvetica-Bold').text('Aanvrager', 56, 220);
         doc.fillColor(muted).fontSize(10).font('Helvetica')
-            .text(naam || '—', 56, 236)
-            .text(bedrijf || '—', 56, 250)
-            .text(email || '—', 56, 264)
-            .text(telefoon || '—', 56, 278);
+            .text(naam || '-', 56, 236)
+            .text(bedrijf || '-', 56, 250)
+            .text(email || '-', 56, 264)
+            .text(telefoon || '-', 56, 278);
 
         let y = 312;
         doc.fillColor(ink).fontSize(11).font('Helvetica-Bold').text('Onderzoek', 56, y);
@@ -1978,15 +1978,15 @@ app.post('/api/offerte-pdf', async (req, res) => {
 
         sendEmail({
             to: lead.email,
-            subject: 'Je vrijblijvende offerte — arbeidsdeskundig.com',
-            html: `<p>Bedankt, ${escapeHtml(voornaam)} — hierbij je vrijblijvende offerte als PDF. Geen verplichtingen: neem gerust de tijd, en stel vooral vragen als iets niet duidelijk is.</p>`,
+            subject: 'Je vrijblijvende offerte, arbeidsdeskundig.com',
+            html: `<p>Bedankt, ${escapeHtml(voornaam)}. Hierbij je vrijblijvende offerte als PDF. Geen verplichtingen: neem gerust de tijd, en stel vooral vragen als iets niet duidelijk is.</p>`,
             attachments,
         }).then(() => console.log('[offerte-pdf] e-mail naar aanvrager verstuurd')).catch((err) => console.error('[offerte-pdf] e-mail naar aanvrager mislukt:', err));
 
         if (!isTestLead(lead, fields) && !shouldSkipDuplicateNotify('offerte-pdf', lead)) {
             sendEmail({
                 to: NOTIFY_EMAIL,
-                subject: `Nieuwe PDF-offerte gegenereerd — ${lead.naam}`,
+                subject: `Nieuwe PDF-offerte gegenereerd: ${lead.naam}`,
                 html: `<h2>Vrijblijvende offerte gegenereerd via arbeidsdeskundig.com</h2><table>${fieldsToHtml(offerteMailFields({ ...lead, bron: lead.bron || 'offerte-pdf' }))}</table>`,
                 replyTo: lead.email,
                 attachments,
@@ -2016,13 +2016,13 @@ app.post('/api/offerte', async (req, res) => {
         kind: 'offerte',
         lead,
         rawFields: fields,
-        notifySubject: `Nieuwe offerteaanvraag — ${lead.naam}`,
+        notifySubject: `Nieuwe offerteaanvraag: ${lead.naam}`,
         notifyHtml: `<h2>Nieuwe offerteaanvraag via arbeidsdeskundig.com</h2><table>${fieldsToHtml(offerteMailFields(lead))}</table>`,
         replyTo: lead.email,
         visitor: {
             to: lead.email,
-            subject: 'Bedankt voor je offerteaanvraag — arbeidsdeskundig.com',
-            html: `<p>Bedankt, ${escapeHtml(voornaam)} — we hebben je offerteaanvraag ontvangen en nemen binnen 24 uur contact met je op.</p>`,
+            subject: 'Bedankt voor je offerteaanvraag, arbeidsdeskundig.com',
+            html: `<p>Bedankt, ${escapeHtml(voornaam)}. We hebben je offerteaanvraag ontvangen en nemen binnen 24 uur contact met je op.</p>`,
         },
     });
     if (delivered.blocked) {
@@ -2062,13 +2062,13 @@ app.post('/api/aanmelden', async (req, res) => {
         kind: 'aanmelden',
         lead,
         rawFields: fields,
-        notifySubject: `Nieuwe aanmelding${lead.spoor2 ? ' (incl. Spoor 2)' : ''} — ${lead.naam}`,
+        notifySubject: `Nieuwe aanmelding${lead.spoor2 ? ' (incl. Spoor 2)' : ''}: ${lead.naam}`,
         notifyHtml: `<h2>Nieuwe aanmelding via arbeidsdeskundig.com</h2><table>${fieldsToHtml(notifyFields)}</table>`,
         replyTo: lead.email,
         visitor: {
             to: lead.email,
-            subject: 'Bedankt voor je aanmelding — arbeidsdeskundig.com',
-            html: `<p>Bedankt, ${escapeHtml(voornaam)} — we hebben je aanmelding ontvangen en pakken dit binnen 24 uur op.</p>`,
+            subject: 'Bedankt voor je aanmelding, arbeidsdeskundig.com',
+            html: `<p>Bedankt, ${escapeHtml(voornaam)}. We hebben je aanmelding ontvangen en pakken dit binnen 24 uur op.</p>`,
         },
     });
     if (delivered.blocked) {
@@ -2091,13 +2091,13 @@ app.post('/api/checklist', async (req, res) => {
         kind: 'checklist',
         lead,
         rawFields: fields,
-        notifySubject: `Checklist aangevraagd — ${lead.naam}`,
+        notifySubject: `Checklist aangevraagd: ${lead.naam}`,
         notifyHtml: `<h2>Gratis checklist aangevraagd via arbeidsdeskundig.com</h2><table>${fieldsToHtml({ Aanvraag: 'Checklist', Dienst: lead.dienst, Naam: lead.naam, 'E-mail': lead.email })}</table>`,
         replyTo: lead.email,
         visitor: {
             to: lead.email,
-            subject: 'Je gratis checklist — arbeidsdeskundig.com',
-            html: `<p>Bedankt, ${escapeHtml(lead.naam)} — hierbij de checklist waar je om vroeg.</p>`,
+            subject: 'Je gratis checklist, arbeidsdeskundig.com',
+            html: `<p>Bedankt, ${escapeHtml(lead.naam)}. Hierbij de checklist waar je om vroeg.</p>`,
         },
     });
     if (delivered.blocked) {
@@ -2122,7 +2122,7 @@ app.post('/api/bel-me-terug', async (req, res) => {
             kind: 'bel-me-terug',
             lead,
             rawFields: fields,
-            notifySubject: `Bel-me-terug verzoek — ${lead.naam}`,
+            notifySubject: `Bel-me-terug verzoek: ${lead.naam}`,
             notifyHtml: `<h2>Iemand wil teruggebeld worden</h2><table>${fieldsToHtml({
                 Aanvraag: 'Bel-me-terug',
                 Dienst: lead.dienst,

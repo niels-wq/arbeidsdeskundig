@@ -29,7 +29,7 @@ describe('kennisbank article: wanneer AD na 1 jaar ziekte', () => {
         const html = await res.text();
 
         assert.match(html, /<title>Arbeidsdeskundig onderzoek na 1 jaar \| Arbeidsdeskundig\.com<\/title>/);
-        assert.match(html, /<meta name="description" content="Wanneer een arbeidsdeskundig onderzoek na 1 jaar ziekte\? Week 42–52 vs eerder inzetten, valkuilen bij wachten\. Vraag een offerte of kennismaking\.">/);
+        assert.match(html, /<meta name="description" content="Wanneer een arbeidsdeskundig onderzoek na 1 jaar ziekte\? Week 42 tot 52 vs eerder inzetten, valkuilen bij wachten\. Vraag een offerte of kennismaking\.">/);
         assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${PATH}">`));
         assert.match(html, /"@type":"Article"/);
         assert.match(html, /"@type":"FAQPage"/);

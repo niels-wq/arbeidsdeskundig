@@ -1,0 +1,427 @@
+{
+  "method": "Git-auteurdatum (de kalenderdatum uit git log %aI, de tijdzone van de auteur) over de commits van public/index.html, van oud naar nieuw. datePublished is de eerste commit waarin die slug in de posts-array staat. Een hernoemde slug krijgt de datum van de nieuwe slug. dateModified is de laatste commit waarin de inhoudelijke tekst veranderde. Tekst is titel, meta, kernpunten, FAQ en artikelbody, zonder HTML-tags. Alleen letters en cijfers tellen: een streepje, komma, href, onclick, class of SVG telt niet als wijziging. Daardoor telt de streepjesopruiming van 29 oktober 2026 niet mee als er geen woorden veranderden. Niet-kennisbankpagina's en /kennisbank gebruiken de laatste woordwijziging van de bijbehorende view. /offerte-aanvragen telt ook de tekst van view-fysiek-tarief mee. /voor/ gebruikt de zichtbare persona-tekst zonder icoon. Deze sitecheck wijzigt de tekst van loonsanctie-voorkomen-dossierfouten en van /voor/wga-specialist; hun dateModified is daarom 2026-11-17. Dit bestand is de enige datamap voor Article-JSON-LD, de zichtbare wijzigingsdatum en sitemap-lastmod.",
+  "generatedFrom": "aeda7743ebbe72f7d0784d75e2d2407560ca3e36",
+  "kennisbank": {
+    "ziektewet": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "uitzend": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "erd": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "vervroegd": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "jaarsevaluatie": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-10-06"
+    },
+    "investering": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-10-22"
+    },
+    "spoor2": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-10-29"
+    },
+    "online-fysiek": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "whk": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "casus-wga": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "casus-ziektewet": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "casus-vervroegd": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "casus-uitzend": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "casus-erd": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "wat-doet-arbeidsdeskundige": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-11-10"
+    },
+    "loonwaardeonderzoek": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-10-20"
+    },
+    "deskundigenoordeel": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-21"
+    },
+    "poortwachter-tijdlijn": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-10-06"
+    },
+    "wia-aanvraag": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-10-20"
+    },
+    "passende-arbeid": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-11-09"
+    },
+    "spoor2-kosten": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "bezwaar-wia": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-10-20"
+    },
+    "werknemer-zelf-aanvragen": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "iva-uitkering": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "casus-complex-wga": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "casus-payroll-zorg": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "casus-fysiek-bouw": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "casus-erd-zw-kort": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "casus-werknemer-initiatief": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "casus-iva-duurzaam": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "casus-bezwaar-succesvol": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "casus-60plus": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "casus-loonwaarde-spoor1": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "casus-deskundigenoordeel-taalbarriere": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-10-22"
+    },
+    "fml-uitleg": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-18"
+    },
+    "no-risk-polis": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "35-min-regeling": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "ontslag-tijdens-ziekte": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "tweede-ziektejaar": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "werkplekaanpassingen-subsidie": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "praktijkroute-wia": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "avg-arbeidsdeskundig": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "doelgroepregister": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "kosten-geen-onderzoek": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-10-22"
+    },
+    "burn-out-re-integratie": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "psychische-klachten-werkhervatting": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "wga-vast-wga-flex": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "arbeidsdeskundig-rapport-voorbeeld": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-11-09"
+    },
+    "riv-toets": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-17"
+    },
+    "spoor1a-spoor1b": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-10-06"
+    },
+    "arbeidsdeskundige-vs-bedrijfsarts-casemanager": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "spoor3-outplacement": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "onderzoek-weigert-medewerking": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "second-opinion-arbeidsdeskundige": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-10-22"
+    },
+    "zzp-arbeidsongeschiktheid": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "dga-arbeidsongeschiktheid": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "long-covid-wia": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "benutbare-marginale-mogelijkheden": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "arbeidsdeskundige-letselschade": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "functionele-capaciteit-evaluatie": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "bedrijfsarts-arbeidsdeskundige-oneens": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "chronische-vermoeidheid-fibromyalgie": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "faillissement-werkgever-onderzoek": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "hartinfarct-beroerte-re-integratie": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "terugwerkende-kracht-onderzoek": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "mediation-arbeidsconflict": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "oneens-met-arbeidsdeskundige": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-10-12"
+    },
+    "bedrijfsarts-onpartijdig": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "hoe-lang-duurt-onderzoek": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "waar-let-arbeidsdeskundige-op": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-01"
+    },
+    "ervaringen-arbeidsdeskundig-onderzoek": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-17"
+    },
+    "voorbereiden-gesprek-arbeidsdeskundige": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-11-12"
+    },
+    "waarom-wanneer-arbeidsdeskundig-onderzoek": {
+      "datePublished": "2026-09-01",
+      "dateModified": "2026-09-17"
+    },
+    "fml-izp-lezen-belastbaarheid": {
+      "datePublished": "2026-09-17",
+      "dateModified": "2026-11-09"
+    },
+    "kosten-arbeidsdeskundig-onderzoek": {
+      "datePublished": "2026-09-17",
+      "dateModified": "2026-10-28"
+    },
+    "arbeidsdeskundig-onderzoek-na-1-jaar-ziekte": {
+      "datePublished": "2026-09-17",
+      "dateModified": "2026-11-10"
+    },
+    "verplicht-arbeidsdeskundig-onderzoek": {
+      "datePublished": "2026-09-17",
+      "dateModified": "2026-11-10"
+    },
+    "tips-werknemer-arbeidsdeskundig-onderzoek": {
+      "datePublished": "2026-09-17",
+      "dateModified": "2026-11-12"
+    },
+    "nadelen-arbeidsdeskundig-onderzoek": {
+      "datePublished": "2026-09-17",
+      "dateModified": "2026-11-09"
+    },
+    "riv-toets-bedrijfsarts-leidend": {
+      "datePublished": "2026-09-17",
+      "dateModified": "2026-10-22"
+    },
+    "beslistermijn-wia-16-weken": {
+      "datePublished": "2026-09-17",
+      "dateModified": "2026-10-22"
+    },
+    "arbeidsdeskundig-onderzoek-gids": {
+      "datePublished": "2026-09-18",
+      "dateModified": "2026-11-10"
+    },
+    "belastbaarheid-verouderd-nieuwe-fml-izp": {
+      "datePublished": "2026-09-18",
+      "dateModified": "2026-11-09"
+    },
+    "wia-aanvraag-parallel-spoor-2": {
+      "datePublished": "2026-09-18",
+      "dateModified": "2026-09-18"
+    },
+    "spoor-2-zonder-spoor-1-afgerond": {
+      "datePublished": "2026-09-18",
+      "dateModified": "2026-09-18"
+    },
+    "fml-izp-hr-beslissen-actualiseren": {
+      "datePublished": "2026-09-21",
+      "dateModified": "2026-09-21"
+    },
+    "deskundigenoordeel-vs-arbeidsdeskundig-onderzoek": {
+      "datePublished": "2026-09-21",
+      "dateModified": "2026-09-21"
+    },
+    "arbeidsdeskundig-rapport-checklist": {
+      "datePublished": "2026-09-21",
+      "dateModified": "2026-09-29"
+    },
+    "loonsanctie-voorkomen-dossierfouten": {
+      "datePublished": "2026-09-29",
+      "dateModified": "2026-11-17"
+    },
+    "urenopbouw-stagneert-arbeidsdeskundig-onderzoek": {
+      "datePublished": "2026-10-06",
+      "dateModified": "2026-10-06"
+    },
+    "goedkoopste-arbeidsdeskundig-onderzoek": {
+      "datePublished": "2026-10-12",
+      "dateModified": "2026-10-28"
+    },
+    "taalbeheersing-passende-functies-arbeidsdeskundige": {
+      "datePublished": "2026-10-14",
+      "dateModified": "2026-10-22"
+    },
+    "maatmanloon-arbeidsdeskundige": {
+      "datePublished": "2026-10-20",
+      "dateModified": "2026-10-20"
+    }
+  },
+  "pages": {
+    "/": {
+      "dateModified": "2026-11-10"
+    },
+    "/rekentool": {
+      "dateModified": "2026-10-22"
+    },
+    "/keuzehulp": {
+      "dateModified": "2026-09-01"
+    },
+    "/veelgestelde-vragen": {
+      "dateModified": "2026-10-22"
+    },
+    "/over-ons": {
+      "dateModified": "2026-09-01"
+    },
+    "/offerte-aanvragen": {
+      "dateModified": "2026-10-22"
+    },
+    "/aanmelden": {
+      "dateModified": "2026-10-22"
+    },
+    "/kennisbank": {
+      "dateModified": "2026-10-22"
+    },
+    "/arbeidsdeskundige-met-tolk": {
+      "dateModified": "2026-10-22"
+    }
+  },
+  "personas": {
+    "hr-adviseur": {
+      "dateModified": "2026-09-01"
+    },
+    "werknemer": {
+      "dateModified": "2026-09-01"
+    },
+    "casemanager": {
+      "dateModified": "2026-09-01"
+    },
+    "wga-specialist": {
+      "dateModified": "2026-11-17"
+    },
+    "directeur-eigenaar": {
+      "dateModified": "2026-10-22"
+    },
+    "letselschadejurist": {
+      "dateModified": "2026-09-01"
+    }
+  }
+}

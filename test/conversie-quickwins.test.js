@@ -82,7 +82,7 @@ describe('conversie quick win: kosten', () => {
         assert.doesNotMatch(html, /2027/);
         assert.match(html, /Laatst bijgewerkt: 28 oktober 2026/);
         assert.match(html, /function zichtbareWijzigingsdatum/);
-        assert.match(html, /Laatst bijgewerkt: \$\{zichtbareWijzigingsdatum\(slug, post\.dateModified\)\}/);
+        assert.match(html, /Laatst bijgewerkt: \$\{zichtbareWijzigingsdatum\(slug, artikelDatum\(slug, 'dateModified'\)\)\}/);
         assert.match(html, /"datePublished":"2026-09-17"/);
         assert.match(html, /"dateModified":"2026-10-28"/);
         const h1At = html.indexOf('id="artikel-titel"');

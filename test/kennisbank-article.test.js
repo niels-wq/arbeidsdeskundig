@@ -1339,7 +1339,7 @@ describe('kennisbank article: loonsanctie voorkomen dossierfouten', () => {
         assert.match(html, /"@type":"Article"/);
         assert.match(html, /"@type":"FAQPage"/);
         assert.match(html, /"datePublished":"2026-09-29"/);
-        assert.match(html, /"dateModified":"2026-09-29"/);
+        assert.match(html, /"dateModified":"2026-11-17"/);
         assert.match(html, /"name":"Niels Alderding"/);
         assert.match(html, /geregistreerd arbeidsdeskundige/);
         assert.match(html, /<h2[^>]*>Veelgestelde vragen<\/h2>/);
@@ -1396,7 +1396,7 @@ describe('kennisbank article: loonsanctie voorkomen dossierfouten', () => {
         assert.equal(pages.length, 1);
         assert.equal(articles.length, 1);
         assert.equal(articles[0].datePublished, '2026-09-29');
-        assert.equal(articles[0].dateModified, '2026-09-29');
+        assert.equal(articles[0].dateModified, '2026-11-17');
         assert.equal(articles[0].author['@type'], 'Person');
         assert.equal(articles[0].author.name, 'Niels Alderding');
         assert.equal(articles[0].author.jobTitle, 'geregistreerd arbeidsdeskundige');
@@ -1762,8 +1762,8 @@ describe('kennisbank article: taalbeheersing en passende functies', () => {
         const crumbs = blocks.filter((b) => b['@type'] === 'BreadcrumbList');
         assert.equal(articles.length, 1);
         assert.equal(articles[0].headline, TAAL_H1);
-        assert.equal(articles[0].datePublished, '2026-10-13');
-        assert.equal(articles[0].dateModified, '2026-10-13');
+        assert.equal(articles[0].datePublished, '2026-10-14');
+        assert.equal(articles[0].dateModified, '2026-10-22');
         assert.equal(articles[0].author.name, 'Niels Alderding');
         assert.equal(articles[0].author.jobTitle, 'geregistreerd arbeidsdeskundige');
         assert.equal(faqs.length, 1);

@@ -651,7 +651,7 @@ describe('kennisbank hub: gids arbeidsdeskundig onderzoek', () => {
         const articles = blocks.filter((b) => b['@type'] === 'Article');
         assert.equal(articles.length, 1);
         assert.equal(articles[0].headline, H1);
-        assert.equal(articles[0].dateModified, '2026-11-10');
+        assert.equal(articles[0].dateModified, '2026-11-23');
         const faqs = blocks.filter((b) => b['@type'] === 'FAQPage');
         assert.equal(faqs.length, 1);
         assert.ok(faqs[0].mainEntity.length >= 5 && faqs[0].mainEntity.length <= 6);
@@ -673,7 +673,7 @@ describe('kennisbank hub: gids arbeidsdeskundig onderzoek', () => {
         assert.equal(res.status, 200);
         const xml = await res.text();
         assert.match(xml, new RegExp(`https://www\\.arbeidsdeskundig\\.com${GIDS_PATH}`));
-        assert.match(xml, /<loc>https:\/\/www\.arbeidsdeskundig\.com\/kennisbank\/arbeidsdeskundig-onderzoek-gids<\/loc><lastmod>2026-11-10<\/lastmod>/);
+        assert.match(xml, /<loc>https:\/\/www\.arbeidsdeskundig\.com\/kennisbank\/arbeidsdeskundig-onderzoek-gids<\/loc><lastmod>2026-11-23<\/lastmod>/);
         assert.equal((xml.match(new RegExp(GIDS_SLUG, 'g')) || []).length, 1);
         for (const slug of GIDS_CLUSTER) {
             assert.notEqual(slug, GIDS_SLUG);
@@ -2176,6 +2176,107 @@ describe('kennisbank article: wat doet een arbeidsdeskundige', () => {
         assert.match(xml, /<loc>https:\/\/www\.arbeidsdeskundig\.com\/kennisbank\/wat-doet-arbeidsdeskundige<\/loc><lastmod>2026-11-17<\/lastmod>/);
         const llms = await (await fetch(base + '/llms.txt')).text();
         assert.match(llms, /https:\/\/www\.arbeidsdeskundig\.com\/kennisbank\/wat-doet-arbeidsdeskundige/);
+    });
+});
+
+const EJ_SLUG = 'eerstejaarsevaluatie-arbeidsdeskundige';
+const EJ_PATH = '/kennisbank/' + EJ_SLUG;
+const EJ_TITLE = 'Eerstejaarsevaluatie: 1e jaars evaluatie | Arbeidsdeskundig.com';
+const EJ_H1 = 'Eerstejaarsevaluatie: wat bespreek je en wanneer komt de arbeidsdeskundige erbij?';
+const EJ_META = 'Eerstejaarsevaluatie (1e jaars evaluatie): wat je rond week 52 bespreekt, wie erbij zit en wanneer de arbeidsdeskundige aansluit. Offerte of aanmelden.';
+
+describe('kennisbank article: eerstejaarsevaluatie en de arbeidsdeskundige', () => {
+    it('opent met een kort antwoord, schema, checklist en live-paden', async () => {
+        const res = await fetch(base + EJ_PATH, GOOGLEBOT);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        const title = html.match(/<title>([^<]+)<\/title>/)[1];
+        assert.equal(title, EJ_TITLE);
+        assert.ok(title.endsWith(' | Arbeidsdeskundig.com'));
+        assert.match(title, /eerstejaarsevaluatie/i);
+        assert.match(title, /1e jaars evaluatie/i);
+
+        const desc = html.match(/<meta name="description" content="([^"]*)">/)[1];
+        assert.equal(desc, EJ_META);
+        assert.ok(desc.length >= 140 && desc.length <= 155, String(desc.length));
+        assert.match(desc, /eerstejaarsevaluatie/i);
+        assert.match(desc, /1e jaars evaluatie/);
+        assert.match(html, new RegExp(`<link rel="canonical" href="https://www\\.arbeidsdeskundig\\.com${EJ_PATH}">`));
+
+        const h1s = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/g) || [];
+        assert.equal(h1s.length, 1);
+        assert.equal((html.match(/<h1/g) || []).length, 1);
+        assert.match(h1s[0], /id="artikel-titel"/);
+        assert.equal(h1s[0].replace(/<[^>]+>/g, ''), EJ_H1);
+
+        const marker = 'id="artikel-body">';
+        const body = html.slice(html.indexOf(marker) + marker.length);
+        const article = body.slice(0, body.indexOf('</div>'));
+        for (const heading of [
+            'Wat hoort er in de eerstejaarsevaluatie',
+            'Wie zijn erbij',
+            'Wanneer de arbeidsdeskundige erbij komt',
+            'Het verschil met het latere UWV-oordeel',
+            'Checklist rond week 52',
+            'Offerte of een vraag stellen',
+        ]) {
+            assert.match(article, new RegExp('<h2>' + heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '</h2>'));
+        }
+        const words = article.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+        assert.ok(words.length >= 1500 && words.length <= 2000, String(words.length));
+        const lead = words.slice(0, 80).join(' ');
+        assert.match(lead, /eerstejaarsevaluatie/i);
+        assert.match(lead, /1e jaars evaluatie/);
+        assert.match(article, /week 91/);
+        assert.match(article, /RIV-toets/);
+        assert.match(article, /spoor 1/);
+        assert.match(article, /spoor 2/);
+        assert.match(article, /href="\/kennisbank\/voorbereiden-gesprek-arbeidsdeskundige"/);
+        assert.match(article, /href="\/kennisbank\/arbeidsdeskundig-onderzoek-gids"/);
+        assert.match(article, /href="\/aanmelden"/);
+        assert.match(article, /href="\/offerte-aanvragen"/);
+        assert.doesNotMatch(article, /—/);
+        assert.doesNotMatch(article, /–/);
+        assert.doesNotMatch(article, /\$\{/);
+        assert.doesNotMatch(article, /€/);
+        assert.doesNotMatch(article, /<h1/i);
+
+        const blocks = [];
+        const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+        let m;
+        while ((m = re.exec(html))) blocks.push(JSON.parse(m[1]));
+        const articles = blocks.filter((b) => b['@type'] === 'Article');
+        const faqs = blocks.filter((b) => b['@type'] === 'FAQPage');
+        assert.equal(articles.length, 1);
+        assert.equal(articles[0].headline, EJ_H1);
+        assert.equal(articles[0].datePublished, '2026-11-23');
+        assert.equal(articles[0].dateModified, '2026-11-23');
+        assert.equal(articles[0].image.url, 'https://www.arbeidsdeskundig.com/assets/og/' + EJ_SLUG + '.png');
+        assert.equal(faqs.length, 1);
+        assert.ok(faqs[0].mainEntity.length >= 4 && faqs[0].mainEntity.length <= 6);
+        assert.match(html, /id="artikel-featured"/);
+        assert.match(html, /Laatst bijgewerkt: 2026-11-23/);
+
+        const xml = await (await fetch(base + '/sitemap.xml')).text();
+        assert.match(xml, new RegExp(`<loc>https://www\\.arbeidsdeskundig\\.com${EJ_PATH}</loc><lastmod>2026-11-23</lastmod>`));
+        assert.equal((xml.match(new RegExp(EJ_SLUG, 'g')) || []).length, 1);
+
+        const llms = await (await fetch(base + '/llms.txt')).text();
+        assert.match(llms, new RegExp('https://www\\.arbeidsdeskundig\\.com' + EJ_PATH));
+        assert.equal(llms.includes('\u2014'), false);
+
+        const kb = await (await fetch(base + '/kennisbank', GOOGLEBOT)).text();
+        assert.match(kb, new RegExp(EJ_SLUG));
+
+        for (const related of [
+            '/kennisbank/jaarsevaluatie',
+            '/kennisbank/arbeidsdeskundig-onderzoek-na-1-jaar-ziekte',
+            '/kennisbank/arbeidsdeskundig-onderzoek-gids',
+        ]) {
+            const rel = await (await fetch(base + related, GOOGLEBOT)).text();
+            assert.match(rel, new RegExp('href="' + EJ_PATH + '"'), related);
+        }
     });
 });
 

@@ -2280,3 +2280,108 @@ describe('kennisbank article: eerstejaarsevaluatie en de arbeidsdeskundige', () 
     });
 });
 
+const DUURZAAM_SLUG = 'duurzaamheid-wga-iva-arbeidsdeskundige';
+const DUURZAAM_PATH = '/kennisbank/' + DUURZAAM_SLUG;
+const DUURZAAM_TITLE = 'Duurzaamheid per aandoening toetsen | Arbeidsdeskundig.com';
+const DUURZAAM_H1 = 'Duurzaamheid per aandoening: zo toetst een arbeidsdeskundige een WGA';
+const DUURZAAM_META = 'Zo toetst een arbeidsdeskundige een WGA op duurzaamheid, per aandoening: of herstel zorgvuldig is onderbouwd of op een hypothetische ingreep rust.';
+
+describe('kennisbank article: duurzaamheid per aandoening', () => {
+    it('toetst een anonieme WGA-casus, met schema, bronnen en listings', async () => {
+        const res = await fetch(base + DUURZAAM_PATH, GOOGLEBOT);
+        assert.equal(res.status, 200);
+        const html = await res.text();
+
+        const title = html.match(/<title>([^<]+)<\/title>/)[1];
+        assert.equal(title, DUURZAAM_TITLE);
+        assert.ok(title.endsWith(' | Arbeidsdeskundig.com'));
+        assert.equal(html.match(/<meta name="description" content="([^"]*)">/)[1], DUURZAAM_META);
+
+        const h1s = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/g) || [];
+        assert.equal(h1s.length, 1);
+        assert.equal((html.match(/<h1/g) || []).length, 1);
+        assert.match(h1s[0], /id="artikel-titel"/);
+        assert.equal(html.match(/id="artikel-titel">([^<]+)<\/h1>/)[1], DUURZAAM_H1);
+
+        const marker = 'id="artikel-body">';
+        const body = html.slice(html.indexOf(marker) + marker.length);
+        const article = body.slice(0, body.indexOf('</div>'));
+        assert.match(article, /<h2>De knie: een ingreep die misschien ooit komt<\/h2>/);
+        assert.match(article, /<h2>De rug: onderhoud, geen herstel<\/h2>/);
+        assert.match(article, /<h2>De handen: een medische eindtoestand<\/h2>/);
+        assert.match(article, /<h2>Cumulatie en het medisch plafond<\/h2>/);
+        assert.match(article, /<h2>Twee FML's: mét en zonder de niet-duurzame beperkingen<\/h2>/);
+        assert.match(article, /20 procent of minder/);
+        assert.match(article, /80 tot 100 procent/);
+        assert.match(article, /120 maandfacturen/);
+        assert.match(article, /artikel 6:7/);
+        assert.match(article, /artikel 4:17/);
+        assert.match(article, /1\.442 euro/);
+        assert.match(article, /href="\/kennisbank\/iva-uitkering"/);
+        assert.match(article, /href="\/kennisbank\/bezwaar-wia"/);
+        assert.match(article, /href="\/kennisbank\/second-opinion-arbeidsdeskundige"/);
+        assert.match(article, /href="\/kennisbank\/deskundigenoordeel"/);
+        assert.match(article, /href="\/kennisbank\/fml-izp-lezen-belastbaarheid"/);
+        assert.match(article, /href="\/kennisbank\/voorbereiden-gesprek-arbeidsdeskundige"/);
+        assert.match(article, /href="\/offerte-aanvragen"/);
+        assert.match(article, /href="\/aanmelden"/);
+        assert.match(article, /https:\/\/www\.uwv\.nl\/nl\/wia\/iva/);
+        assert.match(article, /https:\/\/www\.uwv\.nl\/nl\/eigenrisicodrager\/eigenrisicodrager-wga/);
+        assert.match(article, /BWBR0005537/);
+        assert.match(article, /geen juridisch advies/);
+        assert.doesNotMatch(article, /pensioenleeftijd/);
+        assert.doesNotMatch(article, /—/);
+        assert.doesNotMatch(article, /–/);
+        assert.doesNotMatch(article, /\$\{/);
+        assert.doesNotMatch(article, /<h1/i);
+        assert.doesNotMatch(article, /Dit artikel wordt binnenkort toegevoegd/);
+        assert.doesNotMatch(article, /€/);
+
+        const words = article.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+        assert.ok(words.length >= 1300 && words.length <= 1900, 'woorden ' + words.length);
+        const first = words.slice(0, 40).join(' ');
+        assert.match(first, /^Een arbeidsdeskundige toetst duurzaamheid/);
+
+        const blocks = [];
+        const re = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+        let m;
+        while ((m = re.exec(html))) blocks.push(JSON.parse(m[1]));
+        const articles = blocks.filter((b) => b['@type'] === 'Article');
+        const faqs = blocks.filter((b) => b['@type'] === 'FAQPage');
+        const crumbs = blocks.filter((b) => b['@type'] === 'BreadcrumbList');
+        assert.equal(articles.length, 1);
+        assert.equal(articles[0].headline, DUURZAAM_H1);
+        assert.equal(articles[0].datePublished, '2026-11-26');
+        assert.equal(articles[0].dateModified, '2026-11-26');
+        assert.equal(articles[0].author.name, 'Niels Alderding');
+        assert.equal(articles[0].author.jobTitle, 'geregistreerd arbeidsdeskundige');
+        assert.equal(articles[0].image.url, 'https://www.arbeidsdeskundig.com/assets/og/' + DUURZAAM_SLUG + '.png');
+        assert.equal(faqs.length, 1);
+        assert.equal(crumbs.length, 1);
+        assert.ok(faqs[0].mainEntity.length >= 4 && faqs[0].mainEntity.length <= 6);
+        assert.ok(crumbs[0].itemListElement.some((it) => it.item === 'https://www.arbeidsdeskundig.com' + DUURZAAM_PATH));
+
+        const faqHtmlStart = html.indexOf('id="artikel-faq-list"');
+        const faqHtmlEnd = html.indexOf('Nog een vraag over jouw specifieke dossier', faqHtmlStart);
+        const faqHtml = html.slice(faqHtmlStart, faqHtmlEnd);
+        const visible = [...faqHtml.matchAll(/<button class="accordion-head"[^>]*>([\s\S]*?)<span class="accordion-icon">\+<\/span><\/button>\s*<div class="accordion-body"[^>]*><div class="accordion-body-inner">([\s\S]*?)<\/div>/g)];
+        assert.equal(visible.length, faqs[0].mainEntity.length);
+
+        const xml = await (await fetch(base + '/sitemap.xml')).text();
+        assert.match(xml, new RegExp(`<loc>https://www\\.arbeidsdeskundig\\.com${DUURZAAM_PATH}</loc><lastmod>2026-11-26</lastmod>`));
+        assert.equal((xml.match(new RegExp(DUURZAAM_SLUG, 'g')) || []).length, 1);
+
+        const llms = await (await fetch(base + '/llms.txt')).text();
+        assert.match(llms, new RegExp('https://www\\.arbeidsdeskundig\\.com' + DUURZAAM_PATH));
+        assert.equal(llms.includes('\u2014'), false);
+
+        const kb = await (await fetch(base + '/kennisbank', GOOGLEBOT)).text();
+        assert.match(kb, new RegExp(DUURZAAM_SLUG));
+
+        for (const related of ['/kennisbank/iva-uitkering', '/kennisbank/bezwaar-wia']) {
+            const rel = await (await fetch(base + related, GOOGLEBOT)).text();
+            assert.match(rel, new RegExp('href="' + DUURZAAM_PATH + '"'), related);
+        }
+    });
+});
+

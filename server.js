@@ -1466,6 +1466,7 @@ const LLMS_EXTRA_ROUTES = [
     ['hoe-lang-duurt-onderzoek', 'Doorlooptijd', 'hoe lang een arbeidsdeskundig onderzoek duurt'],
     ['voorbereiden-gesprek-arbeidsdeskundige', 'Gesprek met de arbeidsdeskundige', 'verloop, vragen en wat je doet als je niet bent uitgenodigd'],
     ['eerstejaarsevaluatie-arbeidsdeskundige', 'Eerstejaarsevaluatie', 'wat je rond week 52 bespreekt en wanneer de arbeidsdeskundige erbij komt'],
+    ['duurzaamheid-wga-iva-arbeidsdeskundige', 'Duurzaamheid per aandoening', 'hoe een arbeidsdeskundige een WGA op duurzaamheid toetst'],
 ];
 
 // Alleen doelgroepen die personaData (en dus de sitemap) ook echt kent.

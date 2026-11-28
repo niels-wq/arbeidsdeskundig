@@ -324,12 +324,10 @@ function rubriekenTekst(keys) {
     return [...perRubriek.entries()].map(([rubriek, labels]) => rubriek + ': ' + labels.join(', ')).join('. ');
 }
 
-function naamUitContact(email) {
-    const local = String(email || '').split('@')[0].replace(/[._+-]+/g, ' ').replace(/\d+/g, ' ').replace(/\s+/g, ' ').trim();
-    if (local && /[a-z]/i.test(local) && !isPlaceholderName(local) && !/onbekend/i.test(local)) {
-        return local.slice(0, 80);
-    }
-    return 'Adviesaanvrager';
+function leadNaam(ruweNaam) {
+    const naam = schoon(ruweNaam, 120);
+    if (!naam || isPlaceholderName(naam) || /onbekend/i.test(naam)) return 'Adviesaanvrager';
+    return naam;
 }
 
 function safeSubject(email, telefoon) {
@@ -378,7 +376,7 @@ function validateAdviesLead(fields, now = new Date()) {
     if (!traject.ok) errors.push(traject.error);
 
     const lead = {
-        naam: naamUitContact(email),
+        naam: leadNaam(firstString(src, ['naam', 'ad-naam', 'organisatie'])),
         email: isValidEmail(email) ? email : '',
         telefoon: isValidPhone(telefoon) ? telefoon : '',
         dienst: 'AD-adviesgenerator',
@@ -461,12 +459,12 @@ function systeemPrompt() {
         'Antwoord alleen met JSON, zonder markdown, in precies deze velden: samenvatting, belastbaarheid, spoor1, spoor2, tijdlijn, risicos, vervolgstappen.',
         'samenvatting: kort beeld van functie, beperkingen, werkpercentage en verzuimduur.',
         'belastbaarheid: wat iemand volgens de invoer wel en niet kan, afgezet tegen de belasting van de functie.',
-        'spoor1: mogelijkheden in eigen werk aangepast en in ander werk bij de eigen werkgever.',
-        'spoor2: indicatie of oriëntatie op werk bij een andere werkgever logisch is, en waarom.',
+        'spoor1: mogelijkheden in eigen werk aangepast en in ander werk bij de eigen werkgever. Spoor 1 blijft nodig, ook als spoor 2 al wordt voorbereid.',
+        'spoor2: spoor 2 (werk bij een andere werkgever) wordt tijdig en zo nodig parallel aan spoor 1 voorbereid, niet pas als spoor 1 is mislukt. Leg uit dat de werkgever tijdig moet inzetten zodra duidelijk is dat terugkeer in het eigen werk onzeker is, rond het eerstejaarsevaluatie-moment (week 52) of eerder. Geef aan of dat in deze casus al speelt, op basis van de verzuimduur en de beperkingen.',
         'tijdlijn: de Poortwachter-mijlpalen op de meegestuurde datums (week 6, 8, 42, 52, 88, 91 en 104).',
-        'risicos: het risico op een loonsanctie als termijnen of re-integratie-inspanningen niet op orde zijn, zonder bedragen.',
-        'vervolgstappen: concrete volgende stappen voor werkgever en werknemer, waaronder een volwaardig arbeidsdeskundig onderzoek als een onderbouwd rapport nodig is.',
-        'Houd elk veld beknopt. Samen ongeveer 700 woorden.',
+        'risicos: het risico op een loonsanctie als termijnen of re-integratie-inspanningen niet op orde zijn, ook als spoor 2 te laat wordt voorbereid. Noem geen bedragen.',
+        'vervolgstappen: concrete volgende stappen voor werkgever en werknemer, waaronder tijdig en parallel spoor 2 voorbereiden zodra terugkeer in eigen werk onzeker is, en een volwaardig arbeidsdeskundig onderzoek als een onderbouwd rapport nodig is.',
+        'Richt het hele advies op ongeveer 600 tot 700 woorden.',
     ].join('\n');
 }
 
@@ -500,11 +498,11 @@ function fallbackSecties(lead) {
     return {
         samenvatting: 'Indicatief beeld bij de functie ' + lead.functie + '. De persoon werkt nu ' + lead.werkpercentage + ' procent. De verzuimduur is ' + lead.verzuimduur + ', gerekend tot ' + lead.peildatumNl + '. ' + duur,
         belastbaarheid: 'Taken in de functie: ' + lead.taken + '. Beperkingen volgens de invoer: ' + (lead.beperkingen || 'geen vrije tekst') + '. Aangevinkt: ' + (lead.rubriekenTekst || 'geen rubrieken') + '. Zet dit af tegen wat de functie vraagt. Waar de belasting hoger is dan de belastbaarheid, is aanpassing of ander werk nodig. Een loonwaarde is hier alleen kwalitatief te noemen: zonder onderzoek is niet te zeggen of die beperkt, redelijk of goed is.',
-        spoor1: 'Kijk eerst of het eigen werk kan worden aangepast, in taken, uren, tempo of hulpmiddelen, en of er ander passend werk bij de eigen werkgever is. Spoor 1 is pas afgerond als dat aantoonbaar is onderzocht.',
-        spoor2: 'Spoor 2, werk bij een andere werkgever, komt in beeld als passend werk in spoor 1 niet haalbaar lijkt. Deze generator geeft daar alleen een indicatie. Een arbeidsdeskundige stelt vast of spoor 2 aan de orde is.',
+        spoor1: 'Kijk of het eigen werk kan worden aangepast, in taken, uren, tempo of hulpmiddelen, en of er ander passend werk bij de eigen werkgever is. Spoor 1 blijft nodig en is pas afgerond als dat aantoonbaar is onderzocht.',
+        spoor2: 'Spoor 2, werk bij een andere werkgever, wordt tijdig en zo nodig parallel aan spoor 1 voorbereid. Niet pas als spoor 1 is mislukt. Zodra duidelijk is dat terugkeer in het eigen werk onzeker is, rond de eerstejaarsevaluatie of eerder, moet de werkgever daarop inzetten. Of dat hier al speelt, hangt af van de verzuimduur en de beperkingen. Deze generator geeft alleen een indicatie.',
         tijdlijn: 'De mijlpalen zijn berekend als een vast aantal weken na de eerste ziektedag ' + lead.eersteZiektedagNl + '. Gebruik die datums in het plan van aanpak en het re-integratieverslag. Week 6 is de probleemanalyse, week 8 het plan van aanpak, week 42 de melding bij UWV, week 52 de eerstejaarsevaluatie, week 88 en 91 de WIA-aanvraag met het re-integratieverslag, en week 104 het einde van de wachttijd.',
         risicos: 'Een loonsanctie kan volgen als de werkgever de re-integratie-inspanningen of de termijnen van de Wet verbetering poortwachter niet nakomt, bijvoorbeeld een te late probleemanalyse, een ontbrekend plan van aanpak of een te late WIA-aanvraag. Deze tekst noemt geen bedrag: de hoogte hangt van het loon af en wordt door UWV vastgesteld.',
-        vervolgstappen: 'Leg de beperkingen naast de taken. Werk spoor 1 uit: eigen werk aangepast en ander werk bij de eigen werkgever. Bewaak de mijlpalen. Vraag een volwaardig arbeidsdeskundig onderzoek aan als je een onderbouwd rapport nodig hebt.',
+        vervolgstappen: 'Leg de beperkingen naast de taken. Werk spoor 1 uit: eigen werk aangepast en ander werk bij de eigen werkgever. Bereid spoor 2 tijdig en parallel voor zodra terugkeer in het eigen werk onzeker is, rond de eerstejaarsevaluatie of eerder. Bewaak de mijlpalen. Vraag een volwaardig arbeidsdeskundig onderzoek aan als je een onderbouwd rapport nodig hebt.',
     };
 }
 
@@ -616,18 +614,118 @@ function getReport(id) {
     return reports.get(String(id)) || null;
 }
 
-function loadLogo() {
-    try {
-        return fs.readFileSync(path.join(__dirname, 'assets', 'matchvermogen-logo.png'));
-    } catch (e) {
-        return null;
+const KOP_RUIMTE_PT = 100;
+
+// Een kop hoort niet als enige regel onderaan een pagina. Is er minder dan
+// ongeveer 100 pt over, dan begint de kop op de volgende pagina.
+function zorgVoorKopruimte(doc, minPt = KOP_RUIMTE_PT) {
+    const bottom = doc.page.height - doc.page.margins.bottom;
+    if (doc.y + minPt > bottom) doc.addPage();
+}
+
+// Contact uit JSON-LD Organization en de footer van public/index.html.
+// Telefoon +31850870307 wordt op de site getoond als 085 087 0307.
+const SITE = {
+    telefoon: '085 087 0307',
+    telefoonLink: 'tel:0850870307',
+    email: 'info@arbeidsdeskundig.com',
+    website: 'https://www.arbeidsdeskundig.com/',
+    websiteLabel: 'www.arbeidsdeskundig.com',
+    adres: 'Losplaats 16d, 5404 NJ Uden',
+    kvk: 'KVK 85849618',
+    aanmelden: 'https://www.arbeidsdeskundig.com/aanmelden',
+    aanmeldenLabel: 'Vraag een volwaardig arbeidsdeskundig onderzoek aan',
+    calendly: 'https://calendly.com/matchvermogen/30min',
+    calendlyLabel: 'Plan een kennismaking',
+};
+
+const LOGO_PNG = path.join(__dirname, 'assets', 'logo-arbeidsdeskundig.png');
+
+function tekenKop(doc) {
+    const x = 56;
+    const y = 36;
+    const size = 36;
+    if (fs.existsSync(LOGO_PNG)) {
+        doc.image(LOGO_PNG, x, y, { width: size, height: size });
+    }
+    const textX = x + size + 12;
+    const textW = doc.page.width - doc.page.margins.right - textX;
+    doc.fillColor('#12203A').font('Helvetica-Bold').fontSize(15);
+    doc.text('arbeidsdeskundig.com', textX, y + 2, { width: textW, lineBreak: false });
+    doc.fontSize(11).text('Indicatief arbeidsdeskundig advies', textX, y + 20, { width: textW, lineBreak: false });
+    doc.y = y + size + 14;
+}
+
+function tekenLinkStuk(doc, label, url, x, y) {
+    doc.font('Helvetica').fontSize(8).fillColor('#1F6F5C');
+    const w = doc.widthOfString(label);
+    doc.text(label, x, y, { lineBreak: false });
+    doc.save();
+    doc.strokeColor('#1F6F5C').lineWidth(0.4).moveTo(x, y + 9).lineTo(x + w, y + 9).stroke();
+    doc.restore();
+    doc.link(x, y, w, 10, url);
+    return w;
+}
+
+function tekenVoetteksten(doc) {
+    const range = doc.bufferedPageRange();
+    for (let i = 0; i < range.count; i++) {
+        doc.switchToPage(range.start + i);
+        // switchToPage herstelt de transform van de pagina niet. Zonder een
+        // tweede transform in de stream blijven de annotaties in het juiste vlak.
+        doc._ctm = [1, 0, 0, -1, 0, doc.page.height];
+        // De ondermarge hoort bij de lopende tekst. De voettekst staat daaronder
+        // en mag daarom geen nieuwe pagina openen.
+        doc.page.margins.bottom = 0;
+        const left = doc.page.margins.left;
+        const right = doc.page.width - doc.page.margins.right;
+        const width = right - left;
+        const y0 = doc.page.height - 96;
+        doc.save();
+        doc.lineWidth(0.6).strokeColor('#C7CCC4').moveTo(left, y0).lineTo(right, y0).stroke();
+
+        let x = left;
+        const y1 = y0 + 8;
+        doc.font('Helvetica').fontSize(8);
+        const stuk = (label, url) => {
+            x += tekenLinkStuk(doc, label, url, x, y1);
+        };
+        const punt = () => {
+            doc.fillColor('#555555').text(' · ', x, y1, { lineBreak: false });
+            x += doc.widthOfString(' · ');
+        };
+        stuk(SITE.telefoon, SITE.telefoonLink);
+        punt();
+        stuk(SITE.email, 'mailto:' + SITE.email);
+        punt();
+        stuk(SITE.websiteLabel, SITE.website);
+
+        doc.fillColor('#555555').font('Helvetica').fontSize(8);
+        doc.text(SITE.adres + ' · ' + SITE.kvk, left, y0 + 22, { width, lineBreak: false });
+
+        let x2 = left;
+        const y3 = y0 + 36;
+        x2 += tekenLinkStuk(doc, SITE.aanmeldenLabel, SITE.aanmelden, x2, y3);
+        doc.fillColor('#555555').font('Helvetica').fontSize(8);
+        doc.text(' · ', x2, y3, { lineBreak: false });
+        x2 += doc.widthOfString(' · ');
+        tekenLinkStuk(doc, SITE.calendlyLabel, SITE.calendly, x2, y3);
+
+        doc.fillColor('#555555').font('Helvetica').fontSize(8);
+        const nummer = 'Pagina ' + (i + 1);
+        doc.text(nummer, left, y0 + 50, { width, align: 'right', lineBreak: false });
+        doc.restore();
     }
 }
 
 function schrijfPdf(rec) {
-    const logo = loadLogo();
     return new Promise((resolve, reject) => {
-        const doc = new PDFDocument({ size: 'A4', margin: 56, compress: false });
+        const doc = new PDFDocument({
+            size: 'A4',
+            margins: { top: 56, bottom: 112, left: 56, right: 56 },
+            bufferPages: true,
+            compress: false,
+        });
         const chunks = [];
         doc.on('data', (c) => chunks.push(c));
         doc.on('end', () => resolve(Buffer.concat(chunks)));
@@ -641,18 +739,7 @@ function schrijfPdf(rec) {
         const muted = '#555555';
         const width = doc.page.width - 112;
 
-        if (logo) {
-            const logoWidth = 150;
-            const logoHeight = logoWidth / (1434 / 383);
-            doc.image(logo, 56, 40, { width: logoWidth, height: logoHeight });
-            doc.fillColor(ink).fontSize(16).font('Helvetica-Bold').text('Indicatief arbeidsdeskundig advies', 56, 40 + logoHeight + 12, { width });
-            doc.fillColor(muted).fontSize(9).font('Helvetica').text('arbeidsdeskundig.com, onderdeel van Matchvermogen B.V.', 56, 40 + logoHeight + 32, { width });
-            doc.y = 40 + logoHeight + 52;
-        } else {
-            doc.fillColor(ink).fontSize(16).font('Helvetica-Bold').text('arbeidsdeskundig.com', 56, 40);
-            doc.fillColor(ink).fontSize(13).font('Helvetica-Bold').text('Indicatief arbeidsdeskundig advies', 56, 62);
-            doc.y = 88;
-        }
+        tekenKop(doc);
 
         doc.moveTo(56, doc.y).lineTo(doc.page.width - 56, doc.y).strokeColor(teal).lineWidth(2).stroke();
         doc.lineWidth(1);
@@ -670,12 +757,14 @@ function schrijfPdf(rec) {
 
         for (const sectie of rec.secties || []) {
             doc.moveDown(0.8);
+            zorgVoorKopruimte(doc);
             doc.fillColor(ink).fontSize(12).font('Helvetica-Bold').text(sectie.titel, { width });
             doc.moveDown(0.2);
             doc.fillColor('#222222').fontSize(10).font('Helvetica').text(sectie.tekst || '', { width, lineGap: 2 });
         }
 
         doc.moveDown(0.8);
+        zorgVoorKopruimte(doc);
         doc.fillColor(ink).fontSize(12).font('Helvetica-Bold').text('Berekende Poortwachter-mijlpalen', { width });
         doc.moveDown(0.3);
         doc.fontSize(9).font('Helvetica');
@@ -689,11 +778,7 @@ function schrijfPdf(rec) {
         doc.fillColor(amber).rect(56, doc.y, width, 2).fill();
         doc.moveDown(0.5);
         doc.fillColor(muted).fontSize(8).font('Helvetica').text(DISCLAIMER, { width, lineGap: 1 });
-        doc.moveDown(1);
-        doc.fillColor(muted).fontSize(8).text(
-            'Matchvermogen B.V., Losplaats 16d, 5404 NJ Uden, 085 087 0307, info@arbeidsdeskundig.com, KVK 85849618',
-            { width, align: 'center' }
-        );
+        tekenVoetteksten(doc);
         doc.end();
     });
 }
@@ -830,6 +915,10 @@ module.exports = {
     FML,
     MIJLPAAL,
     berekenTraject,
+    systeemPrompt,
+    fallbackSecties,
+    zorgVoorKopruimte,
+    schrijfPdf,
     vindMedisch,
     elfproef,
     validateAdviesLead,

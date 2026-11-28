@@ -992,6 +992,9 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
         html = hydrateFaqView(html, siteFaqs);
     }
     html = stripInactiveViews(html, route && route.view);
+    if (route && route.view === 'adviesgenerator') {
+        html = html.replace(/\s*<!-- fab-ad-advies -->[\s\S]*?<!-- \/fab-ad-advies -->/, '');
+    }
     html = enforceSingleH1(html, route && route.view);
     html = stripSitewideFaqPage(html);
 

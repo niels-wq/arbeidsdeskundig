@@ -38,6 +38,7 @@ const FOREIGN_VIEWS = [
     'view-tolk',
     'view-fysiek-tarief',
     'view-adviesgenerator',
+    'view-vergelijken',
 ];
 
 let server;

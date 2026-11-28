@@ -504,6 +504,29 @@
     }
   }
 
+  /* Snelknop naar de adviesgenerator. Rechts, zodat hij de checklist links niet raakt.
+     De draaiing blijft binnen het scherm: origin rechtsboven, de tab wijst omlaag langs de rand. */
+  .fab-ad-advies{
+    position:fixed; z-index:44; right:0; top:34%;
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--amber); color:var(--ink); font-weight:700; font-size:.8rem;
+    text-decoration:none; white-space:nowrap; line-height:1.2;
+    padding:8px 12px 8px 10px; border-radius:2px 2px 0 0;
+    box-shadow:-2px 2px 10px rgba(0,0,0,.15);
+    transform:rotate(90deg); transform-origin:right top;
+  }
+  .fab-ad-advies:hover{background:#e0ad4e;}
+  .fab-ad-advies:focus-visible{outline:3px solid var(--ink); outline-offset:3px;}
+  .fab-ad-ico{display:block; flex:0 0 auto;}
+  @media(max-width:639px){
+    /* De tab groeit omhoog vanaf dit punt. 248px houdt hem onder de header
+       en boven WhatsApp, de cookiebanner en de sticky balk. */
+    .fab-ad-advies{
+      top:248px; font-size:.72rem; padding:7px 10px 7px 8px; gap:5px;
+    }
+    .fab-ad-ico{width:12px; height:12px;}
+  }
+
   /* Modal */
   .modal-overlay{position:fixed; inset:0; background:rgba(18,32,58,.55); z-index:60; display:flex; align-items:center; justify-content:center; padding:20px;}
   .modal-box{background:var(--white); border-radius:4px; max-width:460px; width:100%; padding:32px; position:relative; max-height:90vh; overflow-y:auto;}
@@ -2307,6 +2330,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 
       <p class="form-section-title">Je gegevens</p>
       <p style="margin:-6px 0 12px; font-size:.85rem; color:var(--muted);">Het advies wordt pas getoond nadat je een e-mailadres of een telefoonnummer invult. Eén van beide is genoeg.</p>
+      <label class="field"><span class="lbl">Naam of organisatie</span><input type="text" id="ad-naam" name="naam" maxlength="120" autocomplete="organization"><span class="hint">Niet verplicht.</span></label>
       <label class="field"><span class="lbl">E-mailadres</span><input type="email" id="ad-email" name="email" autocomplete="email" inputmode="email"></label>
       <label class="field"><span class="lbl">Telefoonnummer</span><input type="tel" id="ad-telefoon" name="telefoon" autocomplete="tel" inputmode="tel"></label>
       <label class="fml-check" style="margin:8px 0 12px;"><input type="checkbox" id="ad-avg" name="avg" value="ja"> Ik geef toestemming om deze gegevens te gebruiken voor dit advies en om contact met mij op te nemen. <span class="req">*</span></label>
@@ -2327,6 +2351,11 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
         <button type="button" class="btn-ghost" id="ad-pdf" onclick="downloadAdviesPdf()">Download als PDF</button>
         <a class="btn-primary" href="/aanmelden" onclick="event.preventDefault(); setView('aanmelden')">Vraag een volwaardig arbeidsdeskundig onderzoek aan</a>
         <a class="btn-ghost" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een offerte aan</a>
+        <a class="btn-ghost" href="https://calendly.com/matchvermogen/30min" target="_blank" rel="noopener">Plan een kennismaking</a>
+      </div>
+      <div class="ad-contact" style="margin-top:18px; font-size:.85rem; color:var(--muted); line-height:1.55;">
+        <p style="margin:0;"><a href="tel:0850870307">085 087 0307</a> · <a href="mailto:info@arbeidsdeskundig.com">info@arbeidsdeskundig.com</a> · <a href="https://www.arbeidsdeskundig.com/">www.arbeidsdeskundig.com</a></p>
+        <p style="margin:4px 0 0;">Losplaats 16d, 5404 NJ Uden · KVK 85849618</p>
       </div>
     </div>
 
@@ -2408,6 +2437,13 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 
 <!-- Checklist-knop -->
 <button class="fab-checklist" onclick="openChecklistModal()">📋 Gratis checklist</button>
+
+<!-- fab-ad-advies -->
+<a class="fab-ad-advies" id="fab-ad-advies" href="/ad-advies-generator" title="Gratis AD-advies. Sneltoets Alt+A." aria-label="Gratis AD-advies. Opent de adviesgenerator. Sneltoets Alt+A." onclick="return openAdAdviesShortcut(event, 'tab')">
+  <svg class="fab-ad-ico" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path fill="currentColor" d="M3 1.5h6.2L13 5.2V14.5H3V1.5zm6.2.9V5.4H12L9.2 2.4zM4.6 7.2h6.8v1.15H4.6V7.2zm0 2.3h6.8v1.15H4.6V9.5zm0 2.3h4.2v1.15H4.6v-1.15z"/></svg>
+  <span>Gratis AD-advies</span>
+</a>
+<!-- /fab-ad-advies -->
 
 <!-- Exit-intent popup -->
 <div class="modal-overlay hidden" id="exit-intent-overlay">
@@ -2639,6 +2675,36 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     if(label) label.textContent = isOpen ? 'Sluiten' : 'Menu';
   }
 
+  function trackAdAdviesShortcut(source){
+    try{
+      if(window.dataLayer && typeof window.dataLayer.push === 'function'){
+        window.dataLayer.push({ event: 'ad_advies_shortcut', source: source });
+      }
+    }catch(err){}
+  }
+  function openAdAdviesShortcut(event, source){
+    if(event) event.preventDefault();
+    trackAdAdviesShortcut(source || 'tab');
+    setView('adviesgenerator');
+    return false;
+  }
+  function adAdviesFocusInVeld(){
+    const el = document.activeElement;
+    if(!el || el === document.body) return false;
+    const tag = el.tagName;
+    if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+    if(el.isContentEditable) return true;
+    return false;
+  }
+  function onAdAdviesShortcutKey(e){
+    if(!e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || e.repeat) return;
+    if(e.code !== 'KeyA') return;
+    if(adAdviesFocusInVeld()) return;
+    if(!document.getElementById('fab-ad-advies')) return;
+    e.preventDefault();
+    openAdAdviesShortcut(null, 'keyboard');
+  }
+
   function initMobileNav(){
     const nav = document.getElementById('navMobile');
     const btn = document.getElementById('navToggle');
@@ -2660,6 +2726,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
         btn.focus();
       }
     });
+    document.addEventListener('keydown', onAdAdviesShortcutKey);
     window.addEventListener('resize', ()=>{
       if(window.matchMedia('(min-width: 769px)').matches) setMobileNavOpen(false);
     });
@@ -8360,6 +8427,7 @@ whk: `
     const eersteZiektedag = document.getElementById('ad-ziektedag').value || '';
     const werkpercentage = document.getElementById('ad-percentage').value;
     const duurzaam = document.querySelector('#ad-form input[name="ad-duurzaamheid"]:checked');
+    const naam = ((document.getElementById('ad-naam') || {}).value || '').trim();
     const email = (document.getElementById('ad-email').value || '').trim();
     const telefoon = (document.getElementById('ad-telefoon').value || '').trim();
     const avg = document.getElementById('ad-avg').checked;
@@ -8400,7 +8468,7 @@ whk: `
         eersteZiektedag,
         werkpercentage: perc,
         duurzaamheid: duurzaam.value,
-        email, telefoon, avg: true, website,
+        naam, email, telefoon, avg: true, website,
       });
       if(!data.secties){
         showFormError('ad-error', ['De aanvraag is te snel verstuurd of niet compleet. Wacht een moment en probeer het opnieuw.']);

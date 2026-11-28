@@ -131,10 +131,16 @@ describe('AD-adviesgenerator, pagina', () => {
         const waarschuwing = 'Vul geen medische gegevens in (geen diagnoses, ziektes, medicatie of behandelingen) en geen namen of BSN. Beschrijf alleen wat iemand wel en niet kan.';
         assert.equal(html.split(waarschuwing).length - 1, 2);
         assert.equal(html.includes(DISCLAIMER), true);
+        assert.match(html, /href="https:\/\/calendly\.com\/matchvermogen\/30min"/);
+        assert.match(html, />085 087 0307</);
+        assert.match(html, /Losplaats 16d, 5404 NJ Uden/);
+        assert.match(html, /KVK 85849618/);
         assert.match(html, /Vraag een volwaardig arbeidsdeskundig onderzoek aan/);
         assert.match(html, /href="\/aanmelden"/);
         assert.match(html, /href="\/offerte-aanvragen"/);
         assert.match(html, /id="ad-website"/);
+        assert.match(html, /<span class="lbl">Naam of organisatie<\/span>/);
+        assert.doesNotMatch(html, /Naam of organisatie[\s\S]{0,80}<span class="req">/);
         assert.match(html, /id="ad-avg"/);
 
         const blocks = [];
@@ -318,8 +324,80 @@ describe('AD-adviesgenerator, hulpen', () => {
         assert.match(fields['FML-rubrieken'], /Staan/);
         assert.equal(fields['AVG-toestemming'], 'Ja');
         assert.equal(fields['Duurzaam benutbare mogelijkheden'], 'Onbekend');
+        assert.equal(parsed.lead.naam, 'Adviesaanvrager');
+        assert.equal(fields.Naam, 'Adviesaanvrager');
+        const metNaam = advies.validateAdviesLead(geldig({ naam: 'Jansen Logistics' }));
+        assert.equal(metNaam.ok, true);
+        assert.equal(metNaam.lead.naam, 'Jansen Logistics');
+        assert.equal(advies.adviesMailFields(metNaam.lead).Naam, 'Jansen Logistics');
+        const zonderPlaatsvervanger = advies.validateAdviesLead(geldig({ naam: 'onbekend' }));
+        assert.equal(zonderPlaatsvervanger.lead.naam, 'Adviesaanvrager');
         const subject = advies.safeSubject(parsed.lead.email, parsed.lead.telefoon);
         assert.equal(/onbekend/i.test(subject), false);
         assert.match(subject, /jan@bedrijf.nl/);
+    });
+
+    it('vraagt om tijdig en parallel spoor 2, in ongeveer 600 tot 700 woorden', () => {
+        const prompt = advies.systeemPrompt();
+        assert.match(prompt, /parallel aan spoor 1/);
+        assert.match(prompt, /niet pas als spoor 1 is mislukt/);
+        assert.match(prompt, /eerstejaarsevaluatie/);
+        assert.match(prompt, /600 tot 700 woorden/);
+        assert.equal(prompt.includes('\u2014'), false);
+        assert.equal(prompt.includes('\u2013'), false);
+        const lead = advies.validateAdviesLead(geldig()).lead;
+        const fb = advies.fallbackSecties(lead);
+        assert.match(fb.spoor2, /parallel aan spoor 1/);
+        assert.match(fb.spoor2, /eerstejaarsevaluatie/);
+        assert.match(fb.vervolgstappen, /parallel/);
+    });
+
+    it('zet het woordmerk in de PDF en begint een kop niet onderaan de pagina', async () => {
+        const src = require('fs').readFileSync(require('path').join(__dirname, '..', 'ad-advies.js'), 'utf8');
+        assert.equal(src.includes('matchvermogen-logo'), false);
+        const PDFDocument = require('pdfkit');
+        const doc = new PDFDocument({ size: 'A4', margin: 56 });
+        const onderaan = doc.page.height - doc.page.margins.bottom - 40;
+        doc.y = onderaan;
+        const startVoor = doc.bufferedPageRange().start;
+        advies.zorgVoorKopruimte(doc, 100);
+        assert.equal(doc.bufferedPageRange().start, startVoor + 1);
+        assert.ok(doc.y <= doc.page.margins.top + 1);
+        const startNa = doc.bufferedPageRange().start;
+        doc.y = 120;
+        advies.zorgVoorKopruimte(doc, 100);
+        assert.equal(doc.bufferedPageRange().start, startNa);
+        assert.equal(doc.y, 120);
+        doc.end();
+
+        const pdf = await advies.schrijfPdf({
+            functie: 'Magazijnmedewerker',
+            eersteZiektedagNl: '6 januari 2026',
+            verzuimduur: '8 weken',
+            peildatumNl: '3 maart 2026',
+            werkpercentage: 40,
+            fallback: false,
+            secties: [
+                { titel: 'Samenvatting', tekst: 'Kort beeld.' },
+                { titel: 'Belastbaarheid versus belasting van de functie', tekst: 'Tillen is beperkt.' },
+            ],
+            mijlpalen: [{ label: 'Week 6, probleemanalyse', datumNl: '17 februari 2026' }],
+        });
+        const tekst = [...pdf.toString('latin1').matchAll(/<([0-9A-Fa-f]+)>/g)]
+            .filter((m) => m[1].length % 2 === 0)
+            .map((m) => Buffer.from(m[1], 'hex').toString('latin1'))
+            .join('');
+        assert.match(tekst, /arbeidsdeskundig\.com/);
+        assert.match(tekst, /Berekende Poortwachter-mijlpalen/);
+        assert.match(pdf.toString('latin1'), /https:\/\/www\.arbeidsdeskundig\.com\/aanmelden/);
+        assert.match(pdf.toString('latin1'), /https:\/\/calendly\.com\/matchvermogen\/30min/);
+        assert.match(tekst, /085 087 0307/);
+        assert.match(tekst, /info@arbeidsdeskundig\.com/);
+        assert.match(tekst, /www\.arbeidsdeskundig\.com/);
+        assert.match(tekst, /Losplaats 16d, 5404 NJ Uden/);
+        assert.match(tekst, /KVK 85849618/);
+        assert.match(tekst, /Pagina 1/);
+        assert.equal(/matchvermogen-logo/i.test(tekst), false);
+        assert.equal(require('fs').existsSync(require('path').join(__dirname, '..', 'assets', 'logo-arbeidsdeskundig.png')), true);
     });
 });

@@ -74,7 +74,7 @@
   body.conv-page .fab-checklist{display:none;}
   body.conv-page .header-offerte-cta{display:none;}
   @media(max-width:639px){
-    body{padding-bottom:calc(var(--cookie-banner-offset, 0px) + var(--cookie-open-sticky-pad, 0px) + var(--fab-bottom-offset, 0px));}
+    body{padding-bottom:calc(var(--sticky-cta-clearance, 168px) + var(--cookie-banner-offset, 0px) + var(--cookie-open-sticky-pad, 0px) + var(--fab-bottom-offset, 0px));}
     /* Reserveer ruimte vóór de meting, zodat de kaart de footer niet bedekt op de eerste paint. */
     body.cookie-prompt-open{padding-bottom:calc(var(--cookie-banner-offset, 220px) + var(--fab-bottom-offset, 0px));}
     body.conv-page .fab-whatsapp{bottom:calc(20px + var(--cookie-banner-offset, 0px) + var(--fab-bottom-offset, 0px));}
@@ -145,6 +145,22 @@
   @media(max-width:479px){
     a.btn-primary.header-offerte-cta{display:none;}
   }
+  .nav-promo{background:#0E1A30;}
+  .nav-promo a{
+    display:block; max-width:1120px; margin:0 auto; text-align:center; text-decoration:none;
+    background:var(--amber); color:var(--ink); font-weight:700; font-size:.9rem; line-height:1.35;
+    padding:9px 16px; overflow-wrap:anywhere;
+  }
+  nav.desktop a.nav-ad-link{
+    color:var(--ink); background:var(--amber); font-weight:700; padding:4px 8px; border-radius:2px;
+    white-space:nowrap;
+  }
+  nav.desktop a.nav-ad-link.active, nav.desktop a.nav-ad-link.active::after{color:var(--ink); background:var(--amber);}
+  nav.desktop a.nav-ad-link.active::after{display:none;}
+  @media(max-width:1499px){ nav.desktop a.nav-ad-link{display:none;} }
+  .sticky-cta a.sticky-ad{background:var(--paper); color:var(--ink);}
+  nav.mobile a.nav-ad-link{color:var(--ink); background:var(--amber); font-weight:700; text-align:center;}
+  @media(max-width:400px){ .nav-promo a{font-size:.8rem; padding:8px 12px;} }
 
   .btn-primary{background:var(--amber); color:var(--ink); font-weight:600; border:none; padding:12px 22px; border-radius:2px; cursor:pointer; font-size:.95rem; transition:transform .12s ease, box-shadow .12s ease;}
   .btn-primary:hover{transform:translateY(-1px); box-shadow:0 6px 16px rgba(216,160,61,.35);}
@@ -265,6 +281,33 @@
   .form-section-title:first-child{margin-top:0; padding-top:0; border-top:none;}
   .info-box{background:#FCF6E9; border:1px solid var(--amber); border-radius:2px; padding:14px 16px; font-size:.85rem; color:var(--muted); margin-bottom:20px;}
   .info-box a{color:var(--teal); font-weight:600; text-decoration:underline;}
+  .ad-waarschuwing{background:#FDECEC; border:1.5px solid #9B2C2C; color:var(--ink); padding:12px 14px; font-size:.88rem; font-weight:600; line-height:1.45; margin:0 0 16px; overflow-wrap:anywhere;}
+  .ad-page{min-width:0;}
+  @media(max-width:639px){
+    #view-adviesgenerator .ad-page{padding-left:46px;}
+  }
+  .fml-rubriek{border:1px solid #DFE2DB; margin:0 0 12px; padding:10px 12px 12px; min-width:0; max-width:100%;}
+  .fml-rubriek legend{font-weight:600; font-size:.88rem; color:var(--ink); padding:0 6px;}
+  .fml-grid{display:grid; grid-template-columns:1fr; gap:4px 16px;}
+  @media(min-width:640px){ .fml-grid{grid-template-columns:1fr 1fr;} }
+  .fml-check{display:flex; gap:8px; align-items:flex-start; font-size:.85rem; line-height:1.4; margin:4px 0; min-width:0;}
+  .fml-check input{margin-top:3px; flex:0 0 auto;}
+  .ad-duurzaam{display:flex; flex-direction:column; gap:8px;}
+  @media(min-width:640px){ .ad-duurzaam{flex-direction:row; flex-wrap:wrap;} }
+  .ad-duurzaam label{display:flex; gap:8px; align-items:center; font-size:.9rem;}
+  .ad-rapport h2{font-size:1.2rem; margin:22px 0 8px; color:var(--ink);}
+  .ad-rapport p{color:var(--muted); font-size:.95rem; line-height:1.6; margin:0 0 8px; overflow-wrap:anywhere;}
+  .ad-disclaimer{font-size:.8rem; color:var(--muted2); margin-top:18px; line-height:1.5; overflow-wrap:anywhere;}
+  .ad-mijlpalen{width:100%; border-collapse:collapse; font-size:.85rem;}
+  .ad-mijlpalen caption{caption-side:top; text-align:left; font-weight:600; color:var(--ink); padding:0 0 8px;}
+  .ad-mijlpalen td, .ad-mijlpalen th{border-bottom:1px solid #DFE2DB; padding:6px 8px 6px 0; text-align:left; vertical-align:top; overflow-wrap:anywhere;}
+  .ad-actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px;}
+  .ad-fallback{background:#FCF6E9; border:1px solid var(--amber); padding:12px 14px; font-size:.88rem; margin-bottom:12px; line-height:1.45;}
+  .ad-promo-home h2{font-size:1.45rem; color:var(--ink); margin-top:8px;}
+  .ad-promo-home p{color:var(--muted); margin-top:8px; line-height:1.5;}
+  @media(max-width:400px){
+    .sticky-cta a{font-size:.82rem; padding:12px 10px; line-height:1.3;}
+  }
 
   footer.site{background:var(--ink); color:#8590A0; padding:36px 20px 24px;}
   .footer-grid{display:grid; grid-template-columns:1fr; gap:24px; max-width:1120px; margin:0 auto;}
@@ -393,7 +436,7 @@
   /* Floating buttons */
   .fab-whatsapp{position:fixed; right:20px; bottom:calc(20px + var(--fab-bottom-offset, 0px)); z-index:45; width:54px; height:54px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(0,0,0,.25); text-decoration:none; transition:bottom .25s ease;}
   .fab-whatsapp:hover{transform:scale(1.06);}
-  @media(max-width:639px){ .fab-whatsapp{bottom:calc(var(--sticky-cta-clearance, 78px) + var(--cookie-banner-offset, 0px) + var(--fab-bottom-offset, 0px)); right:14px; width:48px; height:48px;} }
+  @media(max-width:639px){ .fab-whatsapp{bottom:calc(var(--sticky-cta-clearance, 168px) + var(--cookie-banner-offset, 0px) + var(--fab-bottom-offset, 0px)); right:14px; width:48px; height:48px;} }
   @media(max-width:639px){
     body.cookie-prompt-open .fab-whatsapp{
       bottom:calc(var(--cookie-banner-offset, 220px) + var(--fab-bottom-offset, 0px));
@@ -494,6 +537,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <a href="/veelgestelde-vragen" data-key="faq" onclick="event.preventDefault(); setView('faq')">FAQ</a>
       <a href="/over-ons" data-key="over" onclick="event.preventDefault(); setView('over')">Over ons</a>
       <a href="/keuzehulp" data-key="advies" onclick="event.preventDefault(); setView('advies')">Adviestool</a>
+      <a class="nav-ad-link" href="/ad-advies-generator" data-key="adviesgenerator" onclick="event.preventDefault(); setView('adviesgenerator')">Genereer vrijblijvend een AD-advies</a>
     </nav>
     <div class="navbar-actions">
       <button class="btn-ghost-header header-bel-cta" style="white-space:nowrap;" onclick="openBelTerugModal()">📞 Bel me terug</button>
@@ -512,8 +556,12 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     <a href="/veelgestelde-vragen" data-key="faq" onclick="event.preventDefault(); setView('faq')">FAQ</a>
     <a href="/over-ons" data-key="over" onclick="event.preventDefault(); setView('over')">Over ons</a>
     <a href="/keuzehulp" data-key="advies" onclick="event.preventDefault(); setView('advies')">Adviestool</a>
+    <a class="nav-ad-link" href="/ad-advies-generator" data-key="adviesgenerator" onclick="event.preventDefault(); setView('adviesgenerator')">Genereer vrijblijvend een AD-advies</a>
     <a class="mobile-bel" href="#bel-me-terug" onclick="event.preventDefault(); openBelTerugModal()">Bel me terug</a>
   </nav>
+  <div class="nav-promo">
+    <a href="/ad-advies-generator" onclick="event.preventDefault(); setView('adviesgenerator')">Genereer vrijblijvend een AD-advies</a>
+  </div>
 </header>
 
 <!-- ============= HOME ============= -->
@@ -563,6 +611,15 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
           <path d="M282 160 l9 9 18 -18" stroke="#1F6F5C" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="anim-draw"/>
         </svg>
       </div>
+    </div>
+  </section>
+
+  <section class="wrap ad-promo-home" aria-label="AD-adviesgenerator">
+    <div class="card" style="border-left:4px solid var(--amber); padding:22px 24px;">
+      <p class="eyebrow">Gratis hulpmiddel</p>
+      <h2>Genereer vrijblijvend een AD-advies</h2>
+      <p>Beschrijf de functie en wat iemand wel en niet kan. Je krijgt een indicatief advies met de Poortwachter-tijdlijn. Vul geen medische gegevens in.</p>
+      <a class="btn-primary" style="margin-top:14px;" href="/ad-advies-generator" onclick="event.preventDefault(); setView('adviesgenerator')">Genereer vrijblijvend een AD-advies</a>
     </div>
   </section>
 
@@ -1548,6 +1605,12 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <p style="font-size:.76rem; color:var(--muted2);">Gecontroleerd door Niels Alderding, geregistreerd arbeidsdeskundige</p>
     </div>
     <p style="margin-top:10px; font-size:1.05rem; color:var(--muted); font-style:italic;" id="artikel-metadesc"></p>
+    <div class="card ad-promo-artikel" id="ad-promo-artikel" style="margin-top:16px; padding:16px 18px;">
+      <p class="eyebrow">Gratis hulpmiddel</p>
+      <p style="margin-top:6px; font-weight:600; color:var(--ink);">Genereer vrijblijvend een AD-advies</p>
+      <p style="margin-top:6px; font-size:.88rem;">Indicatief advies op basis van functie, beperkingen en verzuimduur. Zonder medische gegevens.</p>
+      <a class="btn-primary btn-small" style="margin-top:12px;" href="/ad-advies-generator" onclick="event.preventDefault(); setView('adviesgenerator')">Genereer vrijblijvend een AD-advies</a>
+    </div>
     <div class="card" id="artikel-kernpunten-wrap" style="margin-top:16px; padding:18px 20px;">
       <p class="eyebrow" style="color:var(--muted2);">In het kort</p>
       <ul id="artikel-kernpunten" style="margin:8px 0 0; padding-left:18px; font-size:.87rem; color:var(--muted); line-height:1.6;"></ul>
@@ -2090,6 +2153,140 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
   </div>
 </div>
 
+
+<!-- ============= AD-ADVIESGENERATOR ============= -->
+<div class="view" id="view-adviesgenerator" hidden>
+  <div class="wrap ad-page" style="padding-top:48px; padding-bottom:64px;">
+    <p class="eyebrow">Gratis hulpmiddel</p>
+    <h1 class="route-h1" style="font-size:clamp(1.7rem, 4vw, 2.3rem); color:var(--ink); margin-top:8px;">Genereer vrijblijvend een arbeidsdeskundig advies</h1>
+    <p style="margin-top:12px; color:var(--muted); line-height:1.55;">Je krijgt een indicatief advies vanuit arbeidsdeskundig perspectief: belastbaarheid tegenover de functie, spoor 1, een indicatie voor spoor 2 en de Poortwachter-tijdlijn. Het advies verschijnt nadat je een e-mailadres of telefoonnummer achterlaat.</p>
+    <p class="ad-waarschuwing" role="note">Vul geen medische gegevens in (geen diagnoses, ziektes, medicatie of behandelingen) en geen namen of BSN. Beschrijf alleen wat iemand wel en niet kan.</p>
+
+    <form id="ad-form" onsubmit="event.preventDefault(); submitAdvies();" novalidate>
+      <label class="field"><span class="lbl">Functienaam <span class="req">*</span></span><input type="text" id="ad-functie" name="functie" maxlength="120" autocomplete="organization-title" required></label>
+      <label class="field"><span class="lbl">Korte taakomschrijving <span class="req">*</span></span><textarea id="ad-taken" name="taken" maxlength="1500" required placeholder="Bijvoorbeeld: orderpicken, dozen tot 15 kg tillen, lopen door het magazijn en staand werken."></textarea></label>
+
+      <p class="ad-waarschuwing" role="note">Vul geen medische gegevens in (geen diagnoses, ziektes, medicatie of behandelingen) en geen namen of BSN. Beschrijf alleen wat iemand wel en niet kan.</p>
+      <label class="field"><span class="lbl">Functionele beperkingen</span><textarea id="ad-beperkingen" name="beperkingen" maxlength="2000" placeholder="Beschrijf wat iemand wel en niet kan, bijvoorbeeld niet lang staan en niet zwaar tillen. Lichte taken zittend gaan wel."></textarea><span class="hint">Vrije tekst, aangevuld met de rubrieken hieronder. Minstens één van beide.</span></label>
+
+      <p class="form-section-title">Beperkingen per FML-rubriek</p>
+      <p style="margin:-6px 0 12px; font-size:.85rem; color:var(--muted);">Vink aan waar iemand beperkt is. Dit zijn functionele punten, geen medische gegevens.</p>
+          <fieldset class="fml-rubriek">
+            <legend>Persoonlijk functioneren</legend>
+            <div class="fml-grid">
+            <label class="fml-check"><input type="checkbox" data-rubriek="persoonlijk" value="concentreren"> Concentreren van de aandacht</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="persoonlijk" value="aandacht"> Verdelen van de aandacht</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="persoonlijk" value="herinneren"> Herinneren</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="persoonlijk" value="zelfstandig"> Zelfstandig handelen</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="persoonlijk" value="doelmatig"> Doelmatig handelen</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="persoonlijk" value="tempo"> Handelingstempo</label>
+            </div>
+          </fieldset>
+          <fieldset class="fml-rubriek">
+            <legend>Sociaal functioneren</legend>
+            <div class="fml-grid">
+            <label class="fml-check"><input type="checkbox" data-rubriek="sociaal" value="zien"> Zien</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="sociaal" value="horen"> Horen</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="sociaal" value="spreken"> Spreken</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="sociaal" value="samenwerken"> Samenwerken</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="sociaal" value="conflicten"> Omgaan met conflicten</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="sociaal" value="gevoelens"> Eigen gevoelens uiten</label>
+            </div>
+          </fieldset>
+          <fieldset class="fml-rubriek">
+            <legend>Aanpassing aan fysieke omgeving</legend>
+            <div class="fml-grid">
+            <label class="fml-check"><input type="checkbox" data-rubriek="omgeving" value="hitte"> Hitte</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="omgeving" value="kou"> Koude</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="omgeving" value="geluid"> Geluid</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="omgeving" value="trillingen"> Trillingen</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="omgeving" value="stof"> Stof, rook, gassen of dampen</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="omgeving" value="bescherming"> Beschermende middelen</label>
+            </div>
+          </fieldset>
+          <fieldset class="fml-rubriek">
+            <legend>Dynamische handelingen</legend>
+            <div class="fml-grid">
+            <label class="fml-check"><input type="checkbox" data-rubriek="dynamisch" value="tillen"> Tillen of dragen</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="dynamisch" value="duwen"> Duwen of trekken</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="dynamisch" value="lopen"> Lopen</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="dynamisch" value="trappen"> Trappenlopen</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="dynamisch" value="reiken"> Reiken</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="dynamisch" value="handen"> Hand- en vingergebruik</label>
+            </div>
+          </fieldset>
+          <fieldset class="fml-rubriek">
+            <legend>Statische houdingen</legend>
+            <div class="fml-grid">
+            <label class="fml-check"><input type="checkbox" data-rubriek="statisch" value="zitten"> Zitten</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="statisch" value="staan"> Staan</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="statisch" value="gebogen"> Gebogen of getordeerd actief zijn</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="statisch" value="schouder"> Boven schouderhoogte actief zijn</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="statisch" value="afwisselen"> Afwisseling van houding</label>
+            </div>
+          </fieldset>
+          <fieldset class="fml-rubriek">
+            <legend>Werktijden</legend>
+            <div class="fml-grid">
+            <label class="fml-check"><input type="checkbox" data-rubriek="werktijden" value="uren-dag"> Uren per dag</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="werktijden" value="uren-week"> Uren per week</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="werktijden" value="nacht"> Werken in de nacht</label>
+            <label class="fml-check"><input type="checkbox" data-rubriek="werktijden" value="onregelmatig"> Onregelmatige tijden</label>
+            </div>
+          </fieldset>
+
+      <label class="field" style="margin-top:18px;"><span class="lbl">Eerste ziektedag <span class="req">*</span></span><input type="date" id="ad-ziektedag" name="eersteZiektedag" required oninput="updateAdviesMijlpalen()" onchange="updateAdviesMijlpalen()"></label>
+      <div class="card" id="ad-mijlpalen-live" style="padding:14px 16px; margin-bottom:16px;"><p>Vul een eerste ziektedag in. De verzuimduur en de mijlpalen verschijnen dan hier.</p></div>
+
+      <label class="field"><span class="lbl">Percentage dat iemand nu werkt <span class="req">*</span></span><input type="number" id="ad-percentage" name="werkpercentage" min="0" max="100" step="1" inputmode="numeric" required placeholder="0 tot 100"><span class="hint">0 is volledig verzuim, 100 is volledig aan het werk. Dit is geen loonwaarde.</span></label>
+
+      <fieldset class="fml-rubriek">
+        <legend>Duurzaam benutbare mogelijkheden <span class="req">*</span></legend>
+        <div class="ad-duurzaam">
+          <label><input type="radio" name="ad-duurzaamheid" value="ja" required> Ja</label>
+          <label><input type="radio" name="ad-duurzaamheid" value="nee"> Nee</label>
+          <label><input type="radio" name="ad-duurzaamheid" value="onbekend"> Onbekend</label>
+        </div>
+      </fieldset>
+
+      <p class="form-section-title">Je gegevens</p>
+      <p style="margin:-6px 0 12px; font-size:.85rem; color:var(--muted);">Het advies wordt pas getoond nadat je een e-mailadres of een telefoonnummer invult. Eén van beide is genoeg.</p>
+      <label class="field"><span class="lbl">E-mailadres</span><input type="email" id="ad-email" name="email" autocomplete="email" inputmode="email"></label>
+      <label class="field"><span class="lbl">Telefoonnummer</span><input type="tel" id="ad-telefoon" name="telefoon" autocomplete="tel" inputmode="tel"></label>
+      <label class="fml-check" style="margin:8px 0 12px;"><input type="checkbox" id="ad-avg" name="avg" value="ja"> Ik geef toestemming om deze gegevens te gebruiken voor dit advies en om contact met mij op te nemen. <span class="req">*</span></label>
+      <label class="hp-field" aria-hidden="true"><span>Website</span><input type="text" id="ad-website" name="website" tabindex="-1" autocomplete="off"></label>
+      <input type="hidden" class="form-ts" name="form_ts" value="__FORM_TS__" autocomplete="off">
+      <p id="ad-error" class="form-error hidden" role="alert"></p>
+      <button type="submit" class="btn-primary" id="ad-submit">Genereer mijn advies</button>
+    </form>
+
+    <div id="ad-resultaat" class="ad-rapport hidden" style="margin-top:28px;">
+      <p id="ad-fallback" class="ad-fallback hidden" role="status"></p>
+      <div id="ad-kop"></div>
+      <div id="ad-secties"></div>
+      <h2>Berekende Poortwachter-mijlpalen</h2>
+      <div id="ad-mijlpalen-tabel"></div>
+      <p class="ad-disclaimer">Dit is een automatisch gegenereerd, indicatief advies op basis van jouw invoer. Het is geen medisch advies, geen vervanging van een arbeidsdeskundig onderzoek en er kunnen geen rechten aan worden ontleend. De juistheid en adequaatheid voor jouw situatie zijn niet gegarandeerd. Voer geen medische informatie in.</p>
+      <div class="ad-actions">
+        <button type="button" class="btn-ghost" id="ad-pdf" onclick="downloadAdviesPdf()">Download als PDF</button>
+        <a class="btn-primary" href="/aanmelden" onclick="event.preventDefault(); setView('aanmelden')">Vraag een volwaardig arbeidsdeskundig onderzoek aan</a>
+        <a class="btn-ghost" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vraag een offerte aan</a>
+      </div>
+    </div>
+
+    <div style="margin-top:40px;">
+      <h2 style="font-size:1.35rem; color:var(--ink);">Veelgestelde vragen</h2>
+      <div style="margin-top:12px;">
+        <div class="accordion-item open"><button class="accordion-head" type="button" onclick="toggleAccordion(this)">Wat doet de AD-adviesgenerator?<span class="accordion-icon">+</span></button><div class="accordion-body" style="max-height:none;"><div class="accordion-body-inner">De generator maakt een vrijblijvend, indicatief advies op basis van de functie, de functionele beperkingen, de verzuimduur en het werkpercentage. Het is geen arbeidsdeskundig onderzoek.</div></div></div>
+        <div class="accordion-item open"><button class="accordion-head" type="button" onclick="toggleAccordion(this)">Mag ik een diagnose of andere medische gegevens invullen?<span class="accordion-icon">+</span></button><div class="accordion-body" style="max-height:none;"><div class="accordion-body-inner">Nee. Vul geen diagnoses, ziektes, medicatie, behandelingen, namen of BSN in. Beschrijf alleen wat iemand wel en niet kan.</div></div></div>
+        <div class="accordion-item open"><button class="accordion-head" type="button" onclick="toggleAccordion(this)">Wanneer verschijnt het advies?<span class="accordion-icon">+</span></button><div class="accordion-body" style="max-height:none;"><div class="accordion-body-inner">Het advies verschijnt op deze pagina nadat je een e-mailadres of telefoonnummer invult en toestemming geeft. Je kunt het daarna als PDF downloaden.</div></div></div>
+        <div class="accordion-item open"><button class="accordion-head" type="button" onclick="toggleAccordion(this)">Hoe worden de Poortwachter-mijlpalen berekend?<span class="accordion-icon">+</span></button><div class="accordion-body" style="max-height:none;"><div class="accordion-body-inner">Vanaf de eerste ziektedag rekenen we week 6, week 8, week 42, week 52, week 88, week 91 en week 104 uit, telkens als dat aantal weken na de eerste ziektedag.</div></div></div>
+        <div class="accordion-item open"><button class="accordion-head" type="button" onclick="toggleAccordion(this)">Kunnen er rechten aan dit advies worden ontleend?<span class="accordion-icon">+</span></button><div class="accordion-body" style="max-height:none;"><div class="accordion-body-inner">Nee. Het is een automatisch en indicatief advies. Het vervangt geen medisch advies en geen arbeidsdeskundig onderzoek.</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer class="site">
   <div class="footer-grid">
     <div>
@@ -2098,6 +2295,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <a href="/rekentool" onclick="event.preventDefault(); setView('calculator')">Rekentool</a>
       <a href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Offerte</a>
       <a href="/aanmelden" onclick="event.preventDefault(); setView('aanmelden')">Aanmelden</a>
+      <a href="/ad-advies-generator" onclick="event.preventDefault(); setView('adviesgenerator')">Genereer vrijblijvend een AD-advies</a>
     </div>
     <div>
       <h4>Kennis</h4>
@@ -2125,6 +2323,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
 </footer>
 
 <div class="sticky-cta">
+  <a class="btn-primary sticky-ad" href="/ad-advies-generator" onclick="event.preventDefault(); setView('adviesgenerator')">Genereer vrijblijvend een AD-advies</a>
   <a class="btn-primary" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Direct offerte & planning: reactie binnen 24 uur</a>
 </div>
 
@@ -2339,7 +2538,8 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     let cookieStickyPad = 0;
     let stickyClearance = 0;
     if(stickyCta && getComputedStyle(stickyCta).display !== 'none'){
-      stickyClearance = stickyCta.offsetHeight + 10;
+      stickyClearance = stickyCta.offsetHeight + 28;
+      if(stickyClearance < 40) stickyClearance = 168;
     }
     if(cookieOpen && narrow){
       const bottom = parseFloat(getComputedStyle(cookie).bottom) || 0;
@@ -2348,7 +2548,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     rootStyle.setProperty('--fab-bottom-offset', offset + 'px');
     rootStyle.setProperty('--cookie-banner-offset', cookieOffset + 'px');
     rootStyle.setProperty('--cookie-open-sticky-pad', cookieStickyPad + 'px');
-    rootStyle.setProperty('--sticky-cta-clearance', (stickyClearance || 78) + 'px');
+    rootStyle.setProperty('--sticky-cta-clearance', stickyClearance + 'px');
   }
 
   function setMobileNavOpen(open){
@@ -2543,6 +2743,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     faq: '/veelgestelde-vragen', kennisbank: '/kennisbank',
     over: '/over-ons', offerte: '/offerte-aanvragen', aanmelden: '/aanmelden',
     tolk: '/arbeidsdeskundige-met-tolk',
+    adviesgenerator: '/ad-advies-generator',
   };
   let _routerSync = false; // true tijdens popstate-replay, voorkomt dubbele history-entries
 
@@ -2591,6 +2792,12 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       document.title = 'Arbeidsdeskundige met tolk: zo werkt het | Arbeidsdeskundig.com';
       const metaDescEl = document.querySelector('meta[name="description"]');
       if(metaDescEl) metaDescEl.setAttribute('content', 'Gesprek met de arbeidsdeskundige in je eigen taal? Met tolk of Translate, online of op locatie, door heel Nederland. Zo werkt het en dit zijn je rechten.');
+    }
+    if(view === 'adviesgenerator'){
+      document.title = 'Gratis AD-adviesgenerator | Arbeidsdeskundig.com';
+      const metaAdvies = document.querySelector('meta[name="description"]');
+      if(metaAdvies) metaAdvies.setAttribute('content', 'Genereer vrijblijvend een indicatief arbeidsdeskundig advies op basis van functie, beperkingen en verzuimduur. Zonder medische gegevens. Download het als PDF.');
+      if(typeof updateAdviesMijlpalen === 'function') updateAdviesMijlpalen();
     }
     if(view === 'offerte') applyOfferteDienstFromQuery();
     const stickyBar = document.getElementById('sticky-artikel-cta');
@@ -7962,6 +8169,198 @@ whk: `
   renderTestimonials();
   initCookieBanner();
   initMobileNav();
+
+
+  const AD_MAANDEN = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+  const AD_MIJLPAAL = [
+    [6, 'Week 6, probleemanalyse'],
+    [8, 'Week 8, plan van aanpak'],
+    [42, 'Week 42, melding bij UWV'],
+    [52, 'Week 52, eerstejaarsevaluatie'],
+    [88, 'Week 88, start van de WIA-aanvraag'],
+    [91, 'Week 91, re-integratieverslag bij de WIA-aanvraag'],
+    [104, 'Week 104, einde van de wachttijd'],
+  ];
+  let adRapportId = '';
+
+  function adEscape(s){
+    return String(s || '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function adIsoPlus(iso, days){
+    const [y,m,d] = iso.split('-').map(Number);
+    const dt = new Date(Date.UTC(y, m - 1, d + days));
+    return dt.toISOString().slice(0, 10);
+  }
+  function adNl(iso){
+    const [y,m,d] = iso.split('-');
+    return Number(d) + ' ' + AD_MAANDEN[Number(m) - 1] + ' ' + y;
+  }
+  function adVandaag(){
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Amsterdam', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date());
+  }
+  function adDagen(van, tot){
+    const [y1,m1,d1] = van.split('-').map(Number);
+    const [y2,m2,d2] = tot.split('-').map(Number);
+    return Math.round((Date.UTC(y2, m2 - 1, d2) - Date.UTC(y1, m1 - 1, d1)) / 86400000);
+  }
+  function adVerzuimTekst(dagen){
+    const weken = Math.floor(dagen / 7);
+    const rest = dagen % 7;
+    const w = weken === 1 ? '1 week' : weken + ' weken';
+    const r = rest === 1 ? '1 dag' : rest + ' dagen';
+    if(weken <= 0) return r;
+    if(rest === 0) return w;
+    return w + ' en ' + r;
+  }
+  function updateAdviesMijlpalen(){
+    const el = document.getElementById('ad-mijlpalen-live');
+    const input = document.getElementById('ad-ziektedag');
+    if(!el || !input) return;
+    const iso = input.value;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(iso)){
+      el.innerHTML = '<p>Vul een eerste ziektedag in. De verzuimduur en de mijlpalen verschijnen dan hier.</p>';
+      return;
+    }
+    const dagen = adDagen(iso, adVandaag());
+    if(dagen < 0){
+      el.innerHTML = '<p>De eerste ziektedag kan niet in de toekomst liggen.</p>';
+      return;
+    }
+    const rows = AD_MIJLPAAL.map(([weken, label]) => {
+      const datum = adIsoPlus(iso, weken * 7);
+      return '<tr><th scope="row">' + adEscape(label) + '</th><td>' + adEscape(adNl(datum)) + '</td></tr>';
+    }).join('');
+    el.innerHTML = '<p><strong>Verzuimduur:</strong> ' + adEscape(adVerzuimTekst(dagen)) + ' (tot vandaag). Gerekend als een vast aantal weken na de eerste ziektedag.</p>'
+      + '<table class="ad-mijlpalen"><caption>Poortwachter-mijlpalen</caption><tbody>' + rows + '</tbody></table>';
+  }
+  function adRubrieken(){
+    const out = { persoonlijk: [], sociaal: [], omgeving: [], dynamisch: [], statisch: [], werktijden: [] };
+    document.querySelectorAll('#ad-form input[type="checkbox"][data-rubriek]').forEach((box) => {
+      if(box.checked && out[box.dataset.rubriek]) out[box.dataset.rubriek].push(box.value);
+    });
+    return out;
+  }
+  function renderAdvies(data){
+    adRapportId = data.id || '';
+    const kop = data.kop || {};
+    const kopEl = document.getElementById('ad-kop');
+    if(kopEl){
+      kopEl.innerHTML = '<p><strong>' + adEscape(kop.functie) + '</strong></p>'
+        + '<p>Eerste ziektedag: ' + adEscape(kop.eersteZiektedag) + '. Verzuimduur: ' + adEscape(kop.verzuimduur) + ' (peildatum ' + adEscape(kop.peildatum) + ').</p>'
+        + '<p>Werkpercentage nu: ' + adEscape(String(kop.werkpercentage)) + ' procent. Duurzaam benutbare mogelijkheden: ' + adEscape(kop.duurzaamheid) + '.</p>';
+    }
+    const secties = document.getElementById('ad-secties');
+    if(secties){
+      secties.innerHTML = (data.secties || []).map((s) => '<h2>' + adEscape(s.titel) + '</h2><p>' + adEscape(s.tekst).replace(/\n/g, '<br>') + '</p>').join('');
+    }
+    const tabel = document.getElementById('ad-mijlpalen-tabel');
+    if(tabel){
+      const rows = (data.mijlpalen || []).map((m) => '<tr><th scope="row">' + adEscape(m.label) + '</th><td>' + adEscape(m.datum) + '</td></tr>').join('');
+      tabel.innerHTML = '<table class="ad-mijlpalen"><tbody>' + rows + '</tbody></table>';
+    }
+    const fb = document.getElementById('ad-fallback');
+    if(fb){
+      fb.classList.toggle('hidden', !data.fallback);
+      fb.textContent = data.fallback ? 'De automatische generator is even niet beschikbaar. Hieronder staat een basisadvies op basis van jouw invoer. Je gegevens zijn wel ontvangen.' : '';
+    }
+    const result = document.getElementById('ad-resultaat');
+    if(result){
+      result.classList.remove('hidden');
+      result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+  async function submitAdvies(){
+    const functie = (document.getElementById('ad-functie').value || '').trim();
+    const taken = (document.getElementById('ad-taken').value || '').trim();
+    const beperkingen = (document.getElementById('ad-beperkingen').value || '').trim();
+    const eersteZiektedag = document.getElementById('ad-ziektedag').value || '';
+    const werkpercentage = document.getElementById('ad-percentage').value;
+    const duurzaam = document.querySelector('#ad-form input[name="ad-duurzaamheid"]:checked');
+    const email = (document.getElementById('ad-email').value || '').trim();
+    const telefoon = (document.getElementById('ad-telefoon').value || '').trim();
+    const avg = document.getElementById('ad-avg').checked;
+    const website = ((document.getElementById('ad-website') || {}).value || '').trim();
+    const errors = [];
+    if(functie.length < 2) errors.push('Vul de functienaam in.');
+    if(taken.length < 8) errors.push('Vul een korte taakomschrijving in.');
+    const anyBox = document.querySelector('#ad-form input[type="checkbox"][data-rubriek]:checked');
+    if(beperkingen.length < 8 && !anyBox) errors.push('Beschrijf de functionele beperkingen of vink minstens één rubriek aan.');
+    if(!eersteZiektedag) errors.push('Vul de eerste ziektedag in.');
+    const perc = Number(werkpercentage);
+    if(werkpercentage === '' || !Number.isInteger(perc) || perc < 0 || perc > 100) errors.push('Vul een werkpercentage tussen 0 en 100 in.');
+    if(!duurzaam) errors.push('Geef aan of er duurzaam benutbare mogelijkheden zijn: ja, nee of onbekend.');
+    const mailOk = typeof isValidEmail === 'function' && isValidEmail(email);
+    const telOk = typeof isValidPhone === 'function' && isValidPhone(telefoon);
+    if(!mailOk && !telOk){
+      if(email) errors.push('Vul een geldig e-mailadres in.');
+      else if(telefoon) errors.push('Vul een geldig telefoonnummer in.');
+      else errors.push('Vul een e-mailadres of telefoonnummer in.');
+    } else {
+      if(email && !mailOk) errors.push('Vul een geldig e-mailadres in.');
+      if(telefoon && !telOk) errors.push('Vul een geldig telefoonnummer in.');
+    }
+    if(!avg) errors.push('Vink aan dat je toestemming geeft om je gegevens te gebruiken voor dit advies en om contact op te nemen.');
+    if(errors.length){
+      showFormError('ad-error', errors);
+      return;
+    }
+    showFormError('ad-error', []);
+    const btn = document.getElementById('ad-submit');
+    const orig = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Advies wordt gemaakt...';
+    try {
+      const data = await submitToBackend('/api/ad-advies', {
+        functie, taken, beperkingen,
+        rubrieken: adRubrieken(),
+        eersteZiektedag,
+        werkpercentage: perc,
+        duurzaamheid: duurzaam.value,
+        email, telefoon, avg: true, website,
+      });
+      if(!data.secties){
+        showFormError('ad-error', ['De aanvraag is te snel verstuurd of niet compleet. Wacht een moment en probeer het opnieuw.']);
+        return;
+      }
+      renderAdvies(data);
+    } catch (err) {
+      showFormError('ad-error', [err.message || 'Versturen is niet gelukt. Probeer het opnieuw.']);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = orig;
+    }
+  }
+  async function downloadAdviesPdf(){
+    if(!adRapportId) return;
+    const btn = document.getElementById('ad-pdf');
+    if(btn) btn.disabled = true;
+    try {
+      const r = await fetch('/api/ad-advies-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: adRapportId }),
+      });
+      if(!r.ok){
+        let msg = 'De PDF kon niet worden gemaakt.';
+        try { const j = await r.json(); if(j.error) msg = j.error; } catch(e) {}
+        showFormError('ad-error', [msg]);
+        return;
+      }
+      const blob = await r.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ad-advies-arbeidsdeskundig.pdf';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      showFormError('ad-error', ['De PDF kon niet worden gedownload. Probeer het opnieuw.']);
+    } finally {
+      if(btn) btn.disabled = false;
+    }
+  }
 
   /* Initiële route toepassen: server-side geïnjecteerd (Express), of anders op basis van het URL-pad */
   _routerSync = true;

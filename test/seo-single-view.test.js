@@ -37,6 +37,7 @@ const FOREIGN_VIEWS = [
     'view-over',
     'view-tolk',
     'view-fysiek-tarief',
+    'view-adviesgenerator',
 ];
 
 let server;

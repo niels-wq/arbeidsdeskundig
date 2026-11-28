@@ -21,6 +21,7 @@ const {
 } = require('./lead-validation');
 const formSpam = require('./form-spam');
 const { createChat } = require('./chat');
+const advies = require('./ad-advies');
 
 const app = express();
 
@@ -971,7 +972,7 @@ function isolatePageContent(html, slug) {
     return slimPostsForPage(embedCurrentArticle(stripBlogPostings(html), slug), slug);
 }
 
-function renderPage(res, { title, description, canonicalPath, route, articleJsonLd, breadcrumbJsonLd, faqJsonLd, ogImage, statusCode }) {
+function renderPage(res, { title, description, canonicalPath, route, articleJsonLd, breadcrumbJsonLd, faqJsonLd, webAppJsonLd, ogImage, statusCode }) {
     const canonical = BASE_URL + canonicalPath;
     const safeTitle = escapeHtml(title || DEFAULT_TITLE);
     const safeDesc = escapeHtml(description || DEFAULT_DESC);
@@ -1028,6 +1029,7 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
     // in dat site-brede blok — zie stripSitewideFaqPage().
     let extraJsonLd = '';
     if (articleJsonLd) extraJsonLd += `<script type="application/ld+json">${JSON.stringify(articleJsonLd)}</script>\n`;
+    if (webAppJsonLd) extraJsonLd += `<script type="application/ld+json">${JSON.stringify(webAppJsonLd)}</script>\n`;
     if (breadcrumbJsonLd) extraJsonLd += `<script type="application/ld+json">${JSON.stringify(breadcrumbJsonLd)}</script>\n`;
     if (faqJsonLd) extraJsonLd += `<script type="application/ld+json">${JSON.stringify(faqJsonLd)}</script>\n`;
     if (extraJsonLd) html = html.replace('</head>', extraJsonLd + '</head>');
@@ -1116,13 +1118,14 @@ function buildSitemapXml() {
     const staticPaths = [
         '/', '/rekentool', '/keuzehulp', '/veelgestelde-vragen',
         '/over-ons', '/offerte-aanvragen', '/aanmelden', '/arbeidsdeskundige-met-tolk', '/kennisbank',
+        '/ad-advies-generator',
     ];
     const personaList = Array.isArray(personas) ? personas : [];
     const postList = Array.isArray(posts) ? posts : [];
     const urls = [
         ...staticPaths.map((p) => sitemapUrlEl(absoluteUrl(p), {
             changefreq: 'weekly',
-            priority: p === '/' ? '1.0' : '0.7',
+            priority: p === '/' ? '1.0' : (p === '/ad-advies-generator' ? '0.8' : '0.7'),
             lastmod: staticLastmod(p),
         })),
         ...personaList
@@ -1209,6 +1212,33 @@ app.get('/aanmelden', (req, res) => {
         description: 'Meld je aan voor een arbeidsdeskundig onderzoek. Vanaf €999,-, in sommige gevallen bij een vroegtijdig onderzoek, binnen 24 uur opgepakt. Of plan eerst 15 minuten kennismaking.',
         canonicalPath: '/aanmelden',
         route: { view: 'aanmelden' },
+    });
+});
+
+app.get('/ad-advies-generator', (req, res) => {
+    renderPage(res, {
+        title: 'Gratis AD-adviesgenerator' + TITLE_SUFFIX,
+        description: 'Genereer vrijblijvend een indicatief arbeidsdeskundig advies op basis van functie, beperkingen en verzuimduur. Zonder medische gegevens. Download het als PDF.',
+        canonicalPath: '/ad-advies-generator',
+        route: { view: 'adviesgenerator' },
+        webAppJsonLd: {
+            '@context': 'https://schema.org',
+            '@type': 'WebApplication',
+            name: 'AD-adviesgenerator',
+            url: BASE_URL + '/ad-advies-generator',
+            applicationCategory: 'BusinessApplication',
+            operatingSystem: 'Web',
+            inLanguage: 'nl-NL',
+            isAccessibleForFree: true,
+            description: 'Vrijblijvend indicatief arbeidsdeskundig advies op basis van functie, functionele beperkingen en verzuimduur.',
+            offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+            provider: { '@type': 'Organization', name: 'arbeidsdeskundig.com', url: BASE_URL + '/' },
+        },
+        faqJsonLd: faqPageJsonLd(advies.ADVIES_FAQS),
+        breadcrumbJsonLd: breadcrumbFor([
+            { name: 'Home', path: '/' },
+            { name: 'AD-adviesgenerator', path: '/ad-advies-generator' },
+        ]),
     });
 });
 
@@ -1557,6 +1587,7 @@ ${audiences}
 
 - [Rekentool](${BASE_URL}/rekentool): tijdwinst en besparing van vroeg starten
 - [Gratis keuzehulp](${BASE_URL}/keuzehulp): online of fysiek onderzoek?
+- [AD-adviesgenerator](${BASE_URL}/ad-advies-generator): gratis indicatief arbeidsdeskundig advies op basis van functie, beperkingen en verzuimduur, zonder medische gegevens
 
 ## Unieke kennisbank-artikelen
 
@@ -2150,6 +2181,14 @@ app.post('/api/bel-me-terug', async (req, res) => {
 // de kennisbanklijst. Leads gaan via deliverSalesLead (zelfde mailflow als
 // /api/offerte); het formulier in de chat post naar /api/offerte met bron "chat".
 // ---------------------------------------------------------------------------
+advies.register(app, {
+    deliverSalesLead,
+    fieldsToHtml,
+    escapeHtml,
+    formSpam,
+    rejectLead,
+});
+
 const chat = createChat({
     getKnowledge: () => ({ llmsTxt: buildLlmsTxt(), faqs: siteFaqs, posts }),
     deliverLead: deliverSalesLead,

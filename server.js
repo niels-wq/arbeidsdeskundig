@@ -22,6 +22,7 @@ const {
 const formSpam = require('./form-spam');
 const { createChat } = require('./chat');
 const advies = require('./ad-advies');
+const vgl = require('./vergelijkingstool');
 
 const app = express();
 
@@ -115,6 +116,17 @@ const posts = extractPosts(INDEX_HTML);
 // Eén datamap voor Article-JSON-LD, de zichtbare wijzigingsdatum en sitemap-lastmod.
 // Geen deploydatum: zie data/page-dates.json voor de methode.
 const PAGE_DATES = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'page-dates.json'), 'utf8'));
+const VGL_DATA = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'vergelijkingstool.json'), 'utf8'));
+let vglLeukPromise = null;
+function vglLeukStatus() {
+    if (!vglLeukPromise) {
+        vglLeukPromise = vgl.bronBereikbaar(vgl.leukUrl(VGL_DATA)).then((ok) => {
+            console.log('[vergelijkingstool] Leuk-bron', ok ? 'bereikbaar' : 'niet bereikbaar');
+            return ok;
+        });
+    }
+    return vglLeukPromise;
+}
 for (const post of posts) {
     const row = PAGE_DATES.kennisbank && PAGE_DATES.kennisbank[post.slug];
     if (!row || !row.datePublished || !row.dateModified) {
@@ -440,6 +452,8 @@ function activateView(html, view) {
         html = html.replace('<body>', `<body class="conv-page conv-${view}">`);
     } else if (view === 'calculator') {
         html = html.replace('<body>', '<body class="view-calculator">');
+    } else if (view === 'vergelijken') {
+        html = html.replace('<body>', '<body class="view-vergelijken">');
     }
     return html;
 }
@@ -972,7 +986,7 @@ function isolatePageContent(html, slug) {
     return slimPostsForPage(embedCurrentArticle(stripBlogPostings(html), slug), slug);
 }
 
-function renderPage(res, { title, description, canonicalPath, route, articleJsonLd, breadcrumbJsonLd, faqJsonLd, webAppJsonLd, ogImage, statusCode }) {
+function renderPage(res, { title, description, canonicalPath, route, articleJsonLd, breadcrumbJsonLd, faqJsonLd, webAppJsonLd, datasetJsonLd, vergelijking, ogImage, statusCode }) {
     const canonical = BASE_URL + canonicalPath;
     const safeTitle = escapeHtml(title || DEFAULT_TITLE);
     const safeDesc = escapeHtml(description || DEFAULT_DESC);
@@ -990,6 +1004,15 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
     }
     if (route && route.view === 'faq') {
         html = hydrateFaqView(html, siteFaqs);
+    }
+    if (route && route.view === 'vergelijken' && vergelijking) {
+        html = html
+            .replace('<!--VGL_DISCLAIMER-->', vergelijking.disclaimerHtml)
+            .replace('<!--VGL_APP-->', vergelijking.appHtml)
+            .replace('<!--VGL_FAQ-->', vergelijking.faqHtml)
+            .replace('<!--VGL_MODEL-->', vergelijking.modelJson)
+            .replace('<!--VGL_CTA-->', escapeHtml(vergelijking.cta))
+            .replace('data-leuk-bron="onbekend"', 'data-leuk-bron="' + (vergelijking.leukBereikbaar ? 'bereikbaar' : 'niet-bereikbaar') + '"');
     }
     html = stripInactiveViews(html, route && route.view);
     html = enforceSingleH1(html, route && route.view);
@@ -1030,6 +1053,7 @@ function renderPage(res, { title, description, canonicalPath, route, articleJson
     let extraJsonLd = '';
     if (articleJsonLd) extraJsonLd += `<script type="application/ld+json">${JSON.stringify(articleJsonLd)}</script>\n`;
     if (webAppJsonLd) extraJsonLd += `<script type="application/ld+json">${JSON.stringify(webAppJsonLd)}</script>\n`;
+    if (datasetJsonLd) extraJsonLd += `<script type="application/ld+json">${JSON.stringify(datasetJsonLd)}</script>\n`;
     if (breadcrumbJsonLd) extraJsonLd += `<script type="application/ld+json">${JSON.stringify(breadcrumbJsonLd)}</script>\n`;
     if (faqJsonLd) extraJsonLd += `<script type="application/ld+json">${JSON.stringify(faqJsonLd)}</script>\n`;
     if (extraJsonLd) html = html.replace('</head>', extraJsonLd + '</head>');
@@ -1119,13 +1143,14 @@ function buildSitemapXml() {
         '/', '/rekentool', '/keuzehulp', '/veelgestelde-vragen',
         '/over-ons', '/offerte-aanvragen', '/aanmelden', '/arbeidsdeskundige-met-tolk', '/kennisbank',
         '/ad-advies-generator',
+        '/vergelijken-interventies',
     ];
     const personaList = Array.isArray(personas) ? personas : [];
     const postList = Array.isArray(posts) ? posts : [];
     const urls = [
         ...staticPaths.map((p) => sitemapUrlEl(absoluteUrl(p), {
             changefreq: 'weekly',
-            priority: p === '/' ? '1.0' : (p === '/ad-advies-generator' ? '0.8' : '0.7'),
+            priority: p === '/' ? '1.0' : (p === '/ad-advies-generator' || p === '/vergelijken-interventies' ? '0.8' : '0.7'),
             lastmod: staticLastmod(p),
         })),
         ...personaList
@@ -1240,6 +1265,42 @@ app.get('/ad-advies-generator', (req, res) => {
             { name: 'AD-adviesgenerator', path: '/ad-advies-generator' },
         ]),
     });
+});
+
+app.get('/vergelijken-interventies', async (req, res) => {
+    const leukBereikbaar = await vglLeukStatus();
+    const model = vgl.prepareModel(VGL_DATA, { leukBereikbaar });
+    const state = vgl.defaultState();
+    const gekozen = String(req.query.interventie || '');
+    if (model.interventies.some((item) => item.id === gekozen)) state.interventie = gekozen;
+    renderPage(res, {
+        title: 'Interventies bij verzuim vergelijken' + TITLE_SUFFIX,
+        description: 'Vergelijk openbare tarieven van interventies bij verzuim: onderzoek, tweede spoor, coaching, outplacement en meer. Met bron en peildatum 28 november 2026.',
+        canonicalPath: '/vergelijken-interventies',
+        route: { view: 'vergelijken' },
+        webAppJsonLd: vgl.webAppJsonLd(BASE_URL),
+        datasetJsonLd: vgl.datasetJsonLd(VGL_DATA, BASE_URL),
+        faqJsonLd: faqPageJsonLd(vgl.FAQS),
+        breadcrumbJsonLd: breadcrumbFor([
+            { name: 'Home', path: '/' },
+            { name: 'Vergelijk interventies', path: '/vergelijken-interventies' },
+        ]),
+        vergelijking: {
+            disclaimerHtml: vgl.disclaimerHtml(),
+            appHtml: vgl.renderApp(model, state),
+            faqHtml: vgl.faqHtml(),
+            modelJson: vgl.modelJson(model),
+            cta: vgl.ctaHref(state),
+            leukBereikbaar,
+        },
+    });
+});
+
+app.get('/vergelijkingstool.js', (req, res) => {
+    res.set({
+        'Content-Type': 'application/javascript; charset=utf-8',
+        'Cache-Control': 'public, max-age=300',
+    }).sendFile(path.join(__dirname, 'vergelijkingstool.js'));
 });
 
 const TOLK_PATH = '/arbeidsdeskundige-met-tolk';
@@ -1534,7 +1595,7 @@ function buildLlmsTxt() {
 
 > Arbeidsdeskundig onderzoek vanaf €999,- excl. btw, in sommige gevallen bij een vroegtijdig onderzoek. Online of fysiek, door heel Nederland. Binnen 24 uur opgepakt. UWV-proof, door geregistreerde arbeidsdeskundigen.
 
-arbeidsdeskundig.com is het aanvraag- en kennisplatform voor arbeidsdeskundig onderzoek: een objectieve beoordeling van wat een werknemer nog kan werken, in het kader van de Wet Poortwachter, WGA, Ziektewet en WIA. 1.500+ onderzoeken, gemiddeld 4,9/5 op Google.
+arbeidsdeskundig.com is het platform voor arbeidsdeskundig onderzoek bij de Wet Poortwachter, WGA, Ziektewet en WIA. 1.500+ onderzoeken, gemiddeld 4,9/5 op Google.
 
 ## Wat we wel doen
 
@@ -1588,6 +1649,7 @@ ${audiences}
 - [Rekentool](${BASE_URL}/rekentool): tijdwinst en besparing van vroeg starten
 - [Gratis keuzehulp](${BASE_URL}/keuzehulp): online of fysiek onderzoek?
 - [AD-adviesgenerator](${BASE_URL}/ad-advies-generator): gratis indicatief arbeidsdeskundig advies op basis van functie, beperkingen en verzuimduur, zonder medische gegevens
+- [Vergelijk interventies](${BASE_URL}/vergelijken-interventies): openbare tarieven bij verzuim
 
 ## Unieke kennisbank-artikelen
 

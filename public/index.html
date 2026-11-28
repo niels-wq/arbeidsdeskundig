@@ -305,6 +305,52 @@
   .ad-fallback{background:#FCF6E9; border:1px solid var(--amber); padding:12px 14px; font-size:.88rem; margin-bottom:12px; line-height:1.45;}
   .ad-promo-home h2{font-size:1.45rem; color:var(--ink); margin-top:8px;}
   .ad-promo-home p{color:var(--muted); margin-top:8px; line-height:1.5;}
+  .vgl{max-width:100%; overflow-x:clip; padding-top:36px; padding-bottom:48px;}
+  .vgl h1,.vgl h2,.vgl h3{overflow-wrap:anywhere;}
+  .vgl h2{font-size:1.35rem; color:var(--ink); margin-top:22px;}
+  .vgl a{overflow-wrap:anywhere;}
+  .vgl-disclaimer{font-size:.86rem; line-height:1.55; color:var(--muted); background:#FCF6E9; border:1px solid var(--amber); padding:14px 16px; margin:16px 0;}
+  .vgl-disclaimer a{color:var(--teal); font-weight:600;}
+  .vgl-tabs{display:flex; gap:8px; overflow-x:auto; max-width:100%; padding-bottom:8px; margin:8px 0 14px;}
+  .vgl-tab{flex:0 0 auto; border:1.5px solid var(--rule); background:var(--white); color:var(--ink); padding:8px 12px; font-size:.82rem; cursor:pointer;}
+  .vgl-tab.is-on{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+  .vgl-filters{display:flex; flex-wrap:wrap; gap:10px 16px; align-items:flex-end; margin:8px 0 12px;}
+  .vgl-check{display:flex; gap:8px; align-items:flex-start; font-size:.88rem; min-width:0;}
+  .vgl-params{display:grid; grid-template-columns:1fr; gap:10px; margin:8px 0 16px;}
+  .vgl-field{display:block; min-width:0; max-width:100%;}
+  .vgl-field span{display:block; font-size:.82rem; font-weight:600; margin-bottom:4px; color:var(--ink);}
+  .vgl-sort-field{min-width:min(100%, 220px);}
+  .vgl-card{background:var(--white); border:1px solid #DFE2DB; padding:16px; min-width:0; max-width:100%;}
+  .vgl-card h3{font-size:1.05rem; margin:0 0 8px; overflow-wrap:anywhere;}
+  .vgl-list{display:flex; flex-direction:column; gap:12px;}
+  .vgl-prijs{border-top:1px solid #E6E8E2; margin-top:10px; padding-top:10px;}
+  .vgl-prijs-label{font-size:.84rem; color:var(--ink); margin:0;}
+  .vgl-bedrag{font-size:1.25rem; font-weight:700; color:var(--ink); margin:2px 0;}
+  .vgl-meta,.vgl-bron,.vgl-jaar,.vgl-note,.vgl-review{font-size:.82rem; color:var(--muted); line-height:1.45; overflow-wrap:anywhere;}
+  .vgl-gesloten,.vgl-eigen{font-weight:700; color:var(--ink);}
+  .vgl-feiten{margin:8px 0 0; padding-left:18px; font-size:.84rem; color:var(--muted);}
+  .vgl-bar-row{display:grid; grid-template-columns:4.2rem minmax(0,1fr) auto; gap:8px; align-items:center; font-size:.78rem; min-width:0;}
+  .vgl-bar-track{background:#E6E8E2; height:12px; border-radius:2px; min-width:0;}
+  .vgl-bar{display:block; height:12px; background:var(--teal); border-radius:2px;}
+  .vgl-band{margin:0 0 14px; min-width:0;}
+  .vgl-band.is-focus{outline:2px solid var(--amber); padding:8px;}
+  .vgl-compare{display:grid; gap:12px; min-width:0;}
+  .vgl-cta{display:inline-block; text-decoration:none; margin-top:8px; text-align:center;}
+  .vgl-melding{background:#FCF6E9; border:1px solid var(--amber); padding:8px 12px; font-size:.85rem;}
+  .vgl-sticky{display:none;}
+  @media(min-width:700px){ .vgl-params{grid-template-columns:1fr 1fr;} }
+  @media(min-width:900px){
+    .vgl-compare.cols-2{grid-template-columns:1fr 1fr;}
+    .vgl-compare.cols-3{grid-template-columns:1fr 1fr 1fr;}
+  }
+  @media(max-width:639px){
+    body.view-vergelijken .sticky-cta{display:none !important;}
+    body.view-vergelijken .vgl-sticky{display:block; position:fixed; left:0; right:0; bottom:0; z-index:40; background:var(--ink); border-top:1px solid var(--amber);}
+    body.view-vergelijken .vgl-sticky a{display:block; width:100%; box-sizing:border-box; text-align:center; text-decoration:none; padding:14px 16px;}
+    body.view-vergelijken.cookie-prompt-open .vgl-sticky{display:none !important;}
+    body.view-vergelijken{--sticky-cta-clearance:72px;}
+    body.view-vergelijken #view-vergelijken .vgl{padding-bottom:96px; padding-left:46px; padding-right:88px;}
+  }
   @media(max-width:400px){
     .sticky-cta a{font-size:.82rem; padding:12px 10px; line-height:1.3;}
   }
@@ -620,6 +666,15 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <h2>Genereer vrijblijvend een AD-advies</h2>
       <p>Beschrijf de functie en wat iemand wel en niet kan. Je krijgt een indicatief advies met de Poortwachter-tijdlijn. Vul geen medische gegevens in.</p>
       <a class="btn-primary" style="margin-top:14px;" href="/ad-advies-generator" onclick="event.preventDefault(); setView('adviesgenerator')">Genereer vrijblijvend een AD-advies</a>
+    </div>
+  </section>
+
+  <section class="wrap vgl-promo-home" aria-label="Vergelijking van interventies">
+    <div class="card" style="padding:22px 24px;">
+      <p class="eyebrow">Openbare tarieven</p>
+      <h2>Interventies bij verzuim vergelijken</h2>
+      <p>Zet openbare prijzen van derden naast elkaar: onderzoek, tweede spoor, coaching en meer. Peildatum 28 november 2026.</p>
+      <a class="btn-ghost" style="margin-top:14px;" href="/vergelijken-interventies" onclick="event.preventDefault(); setView('vergelijken')">Bekijk de vergelijking</a>
     </div>
   </section>
 
@@ -1577,6 +1632,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
         <p class="eyebrow">Kennisbank</p>
         <h1 class="route-h1" style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Alles over arbeidsdeskundig onderzoek</h1>
         <p style="margin-top:10px; font-size:.9rem; color:var(--muted); max-width:600px;">Diepgaande, up-to-date artikelen per onderwerp: geschreven om je écht verder te helpen, niet alleen om te scoren in Google. Het cluster <em>arbeidsdeskundig onderzoek</em> start bij de <a class="blog-link" href="/kennisbank/arbeidsdeskundig-onderzoek-gids" onclick="event.preventDefault(); openArtikel('arbeidsdeskundig-onderzoek-gids')">gids</a>.</p>
+        <p style="margin-top:10px; font-size:.9rem; color:var(--muted); max-width:600px;">Liever tarieven vergelijken? <a class="blog-link" href="/vergelijken-interventies">Vergelijk interventies bij verzuim</a>.</p>
       </div>
       <div class="card kb-intro-cta" id="kb-intro-cta">
         <p class="eyebrow" style="color:var(--amber);">Twijfel je over jouw dossier?</p>
@@ -2287,6 +2343,23 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
   </div>
 </div>
 
+<div class="view" id="view-vergelijken" hidden>
+  <div class="wrap vgl">
+    <p class="eyebrow">Vergelijking</p>
+    <h1 class="route-h1" style="font-size:1.9rem; color:var(--ink); margin-top:8px;">Interventies bij verzuim vergelijken: kosten en kwaliteit</h1>
+    <!--VGL_DISCLAIMER-->
+    <div id="vgl-app" data-leuk-bron="onbekend"><!--VGL_APP--></div>
+    <section class="vgl-faq" style="margin-top:36px;">
+      <!--VGL_FAQ-->
+    </section>
+  </div>
+  <div class="vgl-sticky" id="vgl-sticky">
+    <a class="btn-primary" id="vgl-sticky-link" href="<!--VGL_CTA-->">Vraag een offerte op maat aan</a>
+  </div>
+  <script type="application/json" id="vgl-model"><!--VGL_MODEL--></script>
+  <script src="/vergelijkingstool.js" defer></script>
+</div>
+
 <footer class="site">
   <div class="footer-grid">
     <div>
@@ -2296,6 +2369,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       <a href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Offerte</a>
       <a href="/aanmelden" onclick="event.preventDefault(); setView('aanmelden')">Aanmelden</a>
       <a href="/ad-advies-generator" onclick="event.preventDefault(); setView('adviesgenerator')">Genereer vrijblijvend een AD-advies</a>
+      <a href="/vergelijken-interventies" onclick="event.preventDefault(); setView('vergelijken')">Vergelijk interventies</a>
     </div>
     <div>
       <h4>Kennis</h4>
@@ -2527,6 +2601,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     const stickyBar = document.getElementById('sticky-artikel-cta');
     const cookie = document.getElementById('cookie-banner');
     const stickyCta = document.querySelector('.sticky-cta');
+    const vglSticky = document.getElementById('vgl-sticky');
     const rootStyle = document.documentElement.style;
     const narrow = window.matchMedia('(max-width: 639px)').matches;
     let offset = 0;
@@ -2537,8 +2612,9 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     let cookieOffset = 0;
     let cookieStickyPad = 0;
     let stickyClearance = 0;
-    if(stickyCta && getComputedStyle(stickyCta).display !== 'none'){
-      stickyClearance = stickyCta.offsetHeight + 28;
+    const stickyBarEl = (vglSticky && getComputedStyle(vglSticky).display !== 'none') ? vglSticky : stickyCta;
+    if(stickyBarEl && getComputedStyle(stickyBarEl).display !== 'none'){
+      stickyClearance = stickyBarEl.offsetHeight + 28;
       if(stickyClearance < 40) stickyClearance = 168;
     }
     if(cookieOpen && narrow){
@@ -2744,6 +2820,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     over: '/over-ons', offerte: '/offerte-aanvragen', aanmelden: '/aanmelden',
     tolk: '/arbeidsdeskundige-met-tolk',
     adviesgenerator: '/ad-advies-generator',
+    vergelijken: '/vergelijken-interventies',
   };
   let _routerSync = false; // true tijdens popstate-replay, voorkomt dubbele history-entries
 
@@ -2781,6 +2858,7 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
     document.body.classList.toggle('conv-offerte', view === 'offerte');
     document.body.classList.toggle('conv-aanmelden', view === 'aanmelden');
     document.body.classList.toggle('view-calculator', view === 'calculator');
+    document.body.classList.toggle('view-vergelijken', view === 'vergelijken');
     window.scrollTo({top:0, behavior:'instant'});
     revealCheck();
     if(view === 'aanmelden'){ setTimeout(initSignaturePad, 50); }
@@ -2792,6 +2870,11 @@ try{ if(localStorage.getItem('cookie_consent') === null) document.body.classList
       document.title = 'Arbeidsdeskundige met tolk: zo werkt het | Arbeidsdeskundig.com';
       const metaDescEl = document.querySelector('meta[name="description"]');
       if(metaDescEl) metaDescEl.setAttribute('content', 'Gesprek met de arbeidsdeskundige in je eigen taal? Met tolk of Translate, online of op locatie, door heel Nederland. Zo werkt het en dit zijn je rechten.');
+    }
+    if(view === 'vergelijken'){
+      document.title = 'Interventies bij verzuim vergelijken | Arbeidsdeskundig.com';
+      const metaVgl = document.querySelector('meta[name="description"]');
+      if(metaVgl) metaVgl.setAttribute('content', 'Vergelijk openbare tarieven van interventies bij verzuim: onderzoek, tweede spoor, coaching, outplacement en meer. Met bron en peildatum 28 november 2026.');
     }
     if(view === 'adviesgenerator'){
       document.title = 'Gratis AD-adviesgenerator | Arbeidsdeskundig.com';
@@ -6283,7 +6366,8 @@ whk: `
 <h2>Offerte of kennismaking</h2>
 <p>Wil je het tarief zwart-op-wit voor jouw bedrijfsgrootte en vorm? Vraag een vrijblijvende offerte. Liever eerst 15 minuten toetsen of een onderzoek nú zinvol is: plan een kennismaking. Dit artikel gaat over tarief en proces van het onderzoek zelf; Matchvermogen voert het traject uit.</p>
 <p><a class="blog-link" href="/offerte-aanvragen" onclick="event.preventDefault(); setView('offerte')">Vrijblijvende offerte of kennismaking</a> · <a href="https://calendly.com/matchvermogen/call-15-min" target="_blank" rel="noopener">Plan 15 minuten in</a></p>
-<p>Verder: <a class="blog-link" href="/" onclick="event.preventDefault(); setView('home')">wat het onderzoek inhoudt</a> · <a class="blog-link" href="/kennisbank/verplicht-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('verplicht-arbeidsdeskundig-onderzoek')">is het verplicht?</a> · <a class="blog-link" href="/kennisbank/voorbereiden-gesprek-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('voorbereiden-gesprek-arbeidsdeskundige')">gesprek voorbereiden</a> · <a class="blog-link" href="/kennisbank/fml-izp-lezen-belastbaarheid" onclick="event.preventDefault(); openArtikel('fml-izp-lezen-belastbaarheid')">FML/IZP lezen</a></p>`,
+<p>Verder: <a class="blog-link" href="/" onclick="event.preventDefault(); setView('home')">wat het onderzoek inhoudt</a> · <a class="blog-link" href="/kennisbank/verplicht-arbeidsdeskundig-onderzoek" onclick="event.preventDefault(); openArtikel('verplicht-arbeidsdeskundig-onderzoek')">is het verplicht?</a> · <a class="blog-link" href="/kennisbank/voorbereiden-gesprek-arbeidsdeskundige" onclick="event.preventDefault(); openArtikel('voorbereiden-gesprek-arbeidsdeskundige')">gesprek voorbereiden</a> · <a class="blog-link" href="/kennisbank/fml-izp-lezen-belastbaarheid" onclick="event.preventDefault(); openArtikel('fml-izp-lezen-belastbaarheid')">FML/IZP lezen</a></p>
+<p>Wilt u dit tarief naast andere interventies bij verzuim zetten? Gebruik de <a class="blog-link" href="/vergelijken-interventies">vergelijking van interventies</a>. Die toont openbare tarieven van derden, met bron en peildatum.</p>`,
 
 "tips-werknemer-arbeidsdeskundig-onderzoek": `
 <h2>Tips voor werknemers bij een arbeidsdeskundig onderzoek</h2>
